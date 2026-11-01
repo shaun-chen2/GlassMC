@@ -1,0 +1,12 @@
+# 忽略构建产物与本地环境文件
+build/
+.build/
+*.xcodeproj/
+.swiftpm/
+.DS_Store
+devtools/
+*.log
+
+# 本地个人数据
+minecraft/
+*.part
