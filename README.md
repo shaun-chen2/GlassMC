@@ -4,6 +4,7 @@
 
 [![下载](https://img.shields.io/badge/下载-GlassMC.dmg-2f7cf6?style=for-the-badge&logo=apple&logoColor=white)](https://github.com/shaun-chen2/GlassMC/releases/latest/download/GlassMC.dmg)
 [![介绍页](https://img.shields.io/badge/介绍页-GitHub.io-111?style=for-the-badge)](https://shaun-chen2.github.io/GlassMC/)
+[![许可](https://img.shields.io/badge/许可-GPLv3-2f7cf6?style=for-the-badge)](LICENSE)
 
 ![GlassMC 主界面](docs/images/home.jpg)
 
@@ -157,4 +158,4 @@ xattr -dr com.apple.quarantine /Applications/GlassMC.app
 
 想自己编译：`bash build.sh`（需要 macOS 15 + Command Line Tools），产物在 `build/GlassMC.app` 与 `GlassMC.dmg`。
 
-以 [MIT 许可](LICENSE) 开源。
+以 [GNU GPLv3](LICENSE) 开源：你可以自由使用、修改、分发，但**分发修改后的版本时必须同样以 GPLv3 开源**，并保留版权声明与许可证副本。
