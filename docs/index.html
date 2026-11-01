@@ -421,6 +421,9 @@
         <li>会看到一行 <b>"GlassMC" 已被阻止使用，因为它不是来自已识别的开发者</b>，点旁边的 <b>仍要打开</b>，输入开机密码。</li>
         <li>再双击一次 GlassMC，弹窗里会出现 <b>打开</b> 按钮，点它。以后就能正常启动了。</li>
       </ol>
+      <p style="color:#8b93a3;font-size:13.5px;margin:10px 0 0">
+        如果弹窗提示的是 <b>「GlassMC 已损坏，应该将它移到废纸篓」</b>，处理方式完全一样：先去 <b>系统设置 → 隐私与安全性</b> 点 <b>仍要打开</b> 放行一次，再打开应用。
+      </p>
 
       <div class="method-title">方法二 · 终端一行命令</div>
       <div class="code-block">
@@ -464,7 +467,8 @@
 
     <details class="reveal">
       <summary>提示「GlassMC 已损坏，无法打开」怎么办？</summary>
-      <p>先在终端执行上面的 <code>xattr</code> 命令。如果仍然报错，多半是下载文件不完整（比如被浏览器插件截断），重新下载一次完整的 dmg（约 2 MB）再试。</p>
+      <p><b>去「系统设置 → 隐私与安全性 → 安全性」里点「仍要打开」。</b>做法：先双击一次 GlassMC，弹出「已损坏」提示时点「取消」；然后打开系统设置 → 隐私与安全性，向下滚到「安全性」区域，会看到一行 <code>"GlassMC" 已被阻止使用…</code>，点右边的 <b>仍要打开</b>，输入开机密码；再双击 GlassMC，弹窗里就会出现 <b>打开</b> 按钮，点它即可。</p>
+      <p>如果「安全性」区域里始终没有这一行（少数 macOS 版本对「已损坏」只给「移到废纸篓」），再用上面的 <code>xattr</code> 命令放行一次；仍然不行说明 dmg 下载不完整（比如被浏览器插件截断），重新下载完整的 dmg（约 2 MB）。</p>
     </details>
     <details class="reveal">
       <summary>启动游戏时报 Java 相关的错误？</summary>
