@@ -49,6 +49,7 @@
   ::selection { background: rgba(95, 159, 214, .32); color: #fff; }
   a { color: var(--primary-bright); text-decoration: none; }
   code { font-family: var(--mono); font-size: .92em; }
+  img { height: auto; }
 
   /* ---------- 背景层 ---------- */
   .bg-grid {
@@ -283,38 +284,6 @@
   .sec-head h2 em { font-style: normal; color: var(--primary-bright); }
   .sec-head p { color: var(--text-dim); font-size: 15px; margin-top: 10px; max-width: 640px; }
   .sec-head.center p { margin-left: auto; margin-right: auto; }
-
-  /* ---------- 截图 ---------- */
-  .shot-main {
-    border-radius: 16px; overflow: hidden; border: 1px solid var(--card-border);
-    background: var(--card-solid); box-shadow: 0 34px 80px -34px rgba(0, 0, 0, .95);
-    cursor: zoom-in; transition: border-color .3s, box-shadow .3s;
-  }
-  .shot-main:hover { border-color: rgba(95, 159, 214, .42); box-shadow: 0 40px 90px -32px rgba(95, 159, 214, .5); }
-  .shot-bar {
-    display: flex; align-items: center; gap: 7px; padding: 11px 14px;
-    background: rgba(95, 159, 214, .06); border-bottom: 1px solid rgba(95, 159, 214, .1);
-  }
-  .shot-bar span { margin-left: 6px; font-family: var(--mono); font-size: 11.5px; color: var(--text-dimmer); }
-  .shot-main img { width: 100%; display: block; }
-  .gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 14px; }
-  .gallery figure {
-    border-radius: 13px; overflow: hidden; cursor: zoom-in;
-    background: var(--card); border: 1px solid var(--card-border);
-    transition: border-color .3s, transform .3s, box-shadow .3s;
-  }
-  .gallery figure:hover { border-color: rgba(95, 159, 214, .45); transform: translateY(-4px);
-                          box-shadow: 0 24px 48px -26px rgba(95, 159, 214, .6); }
-  .gallery img { width: 100%; display: block; transition: transform .5s cubic-bezier(.2,.7,.2,1); }
-  .gallery figure:hover img { transform: scale(1.04); }
-  .gallery figcaption {
-    display: flex; align-items: center; justify-content: space-between; gap: 8px;
-    padding: 10px 13px; border-top: 1px solid rgba(95, 159, 214, .1);
-    font-size: 12.5px; color: var(--text-dim);
-  }
-  .g-tag { font-family: var(--mono); font-size: 10.5px; font-weight: 700; letter-spacing: .06em;
-           color: var(--primary-bright); padding: 2px 7px; border-radius: 4px;
-           background: rgba(95, 159, 214, .12); border: 1px solid rgba(95, 159, 214, .25); }
 
   /* ---------- 功能卡 ---------- */
   .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
@@ -563,7 +532,6 @@
   <div class="nav-inner">
     <a class="brand" href="#top"><img src="images/icon-256.png" alt="">GlassMC</a>
     <div class="nav-links">
-      <a href="#shots">界面</a>
       <a href="#features">功能</a>
       <a href="#install">安装</a>
       <a href="#permission">打不开？</a>
@@ -636,31 +604,6 @@
   <div class="stat reveal"><div class="stat-num">283</div><div class="stat-label">实测已装模组，启用 279</div></div>
   <div class="stat reveal"><div class="stat-num">2<i> MB</i></div><div class="stat-label">安装包大小</div></div>
 </div>
-
-<section class="section" id="shots">
-  <div class="sec-head center reveal">
-    <span class="sec-tag">SCREENSHOTS</span>
-    <h2>整块<em>液态玻璃</em>，不是套壳网页</h2>
-    <p>全窗口通透材质，透明度 0.35 ~ 1.0 可调；列表、卡片、按钮都是原生绘制。</p>
-  </div>
-
-  <div class="shot-main reveal">
-    <div class="shot-bar">
-      <span class="term-dot r"></span><span class="term-dot y"></span><span class="term-dot g"></span>
-      <span>GlassMC · 欢迎页</span>
-    </div>
-    <img src="images/home.jpg" alt="GlassMC 主界面" width="1880" height="1344" fetchpriority="high" decoding="async">
-  </div>
-
-  <div class="gallery">
-    <figure class="reveal"><img src="images/install.jpg" alt="安装页面：版本列表" width="1200" height="858" loading="lazy" decoding="async">
-      <figcaption><span class="g-tag">INSTALL</span><span>一步装版本与加载器</span></figcaption></figure>
-    <figure class="reveal"><img src="images/mods.jpg" alt="模组管理页面" width="1200" height="858" loading="lazy" decoding="async">
-      <figcaption><span class="g-tag">MODS</span><span>283 个模组一览</span></figcaption></figure>
-    <figure class="reveal"><img src="images/versions.jpg" alt="版本与启动页面" width="1200" height="858" loading="lazy" decoding="async">
-      <figcaption><span class="g-tag">VERSIONS</span><span>实例与启动日志</span></figcaption></figure>
-  </div>
-</section>
 
 <section class="section" id="features">
   <div class="sec-head reveal">
