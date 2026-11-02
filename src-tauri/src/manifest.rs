@@ -19,7 +19,11 @@ use crate::paths;
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct VersionEntry {
     pub id: String,
-    #[serde(rename = "type")]
+    /// 上游 manifest 里叫 `type`（release/snapshot/old_beta…），
+    /// 但对外（前端）统一叫 `kind`。注意必须分开写，`rename = "type"`
+    /// 是两个方向同时生效的，会让前端拿到 `type` 而读不到 `kind`，
+    /// 结果安装页每行只剩一个空胶囊。
+    #[serde(rename(deserialize = "type", serialize = "kind"))]
     pub kind: String,
     #[serde(default)]
     pub url: String,

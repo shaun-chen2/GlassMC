@@ -22,7 +22,7 @@
 |---|---|---|
 | **macOS** 15+（Apple Silicon / Intel 通用） | 已在真机跑过完整流程 | [`GlassMC.dmg`](GlassMC.dmg) 约 10 MB |
 | **Windows** 10 1809+ / 11（64 位） | 已编译，安装 / 运行 / 卸载在 wine 下验证通过 | `GlassMC-Setup.exe` 约 3 MB |
-| **Linux**（WebKitGTK 4.1） | 已编译，依赖自检通过；无桌面环境，未看到图形界面 | `GlassMC.deb` 约 3.4 MB / `GlassMC-linux.tar.gz` 约 4.6 MB |
+| **Linux**（WebKitGTK 4.1） | 已在 Ubuntu 26.04 上实测：界面、下载安装、启动进主菜单均通过 | `GlassMC.deb` 约 3.4 MB / `GlassMC-linux.tar.gz` 约 4.6 MB |
 
 **macOS** 要求 **15 Sequoia 或更新**。装法：双击 dmg，把 GlassMC 拖进「应用程序」。
 
@@ -196,8 +196,10 @@ sudo pacman -S webkit2gtk-4.1
 - **Windows**：装到 wine 里走完了「静默安装 → 从 Program Files 启动 → 卸载无残留」，
   exe 在 wine 下能正常执行到业务逻辑（读配置、找 Java）。真实 Windows 上的界面没看过——
   最可能出问题的是毛玻璃 API（Win11 Mica / Win10 Acrylic 的版本差异）。
-- **Linux**：在 Ubuntu 26.04 上原生编译，`ldd` 无缺失依赖，二进制能启动。
-  但服务器没有桌面，**图形界面没实际看过**；窗口模糊取决于合成器，多数桌面会退化成半透明。
+- **Linux**：在 Ubuntu 26.04 上原生编译，并在虚拟显示（Xvfb）里把整条链路跑了一遍：
+  八个页面全部正常渲染、真实下载 1.21.11（62 个文件 + 4591 个资源对象，0 失败）、
+  启动后进到了主菜单。窗口模糊取决于桌面合成器，测试环境没有合成器，
+  所以「磨砂」实际长什么样还没看到——多数桌面会退化成半透明。
 
 遇到问题欢迎提 issue，附上 `logs/game-latest.log` 和启动器日志。
 

@@ -1020,10 +1020,11 @@
       <h3>Linux</h3>
       <p class="tagline">
         在 Ubuntu 26.04 上原生编译，<code>ldd</code> 依赖自检无缺失。
-        没有统一的窗口模糊 API：KWin 开了 blur 才有真玻璃，GNOME 默认没有，
-        所以一律先按「磨砂」出。
+        虚拟显示里把整条链路跑了一遍：八个页面正常渲染、真实下载 1.21.11、
+        启动后进到主菜单。没有统一的窗口模糊 API：KWin 开了 blur 才有真玻璃，
+        GNOME 默认没有，所以一律先按「磨砂」出。
       </p>
-      <div class="foot"><span class="state wip"><span class="dot"></span>界面未验证</span>服务器无桌面</div>
+      <div class="foot"><span class="state ok"><span class="dot"></span>安装/启动已验证</span>Xvfb 里跑完整流程</div>
     </div>
   </div>
 
@@ -1342,9 +1343,9 @@
     <details class="reveal">
       <summary><span class="q">Q8</span>Windows / Linux 真的能用吗？</summary>
       <div class="faq-body"><div class="faq-inner">
-        <p><b>编译、打包、安装都跑通了，但界面只在自己这台 Mac 上亲眼看过。</b></p>
+        <p><b>编译、打包、安装都跑通了；Linux 的界面也已经在虚拟显示里实际看过。</b></p>
         <p><b>Windows</b>：交叉编译出的是 PE32+ 可执行文件，<code>objdump</code> 确认只依赖系统 DLL 和 <code>WebView2Loader.dll</code>（mingw 运行时已静态链接，不需要额外装东西）。装进 wine 之后走完了「静默安装 → 从 <code>Program Files</code> 启动 → 卸载无残留」，exe 能正常执行到读配置、找 Java。真实 Windows 上的窗口长什么样没看到。</p>
-        <p><b>Linux</b>：在 Ubuntu 26.04 上原生编译，<code>ldd</code> 没有缺失依赖，二进制能启动到业务逻辑；那台机器没装桌面，图形界面没看到。</p>
+        <p><b>Linux</b>：在 Ubuntu 26.04 上原生编译，然后在 Xvfb 虚拟显示里跑了一遍完整流程——八个页面全部正常渲染（没白屏、没错位），点安装真实下载了 1.21.11（62 个文件 + 4591 个资源对象，0 失败），再从这台机器拉起 Minecraft，进到了主菜单。窗口模糊本身没看到：测试环境没有合成器，档位直接落在「磨砂」。</p>
         <p>最可能出问题的两处：<code>glass.rs</code>（Windows 的 Mica / Acrylic API 版本差异、Linux 的合成器行为）和 <code>game.rs</code>（进程组管理、Windows 下控制台窗口是否弹出）。遇到了欢迎提 issue。</p>
       </div></div>
     </details>

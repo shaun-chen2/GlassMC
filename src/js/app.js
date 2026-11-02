@@ -436,12 +436,15 @@
       .slice(0, 200)
       .map((v) => {
         const has = installed.has(v.id);
+        // 后端新版序列化成 kind，旧版误 rename 成了 type，两种都认；
+        // 都取不到就整块不渲染，免得留一个空胶囊光剩圆点。
+        const kind = v.kind || v.type || '';
         return `
       <div class="vrow">
         <div class="v-main">
           <div class="v-id">${esc(v.id)}</div>
           <div class="v-meta">
-            <span class="badge-pill">${esc(v.kind)}</span>
+            ${kind ? `<span class="badge-pill">${esc(kind)}</span>` : ''}
             ${has ? '<span class="badge-pill ok"><span class="d"></span>已安装</span>' : ''}
           </div>
         </div>
