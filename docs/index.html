@@ -999,30 +999,31 @@
       <p class="tagline">
         Apple Silicon 与 Intel 一个包搞定（universal 二进制）。
         无边框窗口 + <code>NSVisualEffectView</code>，圆角是真的圆角。
-        这是唯一实机验证过的平台。
+        装机、装版本、进游戏整条链路都在这台机器上跑过。
       </p>
-      <div class="foot"><span class="state ok"><span class="dot"></span>已验证</span>直接用 dmg</div>
+      <div class="foot"><span class="state ok"><span class="dot"></span>真机全流程</span>直接用 dmg</div>
     </div>
 
     <div class="plat reveal">
-      <div class="os">WINDOWS 10 1809+ / 11</div>
+      <div class="os">WINDOWS 10 1809+ / 11 · X64</div>
       <h3>Windows</h3>
       <p class="tagline">
-        需要 WebView2 运行时（Win11 自带，Win10 需装 Evergreen）。
-        毛玻璃优先 Mica（Win11），失败退 Acrylic（Win10 1803+），
-        都不行则界面自动降级为磨砂——但圆角保留。
+        NSIS 安装包：开始菜单与桌面快捷方式、卸载项齐全，卸载时会问要不要连数据一起删。
+        需要 WebView2（Win11 自带，Win10 装 Evergreen）。毛玻璃优先 Mica，
+        失败退 Acrylic，都不行降级磨砂——圆角保留。
       </p>
-      <div class="foot"><span class="state wip"><span class="dot"></span>待实机验证</span>需自行编译</div>
+      <div class="foot"><span class="state ok"><span class="dot"></span>安装/运行已验证</span>wine 下走完整流程</div>
     </div>
 
     <div class="plat reveal">
-      <div class="os">WEBKITGTK 4.1</div>
+      <div class="os">DEB · TAR.GZ · WEBKITGTK 4.1</div>
       <h3>Linux</h3>
       <p class="tagline">
-        依赖 libwebkit2gtk-4.1 与 GTK3。Linux 没有统一的窗口模糊 API：
-        KWin 开了 blur 才有真玻璃，GNOME 默认没有，所以一律先按「磨砂」出。
+        在 Ubuntu 26.04 上原生编译，<code>ldd</code> 依赖自检无缺失。
+        没有统一的窗口模糊 API：KWin 开了 blur 才有真玻璃，GNOME 默认没有，
+        所以一律先按「磨砂」出。
       </p>
-      <div class="foot"><span class="state wip"><span class="dot"></span>待实机验证</span>需自行编译</div>
+      <div class="foot"><span class="state wip"><span class="dot"></span>界面未验证</span>服务器无桌面</div>
     </div>
   </div>
 
@@ -1256,13 +1257,15 @@
   <div class="download-card reveal">
     <img src="images/icon-256.png" alt="">
     <h2>现在就可以下载</h2>
-    <p class="meta">GlassMC 1.3 · macOS 通用（Apple Silicon + Intel）· <code>GPLv3</code> 开源</p>
+    <p class="meta">GlassMC 1.3 · macOS 15+ · Windows 10+ · Linux · <code>GPLv3</code> 开源</p>
     <div class="hero-btns">
-      <a class="btn btn-primary" href="https://github.com/shaun-chen2/GlassMC/releases/latest/download/GlassMC.dmg">↓ 下载 GlassMC.dmg <small>约 10 MB</small></a>
-      <a class="btn btn-ghost" href="https://github.com/shaun-chen2/GlassMC/releases">历史版本</a>
+      <a class="btn btn-primary" href="https://github.com/shaun-chen2/GlassMC/releases/latest/download/GlassMC.dmg">↓ macOS · dmg <small>约 10 MB</small></a>
+      <a class="btn btn-ghost" href="https://github.com/shaun-chen2/GlassMC/releases/latest/download/GlassMC-Setup.exe">Windows · exe <small>约 3 MB</small></a>
+      <a class="btn btn-ghost" href="https://github.com/shaun-chen2/GlassMC/releases/latest/download/GlassMC.deb">Linux · deb <small>约 3.4 MB</small></a>
     </div>
     <p class="note" style="margin-top:16px">
-      Windows / Linux 目前需要自行编译，构建步骤见仓库 <a href="https://github.com/shaun-chen2/GlassMC/blob/main/docs/development.md">docs/development.md</a>。
+      Linux 绿色版是 <a href="https://github.com/shaun-chen2/GlassMC/releases/latest/download/GlassMC-linux.tar.gz">GlassMC-linux.tar.gz</a>，
+      <a href="https://github.com/shaun-chen2/GlassMC/releases">Release 页</a>能看到全部资产和校验和。
       下载后如被系统拦截，见上方「打不开怎么办」。
     </p>
   </div>
@@ -1339,8 +1342,10 @@
     <details class="reveal">
       <summary><span class="q">Q8</span>Windows / Linux 真的能用吗？</summary>
       <div class="faq-body"><div class="faq-inner">
-        <p><b>代码路径写好了，但没有实机验证过。</b>数据目录、毛玻璃档位、进程托管、路径分隔符都按平台做了分支，能编译、逻辑也是对的，但开发者手上只有一台 Mac。</p>
-        <p>愿意试的话欢迎反馈 issue。最可能出问题的两处：<code>glass.rs</code>（Windows 的 Mica / Acrylic API 版本差异、Linux 的合成器行为）和 <code>game.rs</code>（进程组管理、Windows 下控制台窗口是否弹出）。</p>
+        <p><b>编译、打包、安装都跑通了，但界面只在自己这台 Mac 上亲眼看过。</b></p>
+        <p><b>Windows</b>：交叉编译出的是 PE32+ 可执行文件，<code>objdump</code> 确认只依赖系统 DLL 和 <code>WebView2Loader.dll</code>（mingw 运行时已静态链接，不需要额外装东西）。装进 wine 之后走完了「静默安装 → 从 <code>Program Files</code> 启动 → 卸载无残留」，exe 能正常执行到读配置、找 Java。真实 Windows 上的窗口长什么样没看到。</p>
+        <p><b>Linux</b>：在 Ubuntu 26.04 上原生编译，<code>ldd</code> 没有缺失依赖，二进制能启动到业务逻辑；那台机器没装桌面，图形界面没看到。</p>
+        <p>最可能出问题的两处：<code>glass.rs</code>（Windows 的 Mica / Acrylic API 版本差异、Linux 的合成器行为）和 <code>game.rs</code>（进程组管理、Windows 下控制台窗口是否弹出）。遇到了欢迎提 issue。</p>
       </div></div>
     </details>
 

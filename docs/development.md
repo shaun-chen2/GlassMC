@@ -96,6 +96,52 @@ bash build.sh
 需要 **WebView2 运行时**（Windows 11 自带；Windows 10 需装 Evergreen Runtime）。
 毛玻璃优先 Mica（Windows 11），失败退 Acrylic（Windows 10 1803+），都不行则前端降级为磨砂。
 
+#### 在 Linux 上交叉编译（发布包就是这么来的）
+
+不需要 Windows 机器，也不需要 Mac。`mingw-w64` 出链接器，`nasm` 给 `aws-lc-sys`
+汇编用，`nsis` 是 **Linux 原生版 makensis**（不用 wine 就能打安装包）：
+
+```bash
+sudo apt install -y mingw-w64 nsis nasm
+rustup target add x86_64-pc-windows-gnu
+
+cat >> ~/.cargo/config.toml << 'EOF'
+[target.x86_64-pc-windows-gnu]
+linker = "x86_64-w64-mingw32-gcc"
+ar = "x86_64-w64-mingw32-ar"
+EOF
+
+cd src-tauri
+cargo build --release --target x86_64-pc-windows-gnu
+# 产物：target/x86_64-pc-windows-gnu/release/glassmc.exe
+#      同目录还有 WebView2Loader.dll —— 必须和 exe 放一起
+```
+
+打 NSIS 安装包：
+
+```bash
+cd ..                          # 回到仓库根
+D="$PWD/build/windows"; mkdir -p "$D"
+cp src-tauri/target/x86_64-pc-windows-gnu/release/{glassmc.exe,WebView2Loader.dll} "$D"/
+
+makensis -DEXE_PATH="$D/glassmc.exe" \
+         -DICON_PATH="$PWD/src-tauri/icons/icon.ico" \
+         -DEXTRA_DIR="$D" \
+         -DOUTFILE="$D/GlassMC-Setup.exe" \
+         "$PWD/Scripts/windows-installer.nsi"
+```
+
+`-DEXTRA_DIR` 让脚本把目录里的 `*.dll` 一起装进去（WebView2Loader，以及将来可能出现的
+运行时 DLL）。卸载时会一并删除。
+
+> **运行时依赖**：exe 已经静态链接了 mingw 运行时，`objdump -p` 里只有
+> `KERNEL32/USER32/ole32/...` 这类系统 DLL 加 `WebView2Loader.dll`，
+> 目标机器不用装 mingw、不用装 VC++ 运行库。
+
+#### 在 Windows 上原生编译
+
+装了 Visual Studio Build Tools（C++ 工作负载）的话直接：
+
 ```powershell
 cd src-tauri
 cargo build --release
@@ -113,7 +159,19 @@ sudo apt install libwebkit2gtk-4.1-dev libgtk-3-dev libayatana-appindicator3-dev
 sudo dnf install webkit2gtk4.1-devel gtk3-devel libappindicator-gtk3-devel librsvg2-devel
 
 cd src-tauri && cargo build --release
+# 产物：src-tauri/target/release/glassmc
 ```
+
+打 deb 和绿色版：
+
+```bash
+bash Scripts/make-linux-package.sh
+# 产物：build/linux/GlassMC_1.3.0_amd64.deb
+#      build/linux/GlassMC_1.3.0_linux-amd64.tar.gz
+```
+
+脚本会写好 `.desktop`、hicolor 图标、`control`（依赖声明 `libwebkit2gtk-4.1-0` 等），
+并规范权限（目录 755 / 文件 644），最后 `dpkg-deb --root-owner-group -Zxz --build`。
 
 > Linux 没有统一的窗口模糊 API：KWin 开了 blur 才有真玻璃，GNOME 默认没有。
 > 所以本版在 Linux 上一律先按「磨砂」出，能不能真糊取决于桌面环境——这也正是

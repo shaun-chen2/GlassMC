@@ -180,8 +180,10 @@ fn candidate_homes() -> Vec<(PathBuf, &'static str)> {
         ];
         for key in ["LOCALAPPDATA", "APPDATA", "ProgramFiles", "ProgramFiles(x86)"] {
             if let Ok(v) = std::env::var(key) {
-                roots.push(PathBuf::from(v).join("Programs").join("Eclipse Adoptium"));
-                roots.push(PathBuf::from(v).join("Java"));
+                roots.push(PathBuf::from(&v).join("Programs").join("Eclipse Adoptium"));
+                roots.push(PathBuf::from(&v).join("Programs").join("Microsoft").join("jdk"));
+                roots.push(PathBuf::from(&v).join("Java"));
+                roots.push(PathBuf::from(&v).join("Programs").join("Zulu"));
             }
         }
         for r in roots {

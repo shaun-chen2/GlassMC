@@ -3,7 +3,9 @@
 **一个把「装游戏」这件事藏起来的 Minecraft 启动器。**
 界面是液态玻璃——窗口本身申请系统的原生毛玻璃，不是网页里堆出来的假透明。
 
-[![下载](https://img.shields.io/badge/下载-GlassMC.dmg-2f7cf6?style=for-the-badge&logo=apple&logoColor=white)](https://github.com/shaun-chen2/GlassMC/releases/latest/download/GlassMC.dmg)
+[![macOS](https://img.shields.io/badge/macOS-下载%20dmg-2f7cf6?style=for-the-badge&logo=apple&logoColor=white)](https://github.com/shaun-chen2/GlassMC/releases/latest/download/GlassMC.dmg)
+[![Windows](https://img.shields.io/badge/Windows-下载%20exe-2f7cf6?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/shaun-chen2/GlassMC/releases/latest/download/GlassMC-Setup.exe)
+[![Linux](https://img.shields.io/badge/Linux-下载%20deb-2f7cf6?style=for-the-badge&logo=linux&logoColor=white)](https://github.com/shaun-chen2/GlassMC/releases/latest/download/GlassMC.deb)
 [![介绍页](https://img.shields.io/badge/介绍页-GitHub.io-111?style=for-the-badge)](https://shaun-chen2.github.io/GlassMC/)
 [![许可](https://img.shields.io/badge/许可-GPLv3-2f7cf6?style=for-the-badge)](LICENSE)
 
@@ -18,11 +20,11 @@
 
 | 平台 | 状态 | 文件 |
 |---|---|---|
-| **macOS**（Apple Silicon / Intel 通用） | 已验证 | [`GlassMC.dmg`](GlassMC.dmg) 约 10 MB |
-| **Windows** 10 / 11 | 代码已完成，**未实机验证** | 需自行编译，见 [开发说明](docs/development.md) |
-| **Linux**（WebKitGTK） | 代码已完成，**未实机验证** | 需自行编译，见 [开发说明](docs/development.md) |
+| **macOS** 15+（Apple Silicon / Intel 通用） | 已在真机跑过完整流程 | [`GlassMC.dmg`](GlassMC.dmg) 约 10 MB |
+| **Windows** 10 1809+ / 11（64 位） | 已编译，安装 / 运行 / 卸载在 wine 下验证通过 | `GlassMC-Setup.exe` 约 3 MB |
+| **Linux**（WebKitGTK 4.1） | 已编译，依赖自检通过；无桌面环境，未看到图形界面 | `GlassMC.deb` 约 3.4 MB / `GlassMC-linux.tar.gz` 约 4.6 MB |
 
-macOS 要求 **15 Sequoia 或更新**。装法：双击 dmg，把 GlassMC 拖进「应用程序」。
+**macOS** 要求 **15 Sequoia 或更新**。装法：双击 dmg，把 GlassMC 拖进「应用程序」。
 
 > **第一次打开会被系统拦下来**，提示「无法验证开发者」或「已损坏」——
 > 这不是文件坏了，是没有 Apple 开发者签名的正常现象。处理方法见下面
@@ -92,10 +94,11 @@ HMCL 配置里存着的登录令牌也会顺手带过来。
 
 ## 打不开怎么办
 
-因为没买 Apple 开发者证书（一年 99 美元），应用只有 ad-hoc 签名。第一次打开会被拦，
-**放行一次之后就不会再问**。两种方法选一个：
+三个平台都会因为「没有代码签名证书」被系统拦一次。都只需要放行一次。
 
-### 方法一：系统设置里点「仍要打开」（推荐）
+### macOS：系统设置里点「仍要打开」（推荐）
+
+因为没买 Apple 开发者证书（一年 99 美元），应用只有 ad-hoc 签名。
 
 1. 双击 GlassMC，弹出「无法打开，因为 Apple 无法验证…」时点 **完成**；
 2. 打开 **系统设置 → 隐私与安全性**，向下滚到「安全性」区域；
@@ -105,7 +108,7 @@ HMCL 配置里存着的登录令牌也会顺手带过来。
 > 如果提示的是 **「GlassMC 已损坏，应该将它移到废纸篓」**，处理方式完全一样：
 > 先去隐私与安全性点「仍要打开」放行，再打开应用。**不要点「移到废纸篓」。**
 
-### 方法二：终端一行命令
+### macOS：终端一行命令
 
 ```bash
 xattr -dr com.apple.quarantine /Applications/GlassMC.app
@@ -113,6 +116,43 @@ xattr -dr com.apple.quarantine /Applications/GlassMC.app
 
 这条命令只是去掉 macOS 给下载文件打的「待检查」标记，不改应用内容。
 没装在「应用程序」文件夹的话，把路径换成实际位置。
+
+### Windows：SmartScreen 拦了
+
+双击 `GlassMC-Setup.exe` 时，如果出现蓝色的 **「Windows 已保护你的电脑」**：
+
+1. 点框里的 **更多信息**；
+2. 下面会多出一行 **仍要运行**，点它；
+3. 安装完成后从开始菜单启动，若再被拦一次，同样点「更多信息 → 仍要运行」。
+
+装完是标准程序：控制面板 / 设置里能卸载，开始菜单和桌面都有快捷方式。
+安装位置默认 `C:\Program Files\GlassMC`，用户数据在 `%APPDATA%\GlassMC`（卸载时会问要不要一并删除）。
+
+### Linux：装完运行
+
+Debian / Ubuntu 系直接装 deb，依赖会自动处理：
+
+```bash
+sudo apt install ./GlassMC.deb
+```
+
+Fedora / Arch 等用绿色版：
+
+```bash
+tar -xzf GlassMC-linux.tar.gz
+chmod +x glassmc && ./glassmc
+```
+
+跑起来报缺库的话，装 WebKitGTK 4.1：
+
+```bash
+# Debian / Ubuntu
+sudo apt install libwebkit2gtk-4.1-0
+# Fedora
+sudo dnf install webkit2gtk4.1
+# Arch
+sudo pacman -S webkit2gtk-4.1
+```
 
 ---
 
@@ -151,9 +191,15 @@ xattr -dr com.apple.quarantine /Applications/GlassMC.app
 能。「导入」页会自动扫描 HMCL / 官方 / Prism 的目录，导入时复制过来，原目录不受影响。
 
 **Q：Windows 和 Linux 真的能用吗？**
-代码路径都写好了（数据目录、毛玻璃档位、进程托管、路径分隔符按平台分支），
-但开发者手上只有 macOS，**没有实机验证过**。愿意试的话欢迎反馈 issue，
-最可能出问题的地方是 Windows 的毛玻璃 API 版本差异和 Linux 的窗口管理器兼容性。
+两个平台的包都是交叉编译出来的，编译期错误已经清干净了：
+
+- **Windows**：装到 wine 里走完了「静默安装 → 从 Program Files 启动 → 卸载无残留」，
+  exe 在 wine 下能正常执行到业务逻辑（读配置、找 Java）。真实 Windows 上的界面没看过——
+  最可能出问题的是毛玻璃 API（Win11 Mica / Win10 Acrylic 的版本差异）。
+- **Linux**：在 Ubuntu 26.04 上原生编译，`ldd` 无缺失依赖，二进制能启动。
+  但服务器没有桌面，**图形界面没实际看过**；窗口模糊取决于合成器，多数桌面会退化成半透明。
+
+遇到问题欢迎提 issue，附上 `logs/game-latest.log` 和启动器日志。
 
 **Q：和上一代原生版是什么关系？**
 上一代是纯 SwiftUI 写的，只能在 macOS 跑。这一代换成 Tauri 2（Rust + Web 前端），
