@@ -1,0 +1,43 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "GlassMC",
+  "version": "1.3.0",
+  "identifier": "com.glassmc.launcher",
+  "build": {
+    "frontendDist": "../src"
+  },
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "GlassMC",
+        "width": 1180,
+        "height": 780,
+        "minWidth": 960,
+        "minHeight": 640,
+        "center": true,
+        "resizable": true,
+        "decorations": false,
+        "transparent": true,
+        "shadow": true,
+        "dragDropEnabled": false
+      }
+    ],
+    "withGlobalTauri": true,
+    "security": {
+      "csp": null
+    },
+    "macOSPrivateApi": true
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "icons/icon.png"
+    ],
+    "copyright": "GlassMC · GPLv3",
+    "category": "Game",
+    "shortDescription": "液态玻璃 Minecraft 启动器",
+    "longDescription": "原生液态玻璃风格的 Minecraft 启动器：版本安装、模组管理、多模式登录、联机。"
+  }
+}

@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GlassMC</title>
+<link rel="stylesheet" href="styles/baseline.css">
+<link rel="stylesheet" href="styles/app.css">
+</head>
+<body>
+
+<div class="app-root" id="shell">
+
+  <!-- ============ 自绘标题栏 ============ -->
+  <header class="titlebar" data-tauri-drag-region>
+    <div class="brand" data-tauri-drag-region>
+      <span class="dot"></span>
+      <span data-tauri-drag-region>GlassMC</span>
+      <span class="ver" id="tb-ver">—</span>
+    </div>
+    <div class="tb-spacer" data-tauri-drag-region></div>
+    <div class="tb-status" id="tb-status" title="正在运行的游戏">
+      <span class="led"></span><span id="tb-status-text">空闲</span>
+    </div>
+    <div class="win-btns">
+      <button class="win-btn" id="btn-min" title="最小化">
+        <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M2.5 6h7"/></svg>
+      </button>
+      <button class="win-btn" id="btn-max" title="最大化">
+        <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="2.6" y="2.6" width="6.8" height="6.8" rx="1.2"/></svg>
+      </button>
+      <button class="win-btn close" id="btn-close" title="关闭">
+        <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round"><path d="M3.2 3.2l5.6 5.6M8.8 3.2l-5.6 5.6"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="body-row">
+
+    <!-- ============ 侧边栏 ============ -->
+    <aside class="sidebar">
+      <button class="nav-item active" data-nav="home">
+        <svg class="ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><path d="M2.5 7.2L8 2.5l5.5 4.7V13a.8.8 0 01-.8.8H9.6V9.6H6.4v4.2H3.3a.8.8 0 01-.8-.8z"/></svg>
+        <span class="tx">首页</span>
+      </button>
+      <button class="nav-item" data-nav="versions">
+        <svg class="ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><path d="M8 1.8l5.6 3.1v6.2L8 14.2 2.4 11.1V4.9z"/><path d="M2.5 5l5.5 3 5.5-3M8 8v6"/></svg>
+        <span class="tx">版本</span>
+        <span class="badge" id="nav-badge-versions"></span>
+      </button>
+      <button class="nav-item" data-nav="install">
+        <svg class="ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2.2v7.4M5 6.8L8 9.8l3-3"/><path d="M2.6 11.2v1.4a1 1 0 001 1h8.8a1 1 0 001-1v-1.4"/></svg>
+        <span class="tx">安装</span>
+      </button>
+      <button class="nav-item" data-nav="mods">
+        <svg class="ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><path d="M6 2.2h4v2.1a1.2 1.2 0 002.4 0V2.2h1.4v4.2h-2.1a1.2 1.2 0 000 2.4h2.1v4.2h-4.2v-2.1a1.2 1.2 0 00-2.4 0v2.1H2.2V8.8h2.1a1.2 1.2 0 000-2.4H2.2V2.2H6z"/></svg>
+        <span class="tx">模组</span>
+        <span class="badge" id="nav-badge-mods"></span>
+      </button>
+      <button class="nav-item" data-nav="multiplayer">
+        <svg class="ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><circle cx="5.8" cy="5.9" r="2.2"/><circle cx="11" cy="6.6" r="1.7"/><path d="M2.3 13.4c.4-2.2 2-3.4 3.8-3.4 1.6 0 2.7.8 3.3 2.1"/><path d="M9.4 13.4c.3-1.7 1.5-2.6 2.9-2.6 1.3 0 2.4.8 2.8 2.2"/></svg>
+        <span class="tx">联机</span>
+      </button>
+      <button class="nav-item" data-nav="import">
+        <svg class="ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9.2 1.9H4.3a1 1 0 00-1 1v10.2a1 1 0 001 1h7.4a1 1 0 001-1V5.6z"/><path d="M9.2 1.9v3.7h3.5"/><path d="M8 8.1v3.6M6.6 10.3L8 11.7l1.4-1.4"/></svg>
+        <span class="tx">导入</span>
+      </button>
+      <button class="nav-item" data-nav="accounts">
+        <svg class="ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><circle cx="8" cy="5.6" r="2.7"/><path d="M2.9 13.6c.6-2.6 2.7-4 5.1-4s4.5 1.4 5.1 4"/></svg>
+        <span class="tx">账号</span>
+      </button>
+      <button class="nav-item" data-nav="settings">
+        <svg class="ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><circle cx="8" cy="8" r="2.2"/><path d="M8 1.9l1.1 1.6 1.9-.5.5 1.9 1.6 1.1-1 1.7 1 1.7-1.6 1.1-.5 1.9-1.9-.5L8 14.1l-1.1-1.6-1.9.5-.5-1.9-1.6-1.1 1-1.7-1-1.7 1.6-1.1.5-1.9 1.9.5z"/></svg>
+        <span class="tx">设置</span>
+      </button>
+
+      <div class="grow"></div>
+
+      <div class="account-chip" id="account-chip" title="切换账号">
+        <div class="avatar" id="account-avatar">?</div>
+        <div class="who">
+          <div class="nm" id="account-name">载入中</div>
+          <div class="ty" id="account-type">—</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ============ 内容 ============ -->
+    <main class="content" id="content">
+
+      <!-- 首页 -->
+      <section class="page on" data-page="home">
+        <div class="hero">
+          <div class="eyebrow">READY TO LAUNCH</div>
+          <h2 id="hero-title">选一个版本开始</h2>
+          <div class="ver-big" id="hero-version">—</div>
+          <div class="meta" id="hero-meta"></div>
+          <div class="actions">
+            <button class="btn primary lg" id="btn-play">
+              <svg viewBox="0 0 16 16" fill="currentColor"><path d="M4.4 2.6l8.2 5.4-8.2 5.4z"/></svg>
+              启动游戏
+            </button>
+            <button class="btn lg" id="btn-open-dir">打开游戏目录</button>
+            <button class="btn lg" id="btn-toggle-log">启动日志</button>
+          </div>
+          <div class="stat-grid">
+            <div class="stat"><div class="n" id="stat-versions">—</div><div class="l">已装版本</div></div>
+            <div class="stat"><div class="n" id="stat-mods">—</div><div class="l">模组</div></div>
+            <div class="stat"><div class="n" id="stat-java">—</div><div class="l">可用 Java</div></div>
+            <div class="stat"><div class="n" id="stat-mem">—</div><div class="l">分配内存</div></div>
+          </div>
+        </div>
+
+        <div class="grid-2" style="margin-top:14px">
+          <div class="card">
+            <div class="card-title">最近版本<span class="k" id="home-count"></span></div>
+            <div class="row-list" id="home-recent"></div>
+          </div>
+          <div class="card">
+            <div class="card-title">运行环境<span class="k" id="env-platform"></span></div>
+            <div class="stack" style="gap:8px">
+              <div class="hstack" style="justify-content:space-between">
+                <span style="font-size:12px;color:var(--text-dim)">数据目录</span>
+                <span class="mono-dim" id="env-datadir" style="max-width:60%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
+              </div>
+              <div class="hstack" style="justify-content:space-between">
+                <span style="font-size:12px;color:var(--text-dim)">默认 Java</span>
+                <span class="mono-dim" id="env-java"></span>
+              </div>
+              <div class="hstack" style="justify-content:space-between">
+                <span style="font-size:12px;color:var(--text-dim)">下载源</span>
+                <span class="mono-dim" id="env-source" style="max-width:60%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
+              </div>
+              <div class="hstack" style="justify-content:space-between">
+                <span style="font-size:12px;color:var(--text-dim)">窗口玻璃</span>
+                <span class="badge-pill accent" id="env-glass">—</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 版本 -->
+      <section class="page" data-page="versions">
+        <div class="page-head">
+          <h1>版本</h1>
+          <div class="sub" id="versions-sub">—</div>
+          <div class="spacer"></div>
+          <button class="btn sm" id="btn-refresh-versions">重新扫描</button>
+        </div>
+        <div class="row-list" id="versions-list"></div>
+      </section>
+
+      <!-- 安装 -->
+      <section class="page" data-page="install">
+        <div class="page-head">
+          <h1>安装</h1>
+          <div class="sub">镜像优先，失败自动回退官方源</div>
+          <div class="spacer"></div>
+          <button class="btn sm" id="btn-load-remote">刷新版本列表</button>
+        </div>
+
+        <div class="tabs">
+          <button class="tab on" data-itab="vanilla">游戏版本</button>
+          <button class="tab" data-itab="loader">模组加载器</button>
+          <button class="tab" data-itab="java">Java 环境</button>
+        </div>
+
+        <div data-ipanel="vanilla">
+          <div class="card tight" style="margin-bottom:12px">
+            <div class="hstack" style="gap:10px">
+              <input type="text" id="remote-filter" placeholder="搜索版本号，例如 1.21 / 1.20.1">
+              <label class="hstack" style="font-size:12px;color:var(--text-dim);gap:6px;flex:none">
+                <input type="checkbox" id="chk-snapshots"> 含快照
+              </label>
+            </div>
+          </div>
+          <div class="row-list" id="remote-list">
+            <div class="empty"><span class="big-ico">◌</span><span>点右上角「刷新版本列表」从镜像拉取</span></div>
+          </div>
+        </div>
+
+        <div data-ipanel="loader" style="display:none">
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-title">装在哪个版本上</div>
+              <select id="loader-game"></select>
+              <div class="mini-note section-gap">加载器必须建立在一个原版版本之上；下拉里只列出已装的原版。</div>
+            </div>
+            <div class="card">
+              <div class="card-title">加载器</div>
+              <div class="wrap-gap" id="loader-kinds"></div>
+              <div class="mini-note section-gap" id="loader-hint">—</div>
+            </div>
+          </div>
+          <div class="card section-gap">
+            <div class="card-title">可用版本<span class="k" id="loader-ver-count">—</span></div>
+            <div class="scroll-y row-list" id="loader-versions">
+              <div class="empty"><span class="big-ico">◌</span><span>选好游戏版本与加载器后会自动加载</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div data-ipanel="java" style="display:none">
+          <div class="card">
+            <div class="card-title">已检测到的 Java<span class="k" id="java-count2">—</span></div>
+            <div class="row-list" id="java-list2"></div>
+          </div>
+          <div class="card section-gap">
+            <div class="card-title">安装新 JDK<span class="k">Adoptium · 清华镜像</span></div>
+            <div class="wrap-gap" id="java-install-list"></div>
+            <div class="mini-note section-gap">装好的 JDK 落在数据目录的 java/ 下，启动时自动挑选最合适的一个。</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 模组 -->
+      <section class="page" data-page="mods">
+        <div class="page-head">
+          <h1>模组</h1>
+          <div class="sub" id="mods-sub">—</div>
+          <div class="spacer"></div>
+          <button class="btn sm" id="btn-open-mods">打开 mods 目录</button>
+        </div>
+
+        <div class="tabs">
+          <button class="tab on" data-mtab="local">已安装</button>
+          <button class="tab" data-mtab="browse">Modrinth</button>
+        </div>
+
+        <div data-mpanel="local">
+          <div class="card tight" style="margin-bottom:12px">
+            <input type="text" id="mods-filter" placeholder="按名称过滤">
+          </div>
+          <div class="row-list" id="mods-list"></div>
+        </div>
+
+        <div data-mpanel="browse" style="display:none">
+          <div class="card tight" style="margin-bottom:12px">
+            <div class="hstack" style="gap:10px">
+              <input type="text" id="mr-filter" placeholder="搜索 Modrinth，例如 sodium / jei">
+              <button class="btn sm" id="btn-mr-search" style="flex:none">搜索</button>
+            </div>
+            <div class="mini-note" style="margin-top:8px" id="mr-context">—</div>
+          </div>
+          <div class="row-list" id="mr-list">
+            <div class="empty"><span class="big-ico">◌</span><span>输入关键词搜索模组</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 联机 -->
+      <section class="page" data-page="multiplayer">
+        <div class="page-head">
+          <h1>联机</h1>
+          <div class="sub">陶瓦联机 · 可与 Terracotta 客户端互通</div>
+          <div class="spacer"></div>
+          <button class="btn sm" id="btn-tc-boot">启动联机组件</button>
+          <button class="btn sm" id="btn-tc-shutdown">关闭组件</button>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title">房间状态<span class="k" id="tc-ver">—</span></div>
+            <div id="tc-status" class="stack" style="gap:10px"></div>
+          </div>
+          <div class="card">
+            <div class="card-title">操作</div>
+            <div class="field">
+              <div class="lbl">玩家名</div>
+              <input type="text" id="tc-player" placeholder="留空则用当前账号名">
+            </div>
+            <div class="hstack">
+              <button class="btn primary" id="btn-tc-create">创建房间</button>
+              <button class="btn" id="btn-tc-leave">返回待机</button>
+            </div>
+            <div class="field" style="margin-top:14px">
+              <div class="lbl">加入别人的房间</div>
+              <div class="hstack">
+                <input type="text" id="tc-room" placeholder="U/XXXX-XXXX-XXXX-XXXX">
+                <button class="btn" id="btn-tc-join" style="flex:none">加入</button>
+              </div>
+            </div>
+            <div class="mini-note">房主要先在游戏里「对局域网开放」，再点「创建房间」。组件约 12 MB，首次使用会下载。</div>
+          </div>
+        </div>
+        <div class="card section-gap">
+          <div class="card-title">房间成员<span class="k" id="tc-count">—</span></div>
+          <div class="row-list" id="tc-members"></div>
+        </div>
+      </section>
+
+      <!-- 导入 -->
+      <section class="page" data-page="import">
+        <div class="page-head">
+          <h1>导入</h1>
+          <div class="sub">从其它启动器或 Modrinth 整合包迁移</div>
+          <div class="spacer"></div>
+          <button class="btn sm" id="btn-import-scan">扫描本机启动器</button>
+        </div>
+
+        <div class="card">
+          <div class="card-title">本机启动器<span class="k" id="import-count">—</span></div>
+          <div class="row-list" id="import-list">
+            <div class="empty"><span class="big-ico">◌</span><span>点右上角「扫描本机启动器」</span></div>
+          </div>
+        </div>
+
+        <div class="card section-gap">
+          <div class="card-title">整合包<span class="k">.mrpack</span></div>
+          <div class="wrap-gap">
+            <button class="btn" id="btn-import-mrpack">选择 .mrpack 文件</button>
+            <button class="btn" id="btn-export-mrpack">把当前版本导出为整合包</button>
+          </div>
+          <div class="mini-note section-gap">导入只会铺好文件；缺游戏本体或加载器时会提示你继续安装。</div>
+          <div class="row-list section-gap" id="import-packs"></div>
+        </div>
+      </section>
+
+      <!-- 账号 -->
+      <section class="page" data-page="accounts">
+        <div class="page-head">
+          <h1>账号</h1>
+          <div class="sub">离线 / 微软正版 / 外置登录</div>
+          <div class="spacer"></div>
+          <button class="btn sm" id="btn-add-offline">离线账号</button>
+          <button class="btn sm" id="btn-add-ms">微软正版</button>
+          <button class="btn sm" id="btn-add-ygg">外置登录</button>
+        </div>
+        <div class="row-list" id="accounts-list"></div>
+        <div class="card section-gap">
+          <div class="card-title">皮肤库<span class="k" id="skinlib-site">—</span></div>
+          <div class="hstack">
+            <button class="btn" id="btn-skinlib">浏览皮肤库</button>
+            <span class="mini-note">套用后只影响本机显示，站点皮肤仍以游戏内为准。</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- 设置 -->
+      <section class="page" data-page="settings">
+        <div class="page-head">
+          <h1>设置</h1>
+          <div class="sub">改动即时保存</div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title">启动</div>
+            <div class="field">
+              <div class="lbl">分配内存<span class="hint" id="mem-hint">—</span></div>
+              <div class="slider-row">
+                <input type="range" id="set-memory" min="1" max="32" step="0.5">
+                <span class="slider-val" id="mem-val">—</span>
+              </div>
+              <div class="desc">大型整合包建议 6 GB 以上；实例自带的 HMCL 设置会取较大值。</div>
+            </div>
+            <div class="field">
+              <div class="lbl">游戏窗口尺寸<span class="hint">0 = 不干预</span></div>
+              <div class="hstack">
+                <input type="number" id="set-win-w" min="0" max="7680" placeholder="宽">
+                <span style="color:var(--text-dimmer)">×</span>
+                <input type="number" id="set-win-h" min="0" max="4320" placeholder="高">
+              </div>
+            </div>
+            <div class="field">
+              <div class="lbl">额外 JVM 参数</div>
+              <textarea id="set-jvm" placeholder="-XX:+UseG1GC -XX:MaxGCPauseMillis=50" spellcheck="false"></textarea>
+              <div class="desc">追加在版本自带参数之后、主类之前。</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">外观</div>
+            <div class="field">
+              <div class="lbl">主题</div>
+              <select id="set-theme">
+                <option value="system">跟随系统</option>
+                <option value="dark">深色</option>
+                <option value="light">浅色</option>
+              </select>
+            </div>
+            <div class="field">
+              <div class="lbl">玻璃不透明度<span class="hint" id="glass-hint">—</span></div>
+              <div class="slider-row">
+                <input type="range" id="set-alpha" min="0.35" max="1" step="0.01">
+                <span class="slider-val" id="alpha-val">—</span>
+              </div>
+              <div class="desc">调低能更多透出桌面；窗口不支持系统毛玻璃时会自动退回磨砂。</div>
+            </div>
+            <div class="field">
+              <div class="lbl">液态玻璃开关</div>
+              <div class="hstack" style="gap:14px;flex-wrap:wrap">
+                <liquid-glass-toggle id="demo-toggle" size="md" checked label="演示"></liquid-glass-toggle>
+                <liquid-glass-toggle id="demo-toggle2" size="sm"></liquid-glass-toggle>
+                <liquid-glass-toggle id="demo-toggle3" size="lg" checked></liquid-glass-toggle>
+              </div>
+              <div class="desc">不适配时自动降级为磨砂/实色，圆角保持不变。当前档位：<span id="toggle-tier" class="mono-dim">—</span></div>
+            </div>
+            <div class="field">
+              <div class="lbl">关闭窗口时退出应用</div>
+              <div class="hstack" style="justify-content:space-between">
+                <span style="font-size:11.5px;color:var(--text-dim)">关掉后关闭窗口但进程留在后台</span>
+                <liquid-glass-toggle id="set-quit" size="sm"></liquid-glass-toggle>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:12px">
+          <div class="card-title">下载源</div>
+          <div class="grid-2">
+            <div class="field">
+              <div class="lbl">游戏文件（BMCLAPI）</div>
+              <input type="text" id="set-source" placeholder="https://bmclapi2.bangbang93.com">
+            </div>
+            <div class="field">
+              <div class="lbl">Java 运行环境（清华镜像）</div>
+              <input type="text" id="set-java-mirror" placeholder="https://mirrors.tuna.tsinghua.edu.cn/Adoptium">
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:12px">
+          <div class="card-title">外置登录与皮肤<span class="k" id="injector-state">—</span></div>
+          <div class="grid-2">
+            <div class="field">
+              <div class="lbl">皮肤库站点</div>
+              <input type="text" id="set-skinlib" placeholder="https://www.mcpeau.com">
+              <div class="desc">Blessing Skin 站点，用于浏览与套用皮肤。</div>
+            </div>
+            <div class="field">
+              <div class="lbl">微软客户端 ID<span class="hint">Azure 公共客户端</span></div>
+              <input type="text" id="set-msclient" placeholder="不填则用内置值">
+              <div class="desc">内置值可能被微软限制，建议自己注册一个免费应用。</div>
+            </div>
+          </div>
+          <div class="field">
+            <div class="lbl">认证服务器<span class="hint" id="srv-count">—</span></div>
+            <div class="row-list" id="srv-list"></div>
+            <div class="hstack" style="margin-top:8px">
+              <input type="text" id="srv-name" placeholder="名称，如 LittleSkin">
+              <input type="text" id="srv-base" placeholder="https://example.com/api/yggdrasil">
+              <button class="btn sm" id="btn-add-srv" style="flex:none">添加</button>
+            </div>
+          </div>
+          <div class="field">
+            <div class="lbl">authlib-injector<span class="hint" id="injector-ver">—</span></div>
+            <div class="hstack">
+              <button class="btn sm" id="btn-injector">下载 / 重装</button>
+              <span class="mini-note">外置登录必装：否则游戏里是默认皮肤，也进不了皮肤站的正版服。</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:12px">
+          <div class="card-title">Java 运行环境<span class="k" id="java-count"></span></div>
+          <div class="row-list" id="java-list"></div>
+          <div class="wrap-gap" style="margin-top:10px">
+            <button class="btn sm" id="btn-pick-java">手动指定 java</button>
+            <button class="btn sm" id="btn-clear-java">恢复自动挑选</button>
+            <span class="mini-note" id="java-manual"></span>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:12px">
+          <div class="card-title">关于</div>
+          <div class="hstack" style="gap:14px;align-items:flex-start">
+            <div class="avatar" style="width:44px;height:44px;border-radius:12px;font-size:16px">G</div>
+            <div style="font-size:12px;color:var(--text-dim);line-height:1.7">
+              <div style="color:var(--text);font-weight:650;font-size:13px">GlassMC <span class="mono-dim" id="about-ver"></span></div>
+              液态玻璃 Minecraft 启动器 · Tauri 跨平台版<br>
+              GPLv3 开源 · <a href="#" id="link-repo" style="color:var(--accent-hi)">github.com/shaun-chen2/GlassMC</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ============ 日志抽屉 ============ -->
+  <div class="logbar" id="logbar">
+    <div class="logbar-head">
+      <span class="t">启动日志</span>
+      <span class="mono-dim" id="log-state">未启动</span>
+      <div style="flex:1"></div>
+      <button class="btn sm" id="btn-clear-log">清空</button>
+      <button class="btn sm" id="btn-kill">结束进程</button>
+      <button class="btn sm icon" id="btn-collapse-log" title="收起">▾</button>
+    </div>
+    <div class="log-body" id="log-body"></div>
+  </div>
+
+</div>
+
+<div class="toast-wrap" id="toasts"></div>
+
+<!-- 通用弹层（登录 / 皮肤库 / 整合包预览都放这里） -->
+<div class="modal-mask" id="modal">
+  <div class="sheet" id="sheet"></div>
+</div>
+
+<!-- 全局进度卡 -->
+<div class="progress-card" id="progress-card">
+  <div class="pt"><span class="spinner"></span><span id="pg-title">正在处理</span><span class="pct" id="pg-pct">0%</span></div>
+  <div class="pl" id="pg-label">—</div>
+  <div class="pbar"><i id="pg-bar"></i></div>
+</div>
+
+<script src="vendor/liquid-glass-toggle.js"></script>
+<script src="js/app.js"></script>
+<script src="js/features.js"></script>
+<script src="js/features-install.js"></script>
+<script src="js/features-more.js"></script>
+</body>
+</html>

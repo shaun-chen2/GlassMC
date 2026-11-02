@@ -1,12 +1,19 @@
-# 忽略构建产物与本地环境文件
+# Rust / Cargo 构建目录
+src-tauri/target/
+target/
+
+# Tauri 生成的 schema
+src-tauri/gen/schemas/
+
+# 打包中间产物（发布用的 GlassMC.dmg 放在根目录，会提交）
 build/
-.build/
-*.xcodeproj/
-.swiftpm/
+*.app/
+
+# 系统与编辑器
 .DS_Store
-devtools/
+*.swp
 *.log
 
-# 本地个人数据
+# 本地游戏数据，绝不上传
 minecraft/
 *.part

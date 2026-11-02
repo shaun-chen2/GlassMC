@@ -1,37 +1,57 @@
-#!/bin/bash
-# GlassMC 构建脚本：生成资源 → 编译 → 打包 .app → 签名 → 生成带背景图与图标的 .dmg
-# 需在已安装 Command Line Tools 的 macOS 上运行（无需完整 Xcode）。
-set -uo pipefail
+#!/usr/bin/env bash
+# =============================================================================
+#  GlassMC（Tauri 跨平台版）· macOS 打包
+#
+#  产物：
+#    build/GlassMC.app      universal（arm64 + x86_64）
+#    build/GlassMC.dmg      带安装指引背景与图标布局
+#
+#  为什么不用 `cargo tauri build`：
+#    本机没有装 tauri-cli，且它的打包流程会顺带改写 Info.plist 里我们需要
+#    精细控制的部分（LSMinimumSystemVersion、沙盒开关、图标名）。
+#    这里直接 lipo + 手写 plist，路径最短也最可控。
+# =============================================================================
+set -euo pipefail
+cd "$(dirname "$0")"
 
-SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
-cd "$SCRIPT_DIR"
+APP_NAME="GlassMC"
+BUNDLE_ID="com.glassmc.launcher"
+VERSION="1.3.0"
+OUT="build"
+SRC_TAURI="src-tauri"
 
-APP_NAME=GlassMC
-BUILD="$SCRIPT_DIR/build"
-APP="$BUILD/$APP_NAME.app"
-DMG="$SCRIPT_DIR/$APP_NAME.dmg"
+SKIP_BUILD=0
+[[ "${1:-}" == "--skip-build" ]] && SKIP_BUILD=1
 
-echo "== 1/6 生成图标与 DMG 背景图 =="
-swiftc -O Scripts/generate_assets.swift -o "$BUILD/gen_assets" -framework AppKit -framework Foundation
-./build/gen_assets "$SCRIPT_DIR/Assets"
-test -f "$SCRIPT_DIR/Assets/AppIcon.icns" && echo "  icon ok" || { echo "图标生成失败"; exit 1; }
+# ---------------------------------------------------------------- 1. 编译
+if [[ $SKIP_BUILD -eq 0 ]]; then
+  echo "==> 编译 arm64"
+  ( cd "$SRC_TAURI" && cargo build --release --target aarch64-apple-darwin )
+  echo "==> 编译 x86_64"
+  ( cd "$SRC_TAURI" && cargo build --release --target x86_64-apple-darwin )
+fi
 
-echo "== 2/6 编译 Swift 源码 =="
-SOURCES=$(find Sources -name '*.swift' | sort)
-mkdir -p "$BUILD"
-swiftc -target arm64-apple-macosx15.0 -O -parse-as-library \
-  -o "$BUILD/$APP_NAME" $SOURCES \
-  -framework SwiftUI -framework AppKit -framework Foundation
-test -f "$BUILD/$APP_NAME" && echo "  编译成功" || { echo "编译失败"; exit 1; }
+ARM="$SRC_TAURI/target/aarch64-apple-darwin/release/glassmc"
+INTEL="$SRC_TAURI/target/x86_64-apple-darwin/release/glassmc"
+for f in "$ARM" "$INTEL"; do
+  [[ -f "$f" ]] || { echo "缺少编译产物：$f"; exit 1; }
+done
 
-echo "== 3/6 组装 .app 包 =="
-rm -rf "$APP"
-mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
-cp "$BUILD/$APP_NAME" "$APP/Contents/MacOS/$APP_NAME"
-cp "$SCRIPT_DIR/Assets/AppIcon.icns" "$APP/Contents/Resources/AppIcon.icns"
-chmod +x "$APP/Contents/MacOS/$APP_NAME"
+mkdir -p "$OUT"
+echo "==> 合并为 universal"
+lipo -create "$ARM" "$INTEL" -output "$OUT/$APP_NAME"
+chmod +x "$OUT/$APP_NAME"
+echo -n "    架构："; lipo -archs "$OUT/$APP_NAME"
 
-cat > "$APP/Contents/Info.plist" <<EOF
+# ---------------------------------------------------------------- 2. 组装 app
+echo "==> 组装 $APP_NAME.app"
+rm -rf "$OUT/$APP_NAME.app"
+mkdir -p "$OUT/$APP_NAME.app/Contents/MacOS" "$OUT/$APP_NAME.app/Contents/Resources"
+
+cp "$OUT/$APP_NAME" "$OUT/$APP_NAME.app/Contents/MacOS/$APP_NAME"
+cp "$SRC_TAURI/icons/icon.icns" "$OUT/$APP_NAME.app/Contents/Resources/AppIcon.icns"
+
+cat > "$OUT/$APP_NAME.app/Contents/Info.plist" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
@@ -39,31 +59,38 @@ cat > "$APP/Contents/Info.plist" <<EOF
     <key>CFBundleName</key><string>${APP_NAME}</string>
     <key>CFBundleDisplayName</key><string>${APP_NAME}</string>
     <key>CFBundleExecutable</key><string>${APP_NAME}</string>
-    <key>CFBundleIdentifier</key><string>com.glassmc.launcher</string>
-    <key>CFBundleVersion</key><string>1.1</string>
-    <key>CFBundleShortVersionString</key><string>1.1</string>
+    <key>CFBundleIdentifier</key><string>${BUNDLE_ID}</string>
+    <key>CFBundleVersion</key><string>${VERSION}</string>
+    <key>CFBundleShortVersionString</key><string>${VERSION}</string>
+    <key>CFBundleInfoDictionaryVersion</key><string>6.0</string>
     <key>CFBundleIconFile</key><string>AppIcon</string>
     <key>CFBundlePackageType</key><string>APPL</string>
-    <key>LSMinimumSystemVersion</key><string>15.0</string>
+    <key>CFBundleLocalizations</key>
+    <array><string>zh_CN</string><string>en</string></array>
+    <key>LSApplicationCategoryType</key><string>public.app-category.games</string>
+    <key>LSMinimumSystemVersion</key><string>11.0</string>
     <key>NSHighResolutionCapable</key><true/>
-    <key>NSPrincipalClass</key><string>NSApplication</string>
-    <key>NSHumanReadableCopyright</key><string>GlassMC · 液态玻璃 Minecraft 启动器</string>
+    <key>NSRequiresAquaSystemAppearance</key><false/>
+    <key>NSSupportsAutomaticGraphicsSwitching</key><true/>
 </dict>
 </plist>
-EOF
-printf 'APPL????' > "$APP/Contents/PkgInfo"
+PLIST
 
-echo "== 4/6 Ad-hoc 签名（本地运行） =="
-codesign --force --deep --sign - "$APP" && echo "  签名完成" || echo "  签名跳过（不影响本地运行）"
+echo "==> ad-hoc 签名"
+codesign --force --deep --sign - "$OUT/$APP_NAME.app" 2>/dev/null
+codesign --verify --deep --strict "$OUT/$APP_NAME.app" && echo "    签名校验通过"
 
-echo "== 5/6 用 dmgbuild 生成带背景与图标布局的 DMG =="
-# dmgbuild 直接写 .DS_Store，不依赖 Finder GUI 自动化（适配无头/沙箱环境）。
-rm -f "$DMG"
-python3 -m dmgbuild -s "$SCRIPT_DIR/dmg_settings.py" "$APP_NAME" "$DMG" 2>&1 | tail -15
-test -f "$DMG" && echo "  DMG 生成成功" || { echo "DMG 生成失败"; exit 1; }
+# ---------------------------------------------------------------- 3. DMG
+if command -v dmgbuild >/dev/null 2>&1; then
+  echo "==> 生成 DMG"
+  rm -f "$OUT/$APP_NAME.dmg"
+  dmgbuild -s Scripts/dmg_settings.py -D app="$OUT/$APP_NAME.app" "$APP_NAME" "$OUT/$APP_NAME.dmg"
+  echo -n "    DMG 大小："; du -h "$OUT/$APP_NAME.dmg" | awk '{print $1}'
+else
+  echo "跳过 DMG（未安装 dmgbuild）"
+fi
 
 echo ""
-echo "完成 ✅"
-echo "  App: $APP"
-echo "  DMG: $DMG"
-echo "双击 DMG 后将 App 拖到「应用程序」即可使用。"
+echo "完成："
+echo "  $OUT/$APP_NAME.app"
+[[ -f "$OUT/$APP_NAME.dmg" ]] && echo "  $OUT/$APP_NAME.dmg"
