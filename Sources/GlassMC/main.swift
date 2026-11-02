@@ -33,4 +33,11 @@ final class GlassAppDelegate: NSObject, NSApplicationDelegate {
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
         true
     }
+
+    /// 退出时把联机组件一起收掉，避免留下孤儿进程。
+    func applicationWillTerminate(_ notification: Notification) {
+        Task { @MainActor in
+            TerracottaManager.shared.shutdown()
+        }
+    }
 }

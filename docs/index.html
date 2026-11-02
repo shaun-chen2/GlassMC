@@ -318,6 +318,43 @@
   .feature-card h3 { position: relative; z-index: 1; font-size: 17px; font-weight: 700; margin-bottom: 8px; }
   .feature-card p { position: relative; z-index: 1; color: var(--text-dim); font-size: 13.8px; line-height: 1.75; }
 
+
+  /* ---------- 联机 ---------- */
+  .mp-grid { display: grid; grid-template-columns: 1.04fr .96fr; gap: 34px; align-items: center; }
+  .mp-list { display: grid; gap: 12px; margin-top: 18px; }
+  .mp-item { display: flex; gap: 11px; align-items: flex-start; }
+  .mp-item .k {
+    flex: none; width: 20px; height: 20px; border-radius: 6px; display: grid; place-items: center;
+    font-family: var(--mono); font-size: 10.5px; font-weight: 800; color: var(--primary);
+    background: rgba(95, 159, 214, .12); border: 1px solid rgba(95, 159, 214, .28);
+  }
+  .mp-item b { display: block; font-size: 13.5px; font-weight: 700; color: #E3EEFA; }
+  .mp-item span { font-size: 13px; color: var(--text-dim); }
+  .mp-side { display: grid; gap: 12px; }
+  .code-card {
+    border-radius: 14px; padding: 20px; position: relative; overflow: hidden;
+    background: /* 深色代码卡 */
+      radial-gradient(420px circle at 100% 0%, rgba(95, 159, 214, .16), transparent 62%),
+      rgba(8, 16, 28, .82);
+    border: 1px solid rgba(95, 159, 214, .24);
+    box-shadow: 0 24px 56px -30px rgba(0, 0, 0, .9);
+  }
+  .code-card .label { font-family: var(--mono); font-size: 10.5px; letter-spacing: .18em; color: var(--text-dimmer); }
+  .room-code {
+    font-family: var(--mono); font-size: clamp(17px, 2.3vw, 23px); font-weight: 700;
+    letter-spacing: .06em; color: #EAF4FF; margin-top: 8px; word-break: break-all;
+  }
+  .code-card .hint { font-size: 12px; color: var(--text-dim); margin-top: 10px; }
+  .peers { display: flex; align-items: center; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+  .peer {
+    display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px;
+    font-size: 11.5px; color: #CFE2F5; background: rgba(95, 159, 214, .10);
+    border: 1px solid rgba(95, 159, 214, .24);
+  }
+  .peer .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+  .peer.host .dot { background: #E5C07B; }
+  @media (max-width: 900px) { .mp-grid { grid-template-columns: 1fr; gap: 22px; } }
+
   /* ---------- 安装 / 步骤 ---------- */
   .panel {
     border-radius: 18px; padding: 30px;
@@ -533,6 +570,7 @@
     <a class="brand" href="#top"><img src="images/icon-256.png" alt="">GlassMC</a>
     <div class="nav-links">
       <a href="#features">功能</a>
+      <a href="#multiplayer">联机</a>
       <a href="#install">安装</a>
       <a href="#permission">打不开？</a>
       <a href="#faq">常见问题</a>
@@ -657,6 +695,46 @@
       <span class="feat-icon">09</span><h3>从别的启动器搬家</h3>
       <p>自动扫描 HMCL、官方启动器、Prism / MultiMC 的账号与版本，选一个点导入，原目录不受影响。</p>
       <span class="feat-num">09</span>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="multiplayer">
+  <div class="sec-head reveal">
+    <span class="sec-tag">MULTIPLAYER</span>
+    <h2>和朋友开一局，<em>一串邀请码就够</em></h2>
+    <p>内置联机用的是陶瓦联机（Terracotta）协议：不用公网 IP、不用端口映射，和用陶瓦的朋友可以直接互加。</p>
+  </div>
+
+  <div class="mp-grid reveal">
+    <div>
+      <div class="mp-list">
+        <div class="mp-item"><span class="k">01</span><div><b>房主先开放世界</b><span>进存档 → Esc → 对局域网开放，然后回到「联机」页点创建房间。</span></div></div>
+        <div class="mp-item"><span class="k">02</span><div><b>把邀请码发出去</b><span>形如 U/6DRG-BECK-V92T-F9ZZ，几秒就能生成。</span></div></div>
+        <div class="mp-item"><span class="k">03</span><div><b>朋友粘贴就进</b><span>对方加入后，游戏「多人游戏」里会多出「陶瓦联机大厅」，双击进去。</span></div></div>
+      </div>
+      <p class="note" style="margin-top:16px">
+        协议层由陶瓦官方组件负责（首次使用自动下载，约 12 MB），本启动器只驱动它的本地接口；
+        对方的陶瓦客户端同样能加入你的房间，反之亦然。
+      </p>
+    </div>
+
+    <div class="mp-side">
+      <div class="code-card">
+        <div class="label">ROOM CODE</div>
+        <div class="room-code">U/6DRG-BECK-V92T-F9ZZ</div>
+        <div class="hint">把这个发给朋友，或者直接复制到聊天窗口。</div>
+        <div class="peers">
+          <span class="peer host"><span class="dot"></span>房主 · GlassMC</span>
+          <span class="peer"><span class="dot"></span>成员 · 2 人</span>
+        </div>
+      </div>
+      <div class="code-card" style="padding:16px 20px">
+        <div class="label">TUNNEL</div>
+        <div class="hint" style="margin-top:6px;font-family:var(--mono);font-size:12px">
+          EasyTier · P2P · NAT 穿透 · 无需公网 IP
+        </div>
+      </div>
     </div>
   </div>
 </section>

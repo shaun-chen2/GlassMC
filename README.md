@@ -89,6 +89,16 @@ xattr -dr com.apple.quarantine /Applications/GlassMC.app
 
 左侧 **版本** → 选实例 → 点 **启动**。日志实时滚在窗口里，出问题一眼能看见。
 
+### 5. 联机
+
+左侧 **联机**：
+
+- **当房主**：先在游戏里进入存档，按 <kbd>Esc</kbd> → 对局域网开放，回到启动器点「创建房间」，几秒后拿到邀请码（形如 `U/6DRG-BECK-V92T-F9ZZ`）；
+- **当客人**：把邀请码粘进去点「加入」，成功后回游戏 → 多人游戏，列表里会多出「陶瓦联机大厅」；
+- 用的是**陶瓦联机协议**，用陶瓦客户端的朋友可以直接加入你的房间，反之亦然；不需要公网 IP、不用端口映射。
+
+首次使用会自动下载陶瓦官方组件（约 12 MB）。如果系统询问是否允许「查找本地网络中的设备」，请选**允许**。
+
 ---
 
 ## 功能一览
@@ -100,6 +110,7 @@ xattr -dr com.apple.quarantine /Applications/GlassMC.app
 | **版本隔离** | 每个实例独立的 mods / 存档 / 配置，互不打架 |
 | **模组管理** | Modrinth 在线搜索、装 / 禁 / 删、缺失依赖提示 |
 | **整合包** | `.mrpack` 双向支持：导入、导出 |
+| **联机** | 内置陶瓦联机（Terracotta）协议，邀请码即开即连，可与陶瓦用户互通 |
 | **多模式账号** | 离线 / 微软正版设备码登录 / 任意 Yggdrasil 皮肤站 |
 | **皮肤同步** | 认证服务器皮肤自动带进游戏（authlib-injector） |
 | **皮肤库** | 内置皮肤库，在线挑一张直接套用 |
@@ -144,6 +155,12 @@ xattr -dr com.apple.quarantine /Applications/GlassMC.app
 **Q：加了模组进不去游戏？**
 看窗口里的日志，最常见的是缺前置模组或版本区间不匹配。模组页的「已装模组」会标出缺失依赖；也可以先用「禁用」逐个排查。
 
+**Q：联机时提示找不到房间 / 找不到局域网世界？**
+先确认系统给了「本地网络」权限：系统设置 → 隐私与安全性 → 本地网络，把 GlassMC 打开。房主还需要真正在游戏里点过「对局域网开放」。若仍不行，退出游戏重新开放一次局域网世界，再回启动器点刷新。
+
+**Q：朋友用的是陶瓦客户端，能一起玩吗？**
+能。两边用的是同一套协议（EasyTier + 陶瓦的协调服务），邀请码通用，谁当房主都行。
+
 **Q：Intel Mac 能用吗？**
 目前只提供 Apple Silicon 版本。
 
@@ -154,6 +171,7 @@ xattr -dr com.apple.quarantine /Applications/GlassMC.app
 - 界面与逻辑全部为原生 Swift / SwiftUI，不使用网页技术；
 - 游戏文件来自 BMCLAPI 镜像，Java 来自清华大学开源软件镜像站；
 - 模组数据来自 [Modrinth](https://modrinth.com)；
+- 联机能力由 [Terracotta（陶瓦联机）](https://github.com/burningtnt/Terracotta) 提供（AGPL-3.0）：启动器在首次联机时从官方 Releases 下载其**未经修改的二进制**，仅通过其本地 HTTP 接口交互，未包含或链接其源码；
 - 本项目与 Mojang / Microsoft 无关联，需要自备正版账号才能连接正版服务器。
 
 想自己编译：`bash build.sh`（需要 macOS 15 + Command Line Tools），产物在 `build/GlassMC.app` 与 `GlassMC.dmg`。

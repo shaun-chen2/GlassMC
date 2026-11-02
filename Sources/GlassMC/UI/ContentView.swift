@@ -45,6 +45,7 @@ struct ContentView: View {
         case .versions: VersionsView()
         case .install: InstallView()
         case .mods: ModsView()
+        case .multiplayer: MultiplayerView()
         case .import: ImportView()
         case .settings: SettingsView()
         }

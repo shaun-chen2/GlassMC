@@ -126,6 +126,7 @@ enum Tab: String, CaseIterable, Identifiable {
     case versions = "版本"
     case install = "安装"
     case mods = "模组"
+    case multiplayer = "联机"
     case `import` = "导入"
     case settings = "设置"
     var id: String { rawValue }
@@ -137,6 +138,7 @@ enum Tab: String, CaseIterable, Identifiable {
         case .versions: return "square.stack.3d.up.fill"
         case .install: return "arrow.down.circle.fill"
         case .mods: return "puzzlepiece.extension.fill"
+        case .multiplayer: return "person.3.fill"
         case .import: return "arrow.down.doc.fill"
         case .settings: return "gearshape.fill"
         }
