@@ -502,6 +502,14 @@ body {
 .field .lbl .hint { margin-left: auto; font-weight: 400; font-size: 11px; color: var(--text-dimmer); }
 .field .desc { font-size: 11.5px; color: var(--text-dim); margin-top: 5px; }
 
+/* 只有一行：标题在左、开关在右，两者垂直居中对齐（不再有第二行说明把开关压下去） */
+.field-inline {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; min-height: 20px;
+}
+.field-inline .lbl { margin-bottom: 0; }
+.field-inline liquid-glass-toggle { display: block; flex: none; }
+
 input[type="text"],
 input[type="password"],
 input[type="number"],
