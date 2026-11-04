@@ -16,7 +16,7 @@ cd "$(dirname "$0")"
 
 APP_NAME="GlassMC"
 BUNDLE_ID="com.glassmc.launcher"
-VERSION="1.3.0"
+VERSION="1.3.1"
 OUT="build"
 SRC_TAURI="src-tauri"
 

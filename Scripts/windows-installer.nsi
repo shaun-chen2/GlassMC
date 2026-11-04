@@ -1,6 +1,6 @@
 ; GlassMC Windows 安装包
 ; 用 makensis 编译：
-;   makensis -DEXE_PATH=glassmc.exe -DICON_PATH=icon.ico -DOUTFILE=GlassMC_1.3.0_x64-setup.exe windows-installer.nsi
+;   makensis -DEXE_PATH=glassmc.exe -DICON_PATH=icon.ico -DOUTFILE=GlassMC_1.3.1_x64-setup.exe windows-installer.nsi
 ; Linux 上可以直接用 apt 的 nsis（原生 makensis），不需要 wine。
 
 Unicode true
@@ -16,7 +16,7 @@ Unicode true
   !define ICON_PATH "icon.ico"
 !endif
 !ifndef OUTFILE
-  !define OUTFILE "GlassMC_1.3.0_x64-setup.exe"
+  !define OUTFILE "GlassMC_1.3.1_x64-setup.exe"
 !endif
 ; 需要跟 exe 一起安装的同目录文件（WebView2Loader.dll、mingw 运行时等），
 ; 由 makensis -DEXTRA_DIR=<目录> 指定；不传则跳过。
@@ -25,8 +25,8 @@ Unicode true
 !endif
 
 !define PRODUCT_NAME "GlassMC"
-!define PRODUCT_VERSION "1.3.0"
-!define PRODUCT_VERSION4 "1.3.0.0"
+!define PRODUCT_VERSION "1.3.1"
+!define PRODUCT_VERSION4 "1.3.1.0"
 !define PRODUCT_PUBLISHER "GlassMC"
 !define PRODUCT_WEB_SITE "https://shaun-chen2.github.io/GlassMC/"
 !define PRODUCT_EXE "glassmc.exe"
