@@ -26,7 +26,10 @@ fn cfg(state: &State<'_, ConfigState>) -> crate::config::Config {
     state.0.lock().unwrap().clone()
 }
 
-fn save(state: &State<'_, ConfigState>, f: impl FnOnce(&mut crate::config::Config)) -> Result<crate::config::Config, String> {
+fn save(
+    state: &State<'_, ConfigState>,
+    f: impl FnOnce(&mut crate::config::Config),
+) -> Result<crate::config::Config, String> {
     let mut guard = state.0.lock().unwrap();
     f(&mut guard);
     let next = guard.clone();
@@ -166,7 +169,10 @@ pub async fn ygg_login(
         .ok_or_else(|| "找不到该认证服务器，请重新选择".to_string())?;
     let acc = yggdrasil::authenticate(&server, username.trim(), &password).await?;
     let accounts = add_account(&state, acc.clone())?;
-    Ok(LoginResult { accounts, account: acc })
+    Ok(LoginResult {
+        accounts,
+        account: acc,
+    })
 }
 
 #[tauri::command]
@@ -223,10 +229,7 @@ pub async fn ms_poll(
 
 /// 刷新任意账号（微软重新换令牌，外置登录 refresh，离线不动）。
 #[tauri::command]
-pub async fn refresh_account(
-    state: State<'_, ConfigState>,
-    id: String,
-) -> Result<Account, String> {
+pub async fn refresh_account(state: State<'_, ConfigState>, id: String) -> Result<Account, String> {
     let cfg = cfg(&state);
     let acc = account::find(&id).ok_or_else(|| "账号不存在".to_string())?;
     let updated = match acc.kind.as_str() {
@@ -326,10 +329,7 @@ pub fn skinlib_clear(account_id: String) -> Result<(), String> {
 
 /// 皮肤库缩略图（data URL），列表里直接显示。
 #[tauri::command]
-pub async fn skinlib_thumb(
-    state: State<'_, ConfigState>,
-    tid: i64,
-) -> Result<String, String> {
+pub async fn skinlib_thumb(state: State<'_, ConfigState>, tid: i64) -> Result<String, String> {
     let cfg = cfg(&state);
     let file = skins::library_texture(&cfg.skin_library_base, tid).await?;
     skins::data_url(&file).ok_or_else(|| "皮肤文件无效".to_string())
@@ -379,7 +379,9 @@ pub fn mods_delete(path: String) -> Result<(), String> {
 
 #[tauri::command]
 pub fn mods_dir(version_id: String) -> String {
-    modrinth::mods_dir(&version_id).to_string_lossy().to_string()
+    modrinth::mods_dir(&version_id)
+        .to_string_lossy()
+        .to_string()
 }
 
 #[tauri::command]

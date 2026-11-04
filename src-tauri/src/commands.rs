@@ -125,7 +125,10 @@ pub async fn list_remote(
     let mut v: Vec<VersionEntry> = if include_snapshots {
         m.versions
     } else {
-        m.versions.into_iter().filter(|x| x.kind == "release").collect()
+        m.versions
+            .into_iter()
+            .filter(|x| x.kind == "release")
+            .collect()
     };
     v.truncate(600);
     Ok(v)
@@ -293,7 +296,10 @@ pub fn list_mods(version_id: String) -> Vec<ModFile> {
         .filter_map(|e| {
             let name = e.file_name().to_string_lossy().to_string();
             let lower = name.to_lowercase();
-            if !(lower.ends_with(".jar") || lower.ends_with(".jar.disabled") || lower.ends_with(".disabled")) {
+            if !(lower.ends_with(".jar")
+                || lower.ends_with(".jar.disabled")
+                || lower.ends_with(".disabled"))
+            {
                 return None;
             }
             let meta = e.metadata().ok()?;
@@ -317,6 +323,6 @@ pub fn list_mods(version_id: String) -> Vec<ModFile> {
             })
         })
         .collect();
-    out.sort_by(|a, b| a.label.to_lowercase().cmp(&b.label.to_lowercase()));
+    out.sort_by_key(|a| a.label.to_lowercase());
     out
 }

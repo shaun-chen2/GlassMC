@@ -56,7 +56,9 @@ pub fn candidates() -> Vec<JavaCandidate> {
         .map(|f| JavaCandidate {
             feature: f,
             label: format!("Java {f}"),
-            installed: installed.iter().any(|j| j.version == f && j.source == "managed"),
+            installed: installed
+                .iter()
+                .any(|j| j.version == f && j.source == "managed"),
         })
         .collect()
 }
@@ -134,7 +136,8 @@ pub async fn install(
         pkg.url.clone(),
     ];
 
-    let tmp_dir = std::env::temp_dir().join(format!("glassmc-java-{feature}-{}", std::process::id()));
+    let tmp_dir =
+        std::env::temp_dir().join(format!("glassmc-java-{feature}-{}", std::process::id()));
     let _ = std::fs::remove_dir_all(&tmp_dir);
     std::fs::create_dir_all(&tmp_dir).map_err(|e| format!("创建临时目录失败：{e}"))?;
     let archive = tmp_dir.join(&pkg.name);
@@ -149,9 +152,7 @@ pub async fn install(
     prog.tick(true);
 
     prog.stage("解压", 1, 0.85, 0.12);
-    let staging = paths::paths()
-        .java_dir
-        .join(format!(".staging-{feature}"));
+    let staging = paths::paths().java_dir.join(format!(".staging-{feature}"));
     let _ = std::fs::remove_dir_all(&staging);
     std::fs::create_dir_all(&staging).map_err(|e| format!("创建目录失败：{e}"))?;
 

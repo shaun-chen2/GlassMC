@@ -15,24 +15,13 @@ const MANIFEST: &str = ".glassmc-modpack.json";
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 #[serde(rename_all = "camelCase", default)]
+#[derive(Default)]
 pub struct PackFile {
     pub path: String,
     pub hashes: std::collections::HashMap<String, String>,
     pub env: std::collections::HashMap<String, String>,
     pub downloads: Vec<String>,
     pub file_size: u64,
-}
-
-impl Default for PackFile {
-    fn default() -> Self {
-        Self {
-            path: String::new(),
-            hashes: Default::default(),
-            env: Default::default(),
-            downloads: Vec::new(),
-            file_size: 0,
-        }
-    }
 }
 
 impl PackFile {
@@ -70,7 +59,8 @@ pub struct PackRecord {
 /// 只读索引，供界面预览。
 pub fn inspect(path: &str) -> Result<PackIndex, String> {
     let file = std::fs::File::open(path).map_err(|e| format!("打开整合包失败：{e}"))?;
-    let mut zip = zip::ZipArchive::new(file).map_err(|_| "这不是有效的 .mrpack（无法解压）".to_string())?;
+    let mut zip =
+        zip::ZipArchive::new(file).map_err(|_| "这不是有效的 .mrpack（无法解压）".to_string())?;
     let mut entry = zip
         .by_name("modrinth.index.json")
         .map_err(|_| "整合包里缺少 modrinth.index.json".to_string())?;
@@ -84,10 +74,8 @@ pub fn inspect(path: &str) -> Result<PackIndex, String> {
     // 兼容 camelCase / snake_case 两种写法
     if index.format_version == 0 {
         if let Ok(v) = serde_json::from_str::<serde_json::Value>(text) {
-            index.format_version = v
-                .get("formatVersion")
-                .and_then(|x| x.as_u64())
-                .unwrap_or(1) as u32;
+            index.format_version =
+                v.get("formatVersion").and_then(|x| x.as_u64()).unwrap_or(1) as u32;
         }
     }
     Ok(index)
@@ -125,10 +113,16 @@ pub async fn import(
     prog.tick(true);
 
     // 下载 files[]
-    let entries: Vec<PackFile> = index.files.into_iter().filter(|f| f.client_needed()).collect();
+    let entries: Vec<PackFile> = index
+        .files
+        .into_iter()
+        .filter(|f| f.client_needed())
+        .collect();
     let mod_count = entries
         .iter()
-        .filter(|f| f.path.to_lowercase().starts_with("mods/") && f.path.to_lowercase().ends_with(".jar"))
+        .filter(|f| {
+            f.path.to_lowercase().starts_with("mods/") && f.path.to_lowercase().ends_with(".jar")
+        })
         .count();
 
     if !entries.is_empty() {
@@ -183,7 +177,9 @@ fn extract_prefix(pack: &str, prefix: &str, dest: &Path) -> Result<(), String> {
     let file = std::fs::File::open(pack).map_err(|e| format!("打开整合包失败：{e}"))?;
     let mut zip = zip::ZipArchive::new(file).map_err(|_| "无法解压整合包".to_string())?;
     for i in 0..zip.len() {
-        let Ok(mut entry) = zip.by_index(i) else { continue };
+        let Ok(mut entry) = zip.by_index(i) else {
+            continue;
+        };
         let name = entry.name().to_string();
         let Some(rel) = name.strip_prefix(prefix) else {
             continue;
@@ -208,7 +204,12 @@ fn extract_prefix(pack: &str, prefix: &str, dest: &Path) -> Result<(), String> {
 }
 
 /// 导出为 .mrpack。
-pub fn export(version_id: &str, destination: &str, name: &str, summary: &str) -> Result<String, String> {
+pub fn export(
+    version_id: &str,
+    destination: &str,
+    name: &str,
+    summary: &str,
+) -> Result<String, String> {
     let instance = paths::paths().versions_dir.join(version_id);
     let source = if instance.is_dir() {
         instance
@@ -243,7 +244,10 @@ pub fn export(version_id: &str, destination: &str, name: &str, summary: &str) ->
         if let Ok(rd) = std::fs::read_dir(&mods_src) {
             for e in rd.filter_map(|x| x.ok()) {
                 let p = e.path();
-                let lower = p.file_name().map(|n| n.to_string_lossy().to_lowercase()).unwrap_or_default();
+                let lower = p
+                    .file_name()
+                    .map(|n| n.to_string_lossy().to_lowercase())
+                    .unwrap_or_default();
                 if !p.is_file() || !lower.ends_with(".jar") {
                     continue;
                 }
@@ -256,7 +260,9 @@ pub fn export(version_id: &str, destination: &str, name: &str, summary: &str) ->
                 index.files.push(PackFile {
                     path: format!("mods/{}", p.file_name().unwrap().to_string_lossy()),
                     hashes,
-                    env: [("client".to_string(), "required".to_string())].into_iter().collect(),
+                    env: [("client".to_string(), "required".to_string())]
+                        .into_iter()
+                        .collect(),
                     downloads: Vec::new(),
                     file_size: std::fs::metadata(&target).map(|m| m.len()).unwrap_or(0),
                 });
@@ -292,8 +298,13 @@ pub fn export(version_id: &str, destination: &str, name: &str, summary: &str) ->
         .compression_method(zip::CompressionMethod::Deflated)
         .unix_permissions(0o644);
 
-    add_file(&mut writer, &tmp, &tmp.join("modrinth.index.json"), "modrinth.index.json", opts)?;
-    add_dir(&mut writer, &tmp, &tmp.join("overrides"), "overrides", opts)?;
+    add_file(
+        &mut writer,
+        &tmp.join("modrinth.index.json"),
+        "modrinth.index.json",
+        opts,
+    )?;
+    add_dir(&mut writer, &tmp.join("overrides"), "overrides", opts)?;
     writer.finish().map_err(|e| format!("打包失败：{e}"))?;
     let _ = std::fs::remove_dir_all(&tmp);
 
@@ -302,21 +313,16 @@ pub fn export(version_id: &str, destination: &str, name: &str, summary: &str) ->
 
 fn add_file(
     writer: &mut zip::ZipWriter<std::fs::File>,
-    root: &Path,
     path: &Path,
     name: &str,
     opts: zip::write::SimpleFileOptions,
 ) -> Result<(), String> {
-    let rel = if root == path.parent().unwrap_or(root) {
-        name.to_string()
-    } else {
-        name.to_string()
-    };
     let mut f = std::fs::File::open(path).map_err(|e| format!("读取失败：{e}"))?;
     let mut buf = Vec::new();
-    f.read_to_end(&mut buf).map_err(|e| format!("读取失败：{e}"))?;
+    f.read_to_end(&mut buf)
+        .map_err(|e| format!("读取失败：{e}"))?;
     writer
-        .start_file(rel, opts)
+        .start_file(name, opts)
         .map_err(|e| format!("写入压缩包失败：{e}"))?;
     writer
         .write_all(&buf)
@@ -326,7 +332,6 @@ fn add_file(
 
 fn add_dir(
     writer: &mut zip::ZipWriter<std::fs::File>,
-    root: &Path,
     dir: &Path,
     prefix: &str,
     opts: zip::write::SimpleFileOptions,
@@ -339,12 +344,15 @@ fn add_dir(
     };
     for e in rd.filter_map(|x| x.ok()) {
         let p = e.path();
-        let name = p.file_name().map(|n| n.to_string_lossy().to_string()).unwrap_or_default();
+        let name = p
+            .file_name()
+            .map(|n| n.to_string_lossy().to_string())
+            .unwrap_or_default();
         let rel = format!("{prefix}/{name}");
         if p.is_dir() {
-            add_dir(writer, root, &p, &rel, opts)?;
+            add_dir(writer, &p, &rel, opts)?;
         } else {
-            add_file(writer, root, &p, &rel, opts)?;
+            add_file(writer, &p, &rel, opts)?;
         }
     }
     Ok(())
@@ -408,7 +416,11 @@ fn unique_instance_id(base: &str) -> String {
         .chars()
         .map(|c| if "/\\:*?\"<>|".contains(c) { '_' } else { c })
         .collect();
-    let cleaned = if cleaned.is_empty() { "整合包".to_string() } else { cleaned };
+    let cleaned = if cleaned.is_empty() {
+        "整合包".to_string()
+    } else {
+        cleaned
+    };
     if !paths::paths().versions_dir.join(&cleaned).exists() {
         return cleaned;
     }
@@ -440,7 +452,12 @@ fn guess_game_version(version_id: &str) -> String {
             _ => break,
         }
     }
-    if cur.chars().next().map(|c| c.is_ascii_digit()).unwrap_or(false) {
+    if cur
+        .chars()
+        .next()
+        .map(|c| c.is_ascii_digit())
+        .unwrap_or(false)
+    {
         cur
     } else {
         version_id.to_string()

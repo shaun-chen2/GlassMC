@@ -63,7 +63,7 @@ pub async fn ensure(force: bool) -> Result<PathBuf, String> {
         };
         let url = v.get("download_url").and_then(|x| x.as_str());
         let ver = v.get("version").and_then(|x| x.as_str()).unwrap_or("");
-        let (Some(url), ) = (url,) else {
+        let (Some(url),) = (url,) else {
             last = "元数据缺少 download_url".into();
             continue;
         };
@@ -96,7 +96,11 @@ pub async fn ensure(force: bool) -> Result<PathBuf, String> {
     }
     Err(format!(
         "authlib-injector 下载失败：{}",
-        if last.is_empty() { "所有镜像都不可用".into() } else { last }
+        if last.is_empty() {
+            "所有镜像都不可用".into()
+        } else {
+            last
+        }
     ))
 }
 

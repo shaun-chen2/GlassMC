@@ -52,9 +52,7 @@ pub fn cache_file(acc: &Account) -> PathBuf {
         .filter(|u| !u.is_empty())
         .map(|u| format!("-{}", short_hash(u)))
         .unwrap_or_default();
-    paths::paths()
-        .skins_dir
-        .join(format!("{k}{suffix}.png"))
+    paths::paths().skins_dir.join(format!("{k}{suffix}.png"))
 }
 
 /// 确保账号皮肤在本地，返回文件路径。取不到时返回 None（前端用默认皮肤）。
@@ -99,7 +97,9 @@ pub async fn refresh(acc: &Account) -> Option<PathBuf> {
 fn purge_stale(acc: &Account, keep: &Path) {
     let k = key_of(acc);
     let dir = paths::paths().skins_dir.clone();
-    let Ok(rd) = std::fs::read_dir(&dir) else { return };
+    let Ok(rd) = std::fs::read_dir(&dir) else {
+        return;
+    };
     for entry in rd.filter_map(|e| e.ok()) {
         let name = entry.file_name().to_string_lossy().to_string();
         if !name.starts_with(&k) || !name.ends_with(".png") {
@@ -113,7 +113,9 @@ fn purge_stale(acc: &Account, keep: &Path) {
 }
 
 fn is_png(p: &Path) -> bool {
-    let Ok(bytes) = std::fs::read(p) else { return false };
+    let Ok(bytes) = std::fs::read(p) else {
+        return false;
+    };
     bytes.len() > 64 && bytes.starts_with(&[0x89, b'P', b'N', b'G'])
 }
 
@@ -174,8 +176,8 @@ pub async fn library_page(base: &str, page: u32) -> Result<SkinPage, String> {
     if !(200..300).contains(&status) {
         return Err(format!("皮肤站返回 HTTP {status}"));
     }
-    let v: serde_json::Value =
-        serde_json::from_str(&text).map_err(|_| "皮肤站返回的不是 JSON（可能需要登录）".to_string())?;
+    let v: serde_json::Value = serde_json::from_str(&text)
+        .map_err(|_| "皮肤站返回的不是 JSON（可能需要登录）".to_string())?;
     let items = v
         .get("data")
         .and_then(|d| d.as_array())
@@ -207,7 +209,10 @@ pub async fn library_page(base: &str, page: u32) -> Result<SkinPage, String> {
         .unwrap_or_default();
     Ok(SkinPage {
         items,
-        page: v.get("current_page").and_then(|x| x.as_u64()).unwrap_or(page as u64) as u32,
+        page: v
+            .get("current_page")
+            .and_then(|x| x.as_u64())
+            .unwrap_or(page as u64) as u32,
         last_page: v.get("last_page").and_then(|x| x.as_u64()).unwrap_or(1) as u32,
         total: v.get("total").and_then(|x| x.as_u64()).unwrap_or(0) as u32,
     })
@@ -228,7 +233,10 @@ pub async fn library_texture(base: &str, tid: i64) -> Result<PathBuf, String> {
         .await
         .map_err(|e| format!("查询皮肤详情失败：{e}"))?;
     if !resp.status().is_success() {
-        return Err(format!("查询皮肤详情失败（HTTP {}）", resp.status().as_u16()));
+        return Err(format!(
+            "查询皮肤详情失败（HTTP {}）",
+            resp.status().as_u16()
+        ));
     }
     let v: serde_json::Value = resp
         .json()

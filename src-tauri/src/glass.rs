@@ -17,8 +17,8 @@ pub fn apply(window: &WebviewWindow) -> String {
             Some(NSVisualEffectState::Active),
             Some(14.0),
         ) {
-            Ok(()) => return "liquid".into(),
-            Err(_) => return "frosted".into(),
+            Ok(()) => "liquid".into(),
+            Err(_) => "frosted".into(),
         }
     }
 

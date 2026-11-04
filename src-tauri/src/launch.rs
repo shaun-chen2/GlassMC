@@ -54,7 +54,9 @@ pub fn rules_allow(rules: Option<&Vec<Value>>) -> bool {
     let mut matched = false;
     let cur_arch = arch_name();
     for rule in rules {
-        let Some(obj) = rule.as_object() else { continue };
+        let Some(obj) = rule.as_object() else {
+            continue;
+        };
         if obj.contains_key("features") {
             continue;
         }
@@ -102,7 +104,9 @@ fn flatten_arguments(arr: &[Value]) -> Vec<String> {
             out.push(s.to_string());
             continue;
         }
-        let Some(obj) = item.as_object() else { continue };
+        let Some(obj) = item.as_object() else {
+            continue;
+        };
         if !rules_allow(obj.get("rules").and_then(|v| v.as_array())) {
             continue;
         }
@@ -215,7 +219,6 @@ fn subst(raw: &str, map: &[(&str, String)]) -> String {
     s
 }
 
-
 /// 去掉完全重复的 `--add-opens` / `--add-exports` / `--add-reads`。
 /// 父子版本常把同一份模块开放声明各写一遍；值不同时都保留，值相同才丢。
 fn dedupe_exact_pairs(args: Vec<String>) -> Vec<String> {
@@ -288,7 +291,12 @@ fn dedupe_options(args: Vec<String>) -> Vec<String> {
 
 /// 游戏参数去重：`--key value` 同名只保留最后一个。
 fn dedupe_game_arguments(args: Vec<String>) -> Vec<String> {
-    const FLAGS: [&str; 4] = ["--demo", "--fullscreen", "--disableMultiplayer", "--disableChat"];
+    const FLAGS: [&str; 4] = [
+        "--demo",
+        "--fullscreen",
+        "--disableMultiplayer",
+        "--disableChat",
+    ];
     let mut slots: Vec<(Option<String>, Vec<String>)> = Vec::new();
     let mut i = 0;
     while i < args.len() {
@@ -357,11 +365,16 @@ pub fn jvm_arguments(
         ("${natives_directory}", natives.to_string()),
         ("${classpath}", cp),
         ("${classpath_separator}", cp_sep().to_string()),
-        ("${library_directory}", p.libraries_dir.to_string_lossy().to_string()),
+        (
+            "${library_directory}",
+            p.libraries_dir.to_string_lossy().to_string(),
+        ),
         ("${primary_jar_name}", jar_file.clone()),
         (
             "${primary_jar}",
-            manifest::client_jar_path(jar_id).to_string_lossy().to_string(),
+            manifest::client_jar_path(jar_id)
+                .to_string_lossy()
+                .to_string(),
         ),
         ("${launcher_name}", "GlassMC".into()),
         ("${launcher_version}", env!("CARGO_PKG_VERSION").into()),
@@ -427,7 +440,11 @@ pub fn game_arguments(
     let p = paths::paths();
     // 外置登录由 authlib-injector 接管，userType 必须是 mojang；
     // 微软正版账号必须 msa，否则拿不到档案与皮肤。
-    let user_type = if account.is_microsoft() { "msa" } else { "mojang" };
+    let user_type = if account.is_microsoft() {
+        "msa"
+    } else {
+        "mojang"
+    };
     let token = account.access_token();
     let map: Vec<(&str, String)> = vec![
         ("${auth_player_name}", account.username.clone()),
@@ -498,14 +515,28 @@ pub fn extract_natives(merged: &Value, natives_dir: &Path) {
             .or_else(|| natives.get("macos"))
             .and_then(|v| {
                 // 值里可能带 ${arch}
-                v.as_str().map(|s| s.replace("${arch}", if cfg!(target_pointer_width = "64") { "64" } else { "32" }))
+                v.as_str().map(|s| {
+                    s.replace(
+                        "${arch}",
+                        if cfg!(target_pointer_width = "64") {
+                            "64"
+                        } else {
+                            "32"
+                        },
+                    )
+                })
             });
-        let Some(classifier) = classifier else { continue };
+        let Some(classifier) = classifier else {
+            continue;
+        };
         let jar = lib_dir().join(maven_path(&format!("{name}:{classifier}")));
         if !jar.is_file() {
             continue;
         }
-        let marker = natives_dir.join(format!(".done-{}", jar.file_name().unwrap_or_default().to_string_lossy()));
+        let marker = natives_dir.join(format!(
+            ".done-{}",
+            jar.file_name().unwrap_or_default().to_string_lossy()
+        ));
         if marker.is_file() {
             continue;
         }
@@ -523,7 +554,9 @@ fn unzip_into(jar: &Path, dest: &Path) -> Result<(), String> {
         if entry.is_dir() {
             continue;
         }
-        let Some(rel) = entry.enclosed_name() else { continue };
+        let Some(rel) = entry.enclosed_name() else {
+            continue;
+        };
         // 只要原生库，不要 META-INF 之类
         let ext = rel.extension().and_then(|e| e.to_str()).unwrap_or("");
         if !matches!(ext, "dylib" | "jnilib" | "so" | "dll") {
@@ -666,7 +699,10 @@ pub async fn build_command(
                 match jar {
                     Some(jar) => {
                         args.push(crate::injector::agent_arg(&jar, &srv.normalized_base()));
-                        println!("[launch] 已挂载 authlib-injector：{}", srv.normalized_base());
+                        println!(
+                            "[launch] 已挂载 authlib-injector：{}",
+                            srv.normalized_base()
+                        );
                     }
                     None => println!("[launch] authlib-injector 不可用，外置登录皮肤无法同步"),
                 }

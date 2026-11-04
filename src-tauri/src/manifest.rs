@@ -139,7 +139,9 @@ pub fn merge_chain(chain: &[Value]) -> Value {
 
     // 父 → 子，子版本后写，天然覆盖
     for dict in chain.iter().rev() {
-        let Some(obj) = dict.as_object() else { continue };
+        let Some(obj) = dict.as_object() else {
+            continue;
+        };
         for (k, v) in obj {
             match k.as_str() {
                 "libraries" => {
@@ -286,9 +288,7 @@ const ISOLATION_MARKERS: [&str; 7] = [
 
 pub fn is_isolated(version_id: &str) -> bool {
     let inst = paths::paths().versions_dir.join(version_id);
-    ISOLATION_MARKERS
-        .iter()
-        .any(|m| inst.join(m).exists())
+    ISOLATION_MARKERS.iter().any(|m| inst.join(m).exists())
 }
 
 /// 该版本实际使用的游戏目录。
@@ -299,7 +299,6 @@ pub fn game_directory(version_id: &str) -> std::path::PathBuf {
         paths::paths().game_dir.clone()
     }
 }
-
 
 /// 纯本地合并：沿 `inheritsFrom` 读本地 json 做深合并，不发任何网络请求。
 /// 用于扫描阶段统计「还缺多少个库」。

@@ -53,8 +53,12 @@ impl Progress {
     pub fn stage(&self, label: &str, total: usize, base: f64, span: f64) {
         self.inner.done.store(0, Ordering::Relaxed);
         self.inner.total.store(total, Ordering::Relaxed);
-        self.inner.base.store((base * 1000.0) as u64, Ordering::Relaxed);
-        self.inner.span.store((span * 1000.0) as u64, Ordering::Relaxed);
+        self.inner
+            .base
+            .store((base * 1000.0) as u64, Ordering::Relaxed);
+        self.inner
+            .span
+            .store((span * 1000.0) as u64, Ordering::Relaxed);
         *self.inner.label.lock().unwrap() = label.to_string();
         self.emit(label);
     }
@@ -127,7 +131,10 @@ pub async fn install_version(
 
     // ---------- 1. 客户端 jar ----------
     prog.stage("下载客户端主程序", 1, 0.02, 0.10);
-    let jar_path = paths::paths().versions_dir.join(&jar_id).join(format!("{jar_id}.jar"));
+    let jar_path = paths::paths()
+        .versions_dir
+        .join(&jar_id)
+        .join(format!("{jar_id}.jar"));
     let mut jobs: Vec<Job> = Vec::new();
     if !is_usable(&jar_path) {
         let mirror = format!("{}/versions/{jar_id}/{jar_id}.jar", cfg.download_base());
@@ -160,7 +167,7 @@ pub async fn install_version(
     // ---------- 2. 依赖库 ----------
     let libs = manifest::libraries(&merged);
     for lib in &libs {
-        collect_library(&lib, cfg, &mut jobs);
+        collect_library(lib, cfg, &mut jobs);
     }
     let lib_total = jobs.len();
     prog.stage("下载依赖库", lib_total, 0.12, 0.48);
@@ -196,10 +203,7 @@ pub async fn install_version(
 }
 
 /// 并发执行下载任务，返回（成功数、跳过数、失败明细）。
-async fn run_jobs(
-    jobs: &[Job],
-    concurrency: usize,
-) -> Result<(usize, usize, Vec<String>), String> {
+async fn run_jobs(jobs: &[Job], concurrency: usize) -> Result<(usize, usize, Vec<String>), String> {
     let sem = Arc::new(tokio::sync::Semaphore::new(concurrency.max(1)));
     let mut handles = Vec::new();
     for job in jobs {
@@ -249,13 +253,20 @@ fn collect_library(lib: &Value, cfg: &Config, out: &mut Vec<Job>) {
         if !rel.is_empty() {
             has_artifact = true;
             let mut urls = vec![format!("{base}/libraries/{rel}")];
-            if let Some(u) = art.get("url").and_then(|v| v.as_str()).filter(|u| !u.is_empty()) {
+            if let Some(u) = art
+                .get("url")
+                .and_then(|v| v.as_str())
+                .filter(|u| !u.is_empty())
+            {
                 urls.push(u.to_string());
             }
             out.push(Job {
                 dest: libs_dir.join(&rel),
                 urls,
-                sha1: art.get("sha1").and_then(|v| v.as_str()).map(|s| s.to_string()),
+                sha1: art
+                    .get("sha1")
+                    .and_then(|v| v.as_str())
+                    .map(|s| s.to_string()),
             });
         }
     }
@@ -300,13 +311,20 @@ fn collect_library(lib: &Value, cfg: &Config, out: &mut Vec<Job>) {
                     });
                 if !rel.is_empty() {
                     let mut urls = vec![format!("{base}/libraries/{rel}")];
-                    if let Some(u) = cl.get("url").and_then(|v| v.as_str()).filter(|u| !u.is_empty()) {
+                    if let Some(u) = cl
+                        .get("url")
+                        .and_then(|v| v.as_str())
+                        .filter(|u| !u.is_empty())
+                    {
                         urls.push(u.to_string());
                     }
                     out.push(Job {
                         dest: libs_dir.join(&rel),
                         urls,
-                        sha1: cl.get("sha1").and_then(|v| v.as_str()).map(|s| s.to_string()),
+                        sha1: cl
+                            .get("sha1")
+                            .and_then(|v| v.as_str())
+                            .map(|s| s.to_string()),
                     });
                 }
             }
@@ -329,7 +347,11 @@ async fn ensure_assets(merged: &Value, cfg: &Config, prog: &Progress) -> Result<
 
     if !is_usable(&index_file) {
         let mut urls = vec![format!("{}/assets/indexes/{id}.json", cfg.download_base())];
-        if let Some(u) = index.get("url").and_then(|v| v.as_str()).filter(|u| !u.is_empty()) {
+        if let Some(u) = index
+            .get("url")
+            .and_then(|v| v.as_str())
+            .filter(|u| !u.is_empty())
+        {
             urls.push(u.to_string());
         }
         download::download_any(&urls, &index_file, None)
@@ -354,10 +376,7 @@ async fn ensure_assets(merged: &Value, cfg: &Config, prog: &Progress) -> Result<
         if hash.len() < 2 {
             continue;
         }
-        let dest = assets_dir
-            .join("objects")
-            .join(&hash[0..2])
-            .join(hash);
+        let dest = assets_dir.join("objects").join(&hash[0..2]).join(hash);
         if is_usable(&dest) {
             continue;
         }
@@ -366,7 +385,10 @@ async fn ensure_assets(merged: &Value, cfg: &Config, prog: &Progress) -> Result<
             urls: vec![
                 // BMCLAPI 的对象路径没有 objects 段
                 format!("{base}/assets/{}/{hash}", &hash[0..2]),
-                format!("https://resources.download.minecraft.net/{}/{hash}", &hash[0..2]),
+                format!(
+                    "https://resources.download.minecraft.net/{}/{hash}",
+                    &hash[0..2]
+                ),
             ],
             sha1: Some(hash.to_string()),
         });
@@ -427,7 +449,9 @@ fn client_jar_source(chain: &[Value], jar_id: &str) -> (Option<String>, Option<S
 
 /// 文件存在且非空。
 fn is_usable(p: &Path) -> bool {
-    std::fs::metadata(p).map(|m| m.is_file() && m.len() > 0).unwrap_or(false)
+    std::fs::metadata(p)
+        .map(|m| m.is_file() && m.len() > 0)
+        .unwrap_or(false)
 }
 
 // ---------------------------------------------------------------- 查询/清理

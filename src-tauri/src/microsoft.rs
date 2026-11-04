@@ -155,8 +155,8 @@ pub async fn poll(cfg: &Config, device_code: &str) -> Result<PollResult, String>
 
 /// 用保存的刷新令牌续期。
 pub async fn refresh(cfg: &Config, acc: &Account) -> Result<Account, String> {
-    let token = refresh_token(&acc.id)
-        .ok_or_else(|| "登录凭据已失效，请重新添加微软账号".to_string())?;
+    let token =
+        refresh_token(&acc.id).ok_or_else(|| "登录凭据已失效，请重新添加微软账号".to_string())?;
     let resp = crate::net::client()
         .post(TOKEN_URL)
         .form(&[
@@ -261,7 +261,8 @@ async fn complete_login(ms_token: &str) -> Result<Profile, String> {
     if mc_status != 200 {
         return Err(format!("Minecraft 登录失败（HTTP {mc_status}）"));
     }
-    let mc_json: Value = serde_json::from_str(&mc_text).map_err(|_| "Minecraft 登录响应无法解析")?;
+    let mc_json: Value =
+        serde_json::from_str(&mc_text).map_err(|_| "Minecraft 登录响应无法解析")?;
     let mc_token = mc_json
         .get("access_token")
         .and_then(|x| x.as_str())

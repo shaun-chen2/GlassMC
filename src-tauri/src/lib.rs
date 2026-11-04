@@ -41,12 +41,25 @@ pub fn describe_command(version_id: &str) -> Result<String, String> {
         let mut out = String::new();
         out.push_str(&format!("版本      : {}\n", built.version_id));
         out.push_str(&format!("账号      : {} ({})\n", acc.username, acc.kind));
-        out.push_str(&format!("Java      : {} (major {})\n", built.program, built.java_version));
+        out.push_str(&format!(
+            "Java      : {} (major {})\n",
+            built.program, built.java_version
+        ));
         out.push_str(&format!("工作目录  : {}\n", built.cwd));
         out.push_str(&format!("内存      : {} MB\n", built.max_memory_mb));
-        out.push_str(&format!("classpath : {} 项，缺失 {} 项\n", built.classpath_count, built.missing_files));
+        out.push_str(&format!(
+            "classpath : {} 项，缺失 {} 项\n",
+            built.classpath_count, built.missing_files
+        ));
         let leftover: Vec<&String> = built.args.iter().filter(|a| a.contains("${")).collect();
-        out.push_str(&format!("未替换占位符: {}\n", if leftover.is_empty() { "无".to_string() } else { format!("{:?}", leftover) }));
+        out.push_str(&format!(
+            "未替换占位符: {}\n",
+            if leftover.is_empty() {
+                "无".to_string()
+            } else {
+                format!("{:?}", leftover)
+            }
+        ));
         out.push_str("\n命令:\n");
         out.push_str(&format!("  {}\n", built.program));
         for a in &built.args {

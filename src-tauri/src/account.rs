@@ -115,7 +115,10 @@ pub fn random_id() -> String {
     let c = ((t & 0xFFFF) as u16 & 0x0FFF) | 0x4000;
     let d = ((n as u16) & 0x3FFF) | 0x8000;
     let e = t ^ n.wrapping_mul(0x9E37_79B9_7F4A_7C15);
-    format!("{a:08X}-{b:04X}-{c:04X}-{d:04X}-{:012X}", e % 0xFFFF_FFFF_FFFF)
+    format!(
+        "{a:08X}-{b:04X}-{c:04X}-{d:04X}-{:012X}",
+        e % 0xFFFF_FFFF_FFFF
+    )
 }
 
 pub fn find(id: &str) -> Option<Account> {

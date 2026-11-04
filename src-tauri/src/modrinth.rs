@@ -143,7 +143,11 @@ pub async fn search(
                         .or_else(|| h.get("slug").and_then(|x| x.as_str()))
                         .unwrap_or("")
                         .to_string(),
-                    slug: h.get("slug").and_then(|x| x.as_str()).unwrap_or("").to_string(),
+                    slug: h
+                        .get("slug")
+                        .and_then(|x| x.as_str())
+                        .unwrap_or("")
+                        .to_string(),
                     title: h
                         .get("title")
                         .and_then(|x| x.as_str())
@@ -154,7 +158,11 @@ pub async fn search(
                         .and_then(|x| x.as_str())
                         .unwrap_or("")
                         .to_string(),
-                    author: h.get("author").and_then(|x| x.as_str()).unwrap_or("").to_string(),
+                    author: h
+                        .get("author")
+                        .and_then(|x| x.as_str())
+                        .unwrap_or("")
+                        .to_string(),
                     icon_url: h
                         .get("icon_url")
                         .and_then(|x| x.as_str())
@@ -172,11 +180,18 @@ pub async fn search(
     Ok((hits, total))
 }
 
-pub async fn versions(project_id: &str, game: &str, loader: &str) -> Result<Vec<MrVersion>, String> {
+pub async fn versions(
+    project_id: &str,
+    game: &str,
+    loader: &str,
+) -> Result<Vec<MrVersion>, String> {
     let mut url = format!("{API}/project/{project_id}/version");
     let mut q: Vec<String> = Vec::new();
     if !loader.trim().is_empty() {
-        q.push(format!("loaders={}", query_escape(&format!("[\"{loader}\"]"))));
+        q.push(format!(
+            "loaders={}",
+            query_escape(&format!("[\"{loader}\"]"))
+        ));
     }
     if !game.trim().is_empty() {
         q.push(format!(
@@ -220,7 +235,11 @@ pub async fn versions(project_id: &str, game: &str, loader: &str) -> Result<Vec<
                 let is_primary = d
                     .get("files")
                     .and_then(|x| x.as_array())
-                    .and_then(|arr| arr.iter().find(|x| x.get("filename").and_then(|n| n.as_str()) == Some(f.filename.as_str())))
+                    .and_then(|arr| {
+                        arr.iter().find(|x| {
+                            x.get("filename").and_then(|n| n.as_str()) == Some(f.filename.as_str())
+                        })
+                    })
                     .and_then(|x| x.get("primary"))
                     .and_then(|x| x.as_bool())
                     .unwrap_or(false);
@@ -258,7 +277,11 @@ pub async fn versions(project_id: &str, game: &str, loader: &str) -> Result<Vec<
                 name: d
                     .get("name")
                     .and_then(|x| x.as_str())
-                    .unwrap_or_else(|| d.get("version_number").and_then(|x| x.as_str()).unwrap_or(""))
+                    .unwrap_or_else(|| {
+                        d.get("version_number")
+                            .and_then(|x| x.as_str())
+                            .unwrap_or("")
+                    })
                     .to_string(),
                 game_versions: str_list(d.get("game_versions")),
                 loaders: str_list(d.get("loaders")),
@@ -322,10 +345,7 @@ pub async fn install_mod(
 /// 实例的 mods 目录：版本隔离时用 `versions/<id>/mods`，否则用全局 `mods`。
 pub fn mods_dir(version_id: &str) -> PathBuf {
     if !version_id.trim().is_empty() {
-        let isolated = paths::paths()
-            .versions_dir
-            .join(version_id)
-            .join("mods");
+        let isolated = paths::paths().versions_dir.join(version_id).join("mods");
         if isolated.is_dir() {
             return isolated;
         }
@@ -336,7 +356,11 @@ pub fn mods_dir(version_id: &str) -> PathBuf {
 /// 扫描 mods 目录（含已禁用的 `.jar.disabled`）。
 pub fn scan_mods(version_id: &str) -> Vec<InstalledMod> {
     let dir = manifest::game_directory(version_id).join("mods");
-    let dir = if dir.is_dir() { dir } else { mods_dir(version_id) };
+    let dir = if dir.is_dir() {
+        dir
+    } else {
+        mods_dir(version_id)
+    };
     let Ok(rd) = std::fs::read_dir(&dir) else {
         return Vec::new();
     };
@@ -365,7 +389,7 @@ pub fn scan_mods(version_id: &str) -> Vec<InstalledMod> {
             })
         })
         .collect();
-    out.sort_by(|a, b| a.name.to_lowercase().cmp(&b.name.to_lowercase()));
+    out.sort_by_key(|a| a.name.to_lowercase());
     out
 }
 
@@ -402,7 +426,11 @@ pub fn delete_mod(path: &str) -> Result<(), String> {
     let dir = p.parent().ok_or("路径不合法")?;
     let trash = dir.join(".trash");
     std::fs::create_dir_all(&trash).map_err(|e| format!("创建回收目录失败：{e}"))?;
-    let name = p.file_name().ok_or("路径不合法")?.to_string_lossy().to_string();
+    let name = p
+        .file_name()
+        .ok_or("路径不合法")?
+        .to_string_lossy()
+        .to_string();
     let mut dest = trash.join(&name);
     if dest.exists() {
         let ts = std::time::SystemTime::now()
@@ -494,7 +522,10 @@ fn toml_value(text: &str, key: &str) -> Option<String> {
             continue;
         }
         let v = rest.trim();
-        let v = v.strip_prefix('"').and_then(|s| s.split('"').next()).map(|s| s.to_string());
+        let v = v
+            .strip_prefix('"')
+            .and_then(|s| s.split('"').next())
+            .map(|s| s.to_string());
         if let Some(v) = v {
             if !v.trim().is_empty() {
                 return Some(v.trim().to_string());
@@ -513,7 +544,13 @@ fn cleaned_name(file_name: &str) -> (String, String) {
     let mut parts = base.rsplitn(2, '-');
     let last = parts.next().unwrap_or("");
     let head = parts.next().unwrap_or("");
-    if !head.is_empty() && last.chars().next().map(|c| c.is_ascii_digit()).unwrap_or(false) {
+    if !head.is_empty()
+        && last
+            .chars()
+            .next()
+            .map(|c| c.is_ascii_digit())
+            .unwrap_or(false)
+    {
         (head.to_string(), last.to_string())
     } else {
         (base, String::new())

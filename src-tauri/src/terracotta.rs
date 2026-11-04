@@ -32,11 +32,9 @@ fn lock_file() -> Option<PathBuf> {
 }
 
 fn archive_name() -> String {
+    // 陶瓦只发布 arm64 与 x86_64 两种包，其余架构按 x86_64 处理
     let arch = if cfg!(target_arch = "aarch64") {
-        // mac 与 linux 用 arm64，windows 用 arm64
         "arm64"
-    } else if cfg!(target_arch = "x86_64") {
-        "x86_64"
     } else {
         "x86_64"
     };
@@ -373,7 +371,10 @@ async fn fetch_meta() -> Result<(String, String), String> {
         .send()
         .await
         .map_err(|e| format!("读取组件信息失败：{e}"))?;
-    let v: serde_json::Value = resp.json().await.map_err(|e| format!("组件信息解析失败：{e}"))?;
+    let v: serde_json::Value = resp
+        .json()
+        .await
+        .map_err(|e| format!("组件信息解析失败：{e}"))?;
     Ok((
         v.get("version")
             .and_then(|x| x.as_str())
@@ -403,7 +404,10 @@ pub async fn refresh() -> Result<serde_json::Value, String> {
         });
         return Err(format!("联机组件响应异常（HTTP {code}）"));
     }
-    let v: serde_json::Value = resp.json().await.map_err(|e| format!("状态解析失败：{e}"))?;
+    let v: serde_json::Value = resp
+        .json()
+        .await
+        .map_err(|e| format!("状态解析失败：{e}"))?;
     with(|s| s.state = v.clone());
     Ok(v)
 }
@@ -422,7 +426,9 @@ fn esc(s: &str) -> String {
     let mut out = String::new();
     for b in s.trim().bytes() {
         match b {
-            b'A'..=b'Z' | b'a'..=b'z' | b'0'..=b'9' | b'-' | b'_' | b'.' | b'~' => out.push(b as char),
+            b'A'..=b'Z' | b'a'..=b'z' | b'0'..=b'9' | b'-' | b'_' | b'.' | b'~' => {
+                out.push(b as char)
+            }
             _ => out.push_str(&format!("%{b:02X}")),
         }
     }

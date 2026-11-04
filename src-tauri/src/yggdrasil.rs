@@ -200,10 +200,7 @@ async fn refresh_at(base: &str, acc: &Account, token: &str) -> Result<Account, (
         return Err((status, ygg_error(&text, status)));
     }
     let v: Value = serde_json::from_str(&text).map_err(|_| (status, "刷新响应无法解析".into()))?;
-    let profile = v
-        .get("selectedProfile")
-        .filter(|p| !p.is_null())
-        .cloned();
+    let profile = v.get("selectedProfile").filter(|p| !p.is_null()).cloned();
 
     let mut updated = acc.clone();
     if let Some(t) = v.get("accessToken").and_then(|x| x.as_str()) {
@@ -305,7 +302,13 @@ fn extract_skin(properties: Option<&Value>) -> (Option<String>, Option<String>) 
             .get("metadata")
             .and_then(|m| m.get("model"))
             .and_then(|m| m.as_str())
-            .map(|m| if m == "slim" { "alex".to_string() } else { "steve".to_string() });
+            .map(|m| {
+                if m == "slim" {
+                    "alex".to_string()
+                } else {
+                    "steve".to_string()
+                }
+            });
         return (Some(normalize_skin_url(url)), variant);
     }
     (None, None)

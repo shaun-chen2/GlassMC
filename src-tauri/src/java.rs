@@ -104,8 +104,18 @@ pub fn make(home: PathBuf, source: &str) -> Option<JavaInstall> {
         .filter(|s| !s.is_empty())
         .or_else(|| rel.get("JAVA_VENDOR").cloned())
         .unwrap_or_else(|| name_of(&home));
-    let arch = rel.get("OS_ARCH").cloned().unwrap_or_else(|| "unknown".into());
-    let label = format!("{vendor} {version}{}", if arch == "unknown" { String::new() } else { format!(" · {arch}") });
+    let arch = rel
+        .get("OS_ARCH")
+        .cloned()
+        .unwrap_or_else(|| "unknown".into());
+    let label = format!(
+        "{vendor} {version}{}",
+        if arch == "unknown" {
+            String::new()
+        } else {
+            format!(" · {arch}")
+        }
+    );
     Some(JavaInstall {
         path: exe.to_string_lossy().to_string(),
         home: home.to_string_lossy().to_string(),
@@ -178,10 +188,20 @@ fn candidate_homes() -> Vec<(PathBuf, &'static str)> {
             PathBuf::from(r"C:\Program Files\Amazon Corretto"),
             PathBuf::from(r"C:\Program Files\Semeru"),
         ];
-        for key in ["LOCALAPPDATA", "APPDATA", "ProgramFiles", "ProgramFiles(x86)"] {
+        for key in [
+            "LOCALAPPDATA",
+            "APPDATA",
+            "ProgramFiles",
+            "ProgramFiles(x86)",
+        ] {
             if let Ok(v) = std::env::var(key) {
                 roots.push(PathBuf::from(&v).join("Programs").join("Eclipse Adoptium"));
-                roots.push(PathBuf::from(&v).join("Programs").join("Microsoft").join("jdk"));
+                roots.push(
+                    PathBuf::from(&v)
+                        .join("Programs")
+                        .join("Microsoft")
+                        .join("jdk"),
+                );
                 roots.push(PathBuf::from(&v).join("Java"));
                 roots.push(PathBuf::from(&v).join("Programs").join("Zulu"));
             }
@@ -213,7 +233,11 @@ pub fn installed(manual: &str) -> Vec<JavaInstall> {
 
     if !manual.trim().is_empty() {
         let p = PathBuf::from(manual.trim());
-        let home = if p.file_name().map(|n| n == "java" || n == "java.exe").unwrap_or(false) {
+        let home = if p
+            .file_name()
+            .map(|n| n == "java" || n == "java.exe")
+            .unwrap_or(false)
+        {
             p.parent().and_then(|x| x.parent()).map(|x| x.to_path_buf())
         } else {
             Some(p.clone())
@@ -227,7 +251,9 @@ pub fn installed(manual: &str) -> Vec<JavaInstall> {
     }
 
     for (home, source) in candidate_homes() {
-        let Some(j) = make(home, source) else { continue };
+        let Some(j) = make(home, source) else {
+            continue;
+        };
         let canon = std::fs::canonicalize(&j.path).unwrap_or_else(|_| PathBuf::from(&j.path));
         if seen.iter().any(|s| {
             let sc = std::fs::canonicalize(s).unwrap_or_else(|_| s.clone());
@@ -251,5 +277,7 @@ pub fn best_for(required: u32, manual: &str) -> Option<JavaInstall> {
     }
     let mut fit: Vec<&JavaInstall> = all.iter().filter(|j| j.version >= required).collect();
     fit.sort_by_key(|j| j.version);
-    fit.first().map(|j| (*j).clone()).or_else(|| all.first().cloned())
+    fit.first()
+        .map(|j| (*j).clone())
+        .or_else(|| all.first().cloned())
 }

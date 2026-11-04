@@ -70,9 +70,18 @@ pub fn detect() -> Vec<Candidate> {
 
     // Prism / MultiMC / PolyMC
     let prism_roots = [
-        ("Prism/MultiMC", home.join("Library/Application Support/PrismLauncher")),
-        ("Prism/MultiMC", home.join("Library/Application Support/MultiMC")),
-        ("Prism/MultiMC", home.join("Library/Application Support/PolyMC")),
+        (
+            "Prism/MultiMC",
+            home.join("Library/Application Support/PrismLauncher"),
+        ),
+        (
+            "Prism/MultiMC",
+            home.join("Library/Application Support/MultiMC"),
+        ),
+        (
+            "Prism/MultiMC",
+            home.join("Library/Application Support/PolyMC"),
+        ),
         ("Prism/MultiMC", home.join(".local/share/PrismLauncher")),
         (
             "Prism/MultiMC",
@@ -86,7 +95,10 @@ pub fn detect() -> Vec<Candidate> {
         if !instances.is_dir() {
             continue;
         }
-        if out.iter().any(|c| c.game_dir == instances.to_string_lossy()) {
+        if out
+            .iter()
+            .any(|c| c.game_dir == instances.to_string_lossy())
+        {
             continue;
         }
         push_candidate(&mut out, "prism", name, &root, &instances, 0);
@@ -172,7 +184,10 @@ pub fn import(launcher: &str, game_dir: &str) -> Result<usize, String> {
 
     if launcher == "hmcl" {
         for mut acc in hmcl_accounts(&src) {
-            if account::load_all().iter().any(|a| a.username == acc.username) {
+            if account::load_all()
+                .iter()
+                .any(|a| a.username == acc.username)
+            {
                 continue;
             }
             acc.id = account::random_id();
@@ -199,7 +214,9 @@ fn merge_dir(src: &Path, dst: &Path, top: bool) -> Result<(), String> {
     };
 
     for item in entries {
-        let Some(name) = item.file_name() else { continue };
+        let Some(name) = item.file_name() else {
+            continue;
+        };
         let target = dst.join(name);
         if item.is_dir() {
             std::fs::create_dir_all(&target).map_err(|e| format!("创建目录失败：{e}"))?;
@@ -267,7 +284,10 @@ fn account_from_hmcl(v: &serde_json::Value) -> Account {
         id: account::random_id(),
         kind,
         username,
-        uuid: v.get("uuid").and_then(|x| x.as_str()).map(|s| s.to_string()),
+        uuid: v
+            .get("uuid")
+            .and_then(|x| x.as_str())
+            .map(|s| s.to_string()),
         access_token: token.clone(),
         source: "hmcl".into(),
         needs_reauth: token.is_none(),

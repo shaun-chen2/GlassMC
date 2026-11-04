@@ -35,7 +35,8 @@ pub async fn download(url: &str, dest: &Path, expect_sha1: Option<&str>) -> Resu
                 }
                 last = e;
                 let _ = tokio::fs::remove_file(part_path(dest)).await;
-                tokio::time::sleep(std::time::Duration::from_millis(300 * (attempt as u64 + 1))).await;
+                tokio::time::sleep(std::time::Duration::from_millis(300 * (attempt as u64 + 1)))
+                    .await;
             }
         }
     }
@@ -43,7 +44,11 @@ pub async fn download(url: &str, dest: &Path, expect_sha1: Option<&str>) -> Resu
 }
 
 /// 依次尝试多个地址，全部失败时返回最后一次错误。
-pub async fn download_any(urls: &[String], dest: &Path, expect_sha1: Option<&str>) -> Result<(), String> {
+pub async fn download_any(
+    urls: &[String],
+    dest: &Path,
+    expect_sha1: Option<&str>,
+) -> Result<(), String> {
     let mut last = String::new();
     for u in urls.iter().filter(|u| !u.trim().is_empty()) {
         match download(u, dest, expect_sha1).await {
@@ -115,10 +120,7 @@ async fn once(url: &str, dest: &Path) -> Result<String, String> {
     let mut total: u64 = 0;
     let mut resp = resp;
     loop {
-        let chunk = resp
-            .chunk()
-            .await
-            .map_err(|e| format!("传输中断：{e}"))?;
+        let chunk = resp.chunk().await.map_err(|e| format!("传输中断：{e}"))?;
         let Some(bytes) = chunk else { break };
         if bytes.is_empty() {
             continue;

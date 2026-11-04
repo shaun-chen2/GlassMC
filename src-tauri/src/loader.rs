@@ -29,8 +29,18 @@ pub fn display(kind: &str) -> &'static str {
 /// 该游戏版本可安装的加载器版本（新的在前）。
 pub async fn versions(kind: &str, game: &str) -> Result<Vec<String>, String> {
     match kind {
-        "fabric" => meta_versions(&format!("https://meta.fabricmc.net/v2/versions/loader/{game}")).await,
-        "quilt" => meta_versions(&format!("https://meta.quiltmc.org/v3/versions/loader/{game}")).await,
+        "fabric" => {
+            meta_versions(&format!(
+                "https://meta.fabricmc.net/v2/versions/loader/{game}"
+            ))
+            .await
+        }
+        "quilt" => {
+            meta_versions(&format!(
+                "https://meta.quiltmc.org/v3/versions/loader/{game}"
+            ))
+            .await
+        }
         "neoforge" => neoforge_versions(game).await,
         "forge" => forge_versions(game).await,
         other => Err(format!("未知的加载器：{other}")),
@@ -57,7 +67,13 @@ async fn meta_versions(url: &str) -> Result<Vec<String>, String> {
     if out.is_empty() {
         return Err("该游戏版本没有可用的加载器版本".into());
     }
-    out.sort_by(|a, b| if is_newer(a, b) { std::cmp::Ordering::Less } else { std::cmp::Ordering::Greater });
+    out.sort_by(|a, b| {
+        if is_newer(a, b) {
+            std::cmp::Ordering::Less
+        } else {
+            std::cmp::Ordering::Greater
+        }
+    });
     Ok(out)
 }
 
@@ -77,9 +93,17 @@ async fn neoforge_versions(game: &str) -> Result<Vec<String>, String> {
         .filter(|v| v.starts_with(&prefix) && !v.contains("-beta") && !v.contains("-alpha"))
         .collect();
     if matched.is_empty() {
-        return Err(format!("NeoForge 没有适用于 {game} 的版本（需要 {prefix}x）"));
+        return Err(format!(
+            "NeoForge 没有适用于 {game} 的版本（需要 {prefix}x）"
+        ));
     }
-    matched.sort_by(|a, b| if is_newer(a, b) { std::cmp::Ordering::Less } else { std::cmp::Ordering::Greater });
+    matched.sort_by(|a, b| {
+        if is_newer(a, b) {
+            std::cmp::Ordering::Less
+        } else {
+            std::cmp::Ordering::Greater
+        }
+    });
     Ok(matched)
 }
 
@@ -97,7 +121,13 @@ async fn forge_versions(game: &str) -> Result<Vec<String>, String> {
     if matched.is_empty() {
         return Err(format!("Forge 没有适用于 {game} 的版本"));
     }
-    matched.sort_by(|a, b| if is_newer(a, b) { std::cmp::Ordering::Less } else { std::cmp::Ordering::Greater });
+    matched.sort_by(|a, b| {
+        if is_newer(a, b) {
+            std::cmp::Ordering::Less
+        } else {
+            std::cmp::Ordering::Greater
+        }
+    });
     Ok(matched)
 }
 
@@ -206,7 +236,12 @@ async fn install_with_installer(
 
     let java = java::best_for(21, &cfg.java_path)
         .or_else(|| java::best_for(17, &cfg.java_path))
-        .ok_or_else(|| format!("安装 {} 需要 Java 21，请先到设置里装一个 JDK", display(kind)))?;
+        .ok_or_else(|| {
+            format!(
+                "安装 {} 需要 Java 21，请先到设置里装一个 JDK",
+                display(kind)
+            )
+        })?;
 
     let game_dir = paths::paths().game_dir.clone();
     let before = version_dirs();
@@ -219,7 +254,9 @@ async fn install_with_installer(
     let game_clone = game_dir.clone();
     let output = tokio::time::timeout(
         std::time::Duration::from_secs(420),
-        tokio::task::spawn_blocking(move || run_installer(&java_path, &java_home, &jar_clone, &game_clone)),
+        tokio::task::spawn_blocking(move || {
+            run_installer(&java_path, &java_home, &jar_clone, &game_clone)
+        }),
     )
     .await
     .map_err(|_| format!("{} 安装器运行超时（7 分钟）", display(kind)))?
@@ -256,17 +293,17 @@ async fn install_with_installer(
                 .and_then(|m| m.modified())
                 .ok()
         })
-        .ok_or_else(|| {
-            format!(
-                "安装器已结束，但没找到新版本目录。\n{}",
-                tail(&output, 600)
-            )
-        })?;
+        .ok_or_else(|| format!("安装器已结束，但没找到新版本目录。\n{}", tail(&output, 600)))?;
 
     Ok(installed_id)
 }
 
-fn run_installer(java: &str, java_home: &str, jar: &PathBuf, game_dir: &PathBuf) -> Result<String, String> {
+fn run_installer(
+    java: &str,
+    java_home: &str,
+    jar: &PathBuf,
+    game_dir: &PathBuf,
+) -> Result<String, String> {
     let mut cmd = std::process::Command::new(java);
     cmd.arg("-jar")
         .arg(jar)
@@ -274,7 +311,9 @@ fn run_installer(java: &str, java_home: &str, jar: &PathBuf, game_dir: &PathBuf)
         .arg(game_dir)
         .current_dir(game_dir)
         .env("JAVA_HOME", java_home);
-    let out = cmd.output().map_err(|e| format!("无法启动 Java 安装器：{e}"))?;
+    let out = cmd
+        .output()
+        .map_err(|e| format!("无法启动 Java 安装器：{e}"))?;
     let mut text = String::from_utf8_lossy(&out.stdout).to_string();
     text.push_str(&String::from_utf8_lossy(&out.stderr));
     if !out.status.success() {
@@ -323,7 +362,9 @@ fn xml_versions(xml: &str) -> Vec<String> {
     let mut rest = xml;
     while let Some(start) = rest.find("<version>") {
         let after = &rest[start + 9..];
-        let Some(end) = after.find("</version>") else { break };
+        let Some(end) = after.find("</version>") else {
+            break;
+        };
         let v = after[..end].trim().to_string();
         if !v.is_empty() && !out.contains(&v) {
             out.push(v);
