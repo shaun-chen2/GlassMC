@@ -166,8 +166,8 @@ cd src-tauri && cargo build --release
 
 ```bash
 bash Scripts/make-linux-package.sh
-# 产物：build/linux/GlassMC_1.3.0_amd64.deb
-#      build/linux/GlassMC_1.3.0_linux-amd64.tar.gz
+# 产物：build/linux/GlassMC_<版本>_amd64.deb
+#      build/linux/GlassMC_<版本>_linux-amd64.tar.gz
 ```
 
 脚本会写好 `.desktop`、hicolor 图标、`control`（依赖声明 `libwebkit2gtk-4.1-0` 等），

@@ -761,9 +761,7 @@
     <a class="brand" href="#top"><img src="images/icon-256.png" alt="">GlassMC</a>
     <div class="nav-links">
       <a href="#features">功能</a>
-      <a href="#platforms">跨平台</a>
-      <a href="#specs">明细</a>
-      <a href="#multiplayer">联机</a>
+      <a href="#platforms">平台</a>
       <a href="#install">安装</a>
       <a href="#faq">常见问题</a>
     </div>
@@ -774,20 +772,19 @@
 <header class="hero" id="top">
   <div class="hero-grid">
     <div class="hero-left">
-      <span class="hero-badge"><span class="dot"></span>macOS · Windows · Linux&nbsp;&nbsp;|&nbsp;&nbsp;v1.3&nbsp;&nbsp;|&nbsp;&nbsp;约 10 MB</span>
+      <span class="hero-badge"><span class="dot"></span>macOS · Windows · Linux&nbsp;&nbsp;|&nbsp;&nbsp;v1.3.1&nbsp;&nbsp;|&nbsp;&nbsp;约 10 MB</span>
       <h1 class="hero-title">GlassMC</h1>
       <p class="hero-cn">液态玻璃 · MINECRAFT 启动器</p>
       <p class="hero-slogan">装版本、装模组、开游戏，<br>三次点击的事。</p>
       <p class="hero-desc">
-        内核换成了 Rust，界面重写了一遍，同一套代码现在跑 macOS、Windows、Linux。
-        玻璃还是那层玻璃——只不过这次是<b>窗口本身向系统申请的毛玻璃</b>，
-        不是在网页里堆一堆 blur 滤镜假装。选一个版本点安装，剩下的它自己来。
+        玻璃是窗口本身向系统申请的毛玻璃，不是在网页里堆一层滤镜假装。
+        选一个版本点安装，剩下的下载、补依赖、配 Java、拼启动参数，它自己来。
       </p>
       <div class="hero-btns">
         <a class="btn btn-primary" href="#download">↓ 选一个平台下载</a>
         <a class="btn btn-ghost" href="https://github.com/shaun-chen2/GlassMC">查看源码</a>
       </div>
-      <p class="hero-hint">三个平台都会被系统拦一次 —— <a href="#permission">怎么放行 →</a></p>
+      <p class="hero-hint">三个平台都会被系统拦一次 —— <a href="#install">怎么放行 →</a></p>
     </div>
 
     <div class="hero-right">
@@ -798,11 +795,10 @@
         </div>
         <div class="term-body" id="term-body">
           <div class="term-line"><span class="term-prompt">$</span> <span class="term-cmd">glassmc launch --version 新蒸程1.7</span></div>
-          <div class="term-line term-out">[glassmc] 继承链深合并 3 层 · 模组加载器 NeoForge 21.1.236</div>
+          <div class="term-line term-out">[glassmc] 继承链深合并 3 层 · NeoForge 21.1.236</div>
           <div class="term-line term-out">[glassmc] classpath 100 项 · 缺失 0 · 占位符全部展开</div>
-          <div class="term-line term-out">[glassmc] 注入 authlib-injector · MiniSkins 皮肤已同步</div>
+          <div class="term-line term-out">[glassmc] 注入 authlib-injector · 皮肤已同步</div>
           <div class="term-line term-out">[glassmc] 内存 12288 MB · JDK 21.0.5 (arm64)</div>
-          <div class="term-line term-out">[glassmc] 283 个模组，启用 279</div>
           <div class="term-line term-ok">[minecraft] Backend library: LWJGL</div>
           <div class="term-line term-ok">[minecraft] OpenAL initialized</div>
           <div class="term-line term-ok">[minecraft] Game took 59.164 seconds to start</div>
@@ -835,161 +831,71 @@
   </div>
 </div>
 
-<div class="stats">
-  <div class="stat reveal"><div class="stat-num">393</div><div class="stat-label">可安装版本（正式版 + 快照）</div></div>
-  <div class="stat reveal"><div class="stat-num">4</div><div class="stat-label">模组加载器一键安装</div></div>
-  <div class="stat reveal"><div class="stat-num">3</div><div class="stat-label">操作系统，同一套代码</div></div>
-  <div class="stat reveal"><div class="stat-num">10<i> MB</i></div><div class="stat-label">macOS 安装包大小</div></div>
-</div>
+<!-- ============================================================ 下载 -->
+<section class="section" id="download">
+  <div class="download-card reveal">
+    <img src="images/icon-256.png" alt="">
+    <h2>下载</h2>
+    <p class="meta">GlassMC 1.3.1 · macOS 15+ · Windows 10+ · Linux · <code>GPLv3</code> 开源</p>
+    <div class="hero-btns">
+      <a class="btn btn-primary" href="https://github.com/shaun-chen2/GlassMC/releases/latest/download/GlassMC.dmg">↓ macOS · dmg <small>约 9 MB</small></a>
+      <a class="btn btn-ghost" href="https://github.com/shaun-chen2/GlassMC/releases/latest/download/GlassMC-Setup.exe">Windows · exe <small>约 3 MB</small></a>
+      <a class="btn btn-ghost" href="https://github.com/shaun-chen2/GlassMC/releases/latest/download/GlassMC.deb">Linux · deb <small>约 3.4 MB</small></a>
+    </div>
+    <p class="note" style="margin-top:16px">
+      Linux 绿色版是 <a href="https://github.com/shaun-chen2/GlassMC/releases/latest/download/GlassMC-linux.tar.gz">GlassMC-linux.tar.gz</a>；
+      <a href="https://github.com/shaun-chen2/GlassMC/releases">Release 页</a>有全部资产和 SHA-256。
+      装完第一次打开会被系统拦一下，<a href="#install">放行方法在下面</a>。
+    </p>
+  </div>
+</section>
+
+<div class="sec-divider"></div>
 
 <!-- ============================================================ 功能 -->
 <section class="section" id="features">
   <div class="sec-head reveal">
     <span class="sec-tag">FEATURES</span>
-    <h2>该有的都有，<em>不该操心的不用操心</em></h2>
-    <p>从下载游戏到进服，中间那些琐碎步骤都被吞掉了。下面 12 条，是它替你做的事。</p>
+    <h2>从下载到进服，<em>中间都不用手动</em></h2>
+    <p>不用装 Java，不用手拼参数，不用配内网穿透。</p>
   </div>
 
   <div class="feature-grid">
     <div class="feature-card reveal">
       <span class="feat-icon">01</span><h3>全版本安装</h3>
-      <p>正式版与快照共 393 个。清单、版本 JSON、客户端 jar、依赖库、资源对象全部自动下载，
-        走 BMCLAPI 国内镜像，镜像没有的自动回退官方源。已经下过的文件跳过，中断了再点一次就补齐。</p>
-      <span class="feat-num">01</span>
+      <p>正式版 + 快照共 393 个。清单、版本 JSON、客户端 jar、依赖库、资源对象一路下完，逐项校验 SHA1，已有的跳过。</p>
     </div>
     <div class="feature-card reveal">
-      <span class="feat-icon">02</span><h3>加载器一键装</h3>
-      <p>Fabric、Quilt、NeoForge、Forge 四个都支持，自动匹配你选的那个游戏版本。
-        Fabric / Quilt 直接写 profile；NeoForge / Forge 下载官方安装器跑 <code>--installClient</code>，装完自动补依赖。</p>
-      <span class="feat-num">02</span>
+      <span class="feat-icon">02</span><h3>加载器与 Java</h3>
+      <p>Fabric、Quilt、Forge、NeoForge 一键装；JDK 8 / 11 / 17 / 21 按版本自动配，从清华镜像下，不用碰环境变量。</p>
     </div>
     <div class="feature-card reveal">
-      <span class="feat-icon">03</span><h3>Java 托管</h3>
-      <p>JDK 8 / 11 / 17 / 21 从清华镜像按需装，不用去 Oracle 注册账号。
-        系统里已经有的 JDK 也会被自动认出来（环境变量、系统目录、托管目录三路合并）。
-        Apple Silicon 上装 JDK 8 会自动选 x64 版本，不会给你一个装不上的包。</p>
-      <span class="feat-num">03</span>
+      <span class="feat-icon">03</span><h3>三种登录，皮肤跟着走</h3>
+      <p>离线 / 微软正版 / 外置登录。皮肤站登录后游戏里就是你的皮肤，还带一个在线皮肤库。</p>
     </div>
     <div class="feature-card reveal">
-      <span class="feat-icon">04</span><h3>三种登录方式</h3>
-      <p>离线账号、微软正版（设备码，不用在本程序里填密码）、
-        任意 Yggdrasil 认证服务器（LittleSkin / Ely.by / MiniSkins 已内置，也能填自建）。
-        认证路径会自动探测，填基址就行。</p>
-      <span class="feat-num">04</span>
+      <span class="feat-icon">04</span><h3>模组与整合包</h3>
+      <p>本地模组开关、缺失依赖提示、Modrinth 搜索安装；整合包能导入，也能导出成 .mrpack 分享。</p>
     </div>
     <div class="feature-card reveal">
-      <span class="feat-icon">05</span><h3>皮肤同步与皮肤库</h3>
-      <p>皮肤站换的皮肤会自动带进游戏（启动时挂 authlib-injector，日志里能看到
-        <code>Authentication server: 你的皮肤站</code>）。内置皮肤库连 Blessing Skin，
-        点一张直接套到账号上。头像用 canvas 现场画等距 3D 头。</p>
-      <span class="feat-num">05</span>
+      <span class="feat-icon">05</span><h3>从别的启动器搬家</h3>
+      <p>自动扫描 HMCL、官方启动器、Prism / MultiMC。版本、模组、存档、账号一起复制，原目录不动。</p>
     </div>
     <div class="feature-card reveal">
-      <span class="feat-icon">06</span><h3>本地模组管理</h3>
-      <p>读 jar 里的 <code>neoforge.mods.toml</code> / <code>mods.toml</code> / <code>fabric.mod.json</code>，
-        显示的是模组真名和版本号，不是文件名。启停就是改后缀，删除会进 <code>mods/.trash</code>，可反悔。</p>
-      <span class="feat-num">06</span>
-    </div>
-    <div class="feature-card reveal">
-      <span class="feat-icon">07</span><h3>Modrinth 搜索</h3>
-      <p>内置搜索，自动按当前实例的游戏版本和加载器过滤，装之前校验 SHA1。
-        不用开浏览器、不用手动往 mods 文件夹里拖。</p>
-      <span class="feat-num">07</span>
-    </div>
-    <div class="feature-card reveal">
-      <span class="feat-icon">08</span><h3>整合包双向支持</h3>
-      <p><code>.mrpack</code> 拖进来就能装：overrides 和文件都落到版本隔离目录，缺本体或加载器会给「继续安装」入口。
-        也能把自己的实例导出来分享，依赖从合并后的 libraries 反推。</p>
-      <span class="feat-num">08</span>
-    </div>
-    <div class="feature-card reveal">
-      <span class="feat-icon">09</span><h3>从别的启动器搬家</h3>
-      <p>自动扫描 HMCL、官方启动器、Prism / MultiMC 的目录，点一下导入：版本、模组、存档、资源包、设置都复制过来，
-        原目录不动。HMCL 配置里存着的登录令牌也会顺手带过来。</p>
-      <span class="feat-num">09</span>
-    </div>
-    <div class="feature-card reveal">
-      <span class="feat-icon">10</span><h3>陶瓦联机</h3>
-      <p>内置陶瓦联机（Terracotta）协议，不需要公网 IP、不用配端口映射。
-        一串邀请码发给朋友，对方粘进去，游戏「多人游戏」里就多出一个大厅。和官方陶瓦客户端可以互加。</p>
-      <span class="feat-num">10</span>
-    </div>
-    <div class="feature-card reveal">
-      <span class="feat-icon">11</span><h3>实时日志与参数</h3>
-      <p>启动时窗口里滚动显示游戏输出，同时落盘到 <code>logs/game-latest.log</code>。
-        内存滑块给，自定义 JVM 参数、游戏窗口尺寸改完立即生效。</p>
-      <span class="feat-num">11</span>
-    </div>
-    <div class="feature-card reveal">
-      <span class="feat-icon">12</span><h3>真的玻璃窗口</h3>
-      <p>窗口是无边框自绘的，glass 效果向系统申请：macOS 用 <code>NSVisualEffectView</code>，
-        Windows 11 用 Mica、10 退 Acrylic，Linux 交给合成器。不透明度 0.35 ~ 1.0 可调，
-        连窗口圆角都是圆的——不是画一张假截图。</p>
-      <span class="feat-num">12</span>
+      <span class="feat-icon">06</span><h3>陶瓦联机</h3>
+      <p>不用公网 IP、不用端口映射。生成一串邀请码发给朋友，对方粘进去就能进你的世界。</p>
     </div>
   </div>
 </section>
 
 <div class="sec-divider"></div>
 
-<!-- ============================================================ 两代对照 -->
-<section class="section" id="story">
-  <div class="sec-head reveal">
-    <span class="sec-tag">REWRITE</span>
-    <h2>为什么重写，<em>而不是打个补丁</em></h2>
-    <p>
-      SwiftUI 只存在于 Apple 平台。要让 Windows 和 Linux 也能跑，UI 层必须换一套能在三端渲染出同一套像素的方案。
-      界面之外，启动器最脏最累的活——拼上千项 JVM 参数、解压 natives、fork 进程、扫几百个 jar——本来就在系统层。
-      所以这一版是 <b>Rust 管后台、Web 管界面</b>。
-    </p>
-  </div>
-
-  <div class="story-grid">
-    <div class="story reveal">
-      <div class="age">上一代 · v1.1 · 归档于 swift-v1.1</div>
-      <h3>纯 SwiftUI 实现</h3>
-      <div class="stack">Swift · SwiftUI · AppKit · CoreGraphics</div>
-      <ul>
-        <li>原生控件，动画由系统渲染，手感最「Mac」</li>
-        <li>玻璃直接用 <code>NSVisualEffectView</code>，稳定</li>
-        <li><b>只能跑 macOS</b>，且要求 macOS 15+</li>
-        <li>安装包 2.3 MB，内存占用最低</li>
-        <li>源码仍保留在 <a href="https://github.com/shaun-chen2/GlassMC/tree/swift-v1.1">swift-v1.1</a> 标签</li>
-      </ul>
-    </div>
-
-    <div class="story now reveal">
-      <div class="age">这一代 · v1.3 · 当前版本</div>
-      <h3>Rust + Web 前端（Tauri 2）</h3>
-      <div class="stack">Rust · Tauri 2 · 原生 WebView · TypeScript-free JS</div>
-      <ul>
-        <li><b>同一份代码跑三个平台</b>，Windows / Linux 也已写好</li>
-        <li>窗口玻璃仍走系统 API：三端各有各的实现</li>
-        <li>卡片不再叠 <code>backdrop-filter</code>——窗口已经糊过，再糊一次只是白烧内存</li>
-        <li>功能与上一代对齐，并补了联机、导入、Modrinth</li>
-        <li><b>共用同一份数据目录</b>，装了旧版可以直接接着用</li>
-      </ul>
-    </div>
-  </div>
-
-  <div class="info reveal" style="margin-top:18px">
-    <span class="i-ico">i</span>
-    <div>
-      两代不是替代关系：数据目录、<code>accounts.json</code>、已装版本、模组全部沿用，
-      可以同时装着互不影响（配置文件刻意存成两个名字，不会互相踩）。
-      从旧版升级过来<b>不需要重新下载任何游戏文件</b>。
-    </div>
-  </div>
-</section>
-
-<div class="sec-divider"></div>
-
-<!-- ============================================================ 跨平台 -->
+<!-- ============================================================ 平台 -->
 <section class="section" id="platforms">
   <div class="sec-head reveal">
     <span class="sec-tag">PLATFORMS</span>
-    <h2>三个平台，<em>一台机器写不出三份</em></h2>
-    <p>数据目录、毛玻璃档位、进程托管、路径分隔符全按平台分支。下面是各平台的真实状态——不含吹牛。</p>
+    <h2>三个平台，<em>同一套代码</em></h2>
+    <p>数据目录、毛玻璃档位、进程托管都按平台分支，下面写的是真实状态。</p>
   </div>
 
   <div class="plat-grid">
@@ -997,9 +903,8 @@
       <div class="os">MACOS 15+ · UNIVERSAL</div>
       <h3>macOS</h3>
       <p class="tagline">
-        Apple Silicon 与 Intel 一个包搞定（universal 二进制）。
-        无边框窗口 + <code>NSVisualEffectView</code>，圆角是真的圆角。
-        装机、装版本、进游戏整条链路都在这台机器上跑过。
+        Apple Silicon 与 Intel 共用一个包。无边框窗口 + 系统毛玻璃，圆角是真的圆角。
+        装机、装版本、进游戏整条链路都在真机上跑过。
       </p>
       <div class="foot"><span class="state ok"><span class="dot"></span>真机全流程</span>直接用 dmg</div>
     </div>
@@ -1008,9 +913,8 @@
       <div class="os">WINDOWS 10 1809+ / 11 · X64</div>
       <h3>Windows</h3>
       <p class="tagline">
-        NSIS 安装包：开始菜单与桌面快捷方式、卸载项齐全，卸载时会问要不要连数据一起删。
-        需要 WebView2（Win11 自带，Win10 装 Evergreen）。毛玻璃优先 Mica，
-        失败退 Acrylic，都不行降级磨砂——圆角保留。
+        NSIS 安装包，快捷方式和卸载项齐全，卸载时会问要不要连数据一起删。
+        毛玻璃优先 Mica，退 Acrylic，都不行降级磨砂。
       </p>
       <div class="foot"><span class="state ok"><span class="dot"></span>安装/运行已验证</span>wine 下走完整流程</div>
     </div>
@@ -1019,152 +923,10 @@
       <div class="os">DEB · TAR.GZ · WEBKITGTK 4.1</div>
       <h3>Linux</h3>
       <p class="tagline">
-        在 Ubuntu 26.04 上原生编译，<code>ldd</code> 依赖自检无缺失。
-        虚拟显示里把整条链路跑了一遍：八个页面正常渲染、真实下载 1.21.11、
-        启动后进到主菜单。没有统一的窗口模糊 API：KWin 开了 blur 才有真玻璃，
-        GNOME 默认没有，所以一律先按「磨砂」出。
+        Ubuntu 26.04 原生编译，依赖自检无缺失。虚拟显示里跑完整条链路：
+        八个页面正常渲染、真实下载 1.21.11、启动进到主菜单。
       </p>
       <div class="foot"><span class="state ok"><span class="dot"></span>安装/启动已验证</span>Xvfb 里跑完整流程</div>
-    </div>
-  </div>
-
-  <div class="subhead"><span class="n">01</span>同一份界面，三个内核，像素要对齐</div>
-  <p class="note" style="max-width:820px">
-    换到 WebView 之后遇到的第一件事：同一份 HTML 在 <b>WKWebView</b>（macOS）、
-    <b>WebView2</b>（Windows）、<b>WebKitGTK</b>（Linux）里高度不一样。
-    用探针把 <code>getBoundingClientRect</code> 和 <code>getComputedStyle</code> 全量回传，
-    和 Chrome 逐项 diff 之后，根因就两个：<code>line-height: normal</code> 的解释不同，
-    以及系统字体回退链不一致。修完之后：
-  </p>
-
-  <div class="metric-grid reveal">
-    <div class="metric">
-      <div class="k">H1 标题高度</div>
-      <div class="v"><span class="was">26px / 31px</span><span class="arrow">→</span><span class="now">27.5 = 27.5</span></div>
-      <div class="d">WebKit 把 <code>normal</code> 算成 ×1.18，Blink 算成 ×1.41。显式写死 <code>line-height</code> 后两端一致。</div>
-    </div>
-    <div class="metric">
-      <div class="k">功能卡高度</div>
-      <div class="v"><span class="was">95.98 vs 99.4</span><span class="arrow">→</span><span class="now">95.98 / 95.99</span></div>
-      <div class="d">差 0.01px 是浮点舍入，肉眼不可见。修的是字体栈：<code>-apple-system</code> 在 Chrome 会静默回退。</div>
-    </div>
-    <div class="metric">
-      <div class="k">窗口内容区</div>
-      <div class="v"><span class="was">768px</span><span class="arrow">→</span><span class="now">800px</span></div>
-      <div class="d">无边框窗口去掉 32px 标题栏占位，内容区不再被裁掉一截。</div>
-    </div>
-  </div>
-  <p class="note">
-    完整实测记录（含 29 项一致 / 6 项差异的逐条对照、字体回退链的 7.5% 偏差来源）在仓库
-    <a href="https://github.com/shaun-chen2/GlassMC/blob/main/docs/rendering-parity.md">docs/rendering-parity.md</a>。
-  </p>
-</section>
-
-<div class="sec-divider"></div>
-
-<!-- ============================================================ 能力明细 -->
-<section class="section" id="specs">
-  <div class="sec-head reveal">
-    <span class="sec-tag">SPECS</span>
-    <h2>每一项到底<em>做到什么程度</em></h2>
-    <p>功能列表容易写，难的是边界在哪。下面把容易含糊的地方都写清楚。</p>
-  </div>
-
-  <div class="subhead"><span class="n">A</span>安装与运行</div>
-  <div class="table-wrap reveal">
-    <table class="spec">
-      <tr><th style="width:130px">能力</th><th style="width:120px">数据来源</th><th>具体行为</th></tr>
-      <tr><td>版本清单</td><td>BMCLAPI</td><td>正式版 + 快照共 393 个；镜像取不到时回退 <code>piston-meta.mojang.com</code></td></tr>
-      <tr><td>客户端文件</td><td>BMCLAPI / 官方</td><td>版本 JSON → 客户端 jar → 依赖库 → 资源对象，逐项校验 SHA1，已存在的跳过</td></tr>
-      <tr><td>加载器</td><td>官方 meta</td><td>Fabric / Quilt 写 profile；NeoForge / Forge 跑官方安装器再扫描新增目录</td></tr>
-      <tr><td>Java 运行时</td><td>清华 Adoptium</td><td>JDK 8 / 11 / 17 / 21；解压到 <code>.staging-*</code> 校验后才落位，避免留下空目录</td></tr>
-      <tr><td>Java 检测</td><td>本地扫描</td><td>环境变量 + <code>/Library/Java</code> + <code>~/.jdks</code> + Homebrew，读 <code>release</code> 文件解析主版本，软链去重</td></tr>
-      <tr><td>版本隔离</td><td>目录嗅探</td><td>版本目录里出现 <code>mods</code> / <code>config</code> / <code>saves</code> 就按隔离实例处理，<code>--gameDir</code> 指到该目录</td></tr>
-      <tr><td>启动参数</td><td>版本 JSON</td><td>继承链深合并 → rules 求值（含 <code>os.arch</code>）→ 占位符展开 → 分类去重</td></tr>
-      <tr><td>日志</td><td>子进程</td><td>窗口内实时滚动，同时写 <code>logs/game-latest.log</code>，退出码与耗时都记录</td></tr>
-    </table>
-  </div>
-
-  <div class="subhead"><span class="n">B</span>账号与皮肤</div>
-  <div class="table-wrap reveal">
-    <table class="spec">
-      <tr><th style="width:130px">能力</th><th style="width:120px">协议 / 服务</th><th>具体行为</th></tr>
-      <tr><td>离线账号</td><td>本地</td><td>UUID 按 <code>MD5("OfflinePlayer:名字")</code>，第 3 位固定 3、第 4 位按 RFC4122 处理变体位</td></tr>
-      <tr><td>微软正版</td><td>OAuth 2.0 设备码</td><td>device code → XBL → XSTS → Minecraft 档案；XErr 全部翻成中文，刷新令牌单独存 <code>ms-refresh.json</code></td></tr>
-      <tr><td>外置登录</td><td>Yggdrasil</td><td>认证路径自动探测：<code>/authenticate</code> → <code>/authserver/authenticate</code> → <code>/auth/authenticate</code>，404 视为路径不对继续试</td></tr>
-      <tr><td>皮肤同步</td><td>sessionserver</td><td>额外请求 <code>/sessionserver/session/minecraft/profile/{uuid}</code> 解 base64 贴图；缓存名带地址短哈希，站点换皮自动失效</td></tr>
-      <tr><td>皮肤库</td><td>Blessing Skin</td><td><code>/skinlib/list</code> 分页 + <code>/textures/{hash}</code> 原图；必须带 <code>X-Requested-With</code>，否则返回 HTML 壳</td></tr>
-      <tr><td>注入器</td><td>authlib-injector</td><td>自动下载 + SHA-256 校验，外置登录启动时挂 <code>-javaagent:…=基址</code>，<code>--userType</code> 用 <code>mojang</code></td></tr>
-    </table>
-  </div>
-
-  <div class="subhead"><span class="n">C</span>模组与整合包</div>
-  <div class="table-wrap reveal">
-    <table class="spec">
-      <tr><th style="width:130px">能力</th><th style="width:120px">数据来源</th><th>具体行为</th></tr>
-      <tr><td>本地模组</td><td>jar 元数据</td><td>解析 <code>neoforge.mods.toml</code> / <code>mods.toml</code> / <code>fabric.mod.json</code>，显示真名与版本</td></tr>
-      <tr><td>启停 / 删除</td><td>文件操作</td><td>启停改 <code>.jar</code> ↔ <code>.jar.disabled</code>；删除进 <code>mods/.trash</code>，不会真删</td></tr>
-      <tr><td>Modrinth</td><td>Modrinth API</td><td>搜索 + 版本列表，按实例的游戏版本与加载器过滤，下载后校验 SHA1</td></tr>
-      <tr><td>整合包导入</td><td>.mrpack</td><td>读 <code>modrinth.index.json</code>，overrides 落到 <code>versions/&lt;实例&gt;/</code>；缺本体给「继续安装」</td></tr>
-      <tr><td>整合包导出</td><td>本地实例</td><td>打 <code>mods/*.jar</code> + <code>config/**</code> + <code>resourcepacks/*.zip</code>，加载器版本从合并后的 libraries 反推</td></tr>
-    </table>
-  </div>
-
-  <div class="subhead"><span class="n">D</span>联机</div>
-  <div class="table-wrap reveal">
-    <table class="spec">
-      <tr><th style="width:130px">能力</th><th style="width:120px">实现</th><th>具体行为</th></tr>
-      <tr><td>协议</td><td>陶瓦 Terracotta</td><td>与官方陶瓦客户端同协议，双向可互通</td></tr>
-      <tr><td>组件</td><td>GitHub Releases</td><td>首次使用自动下载（约 12 MB），只取裸二进制，解压后校验可执行位</td></tr>
-      <tr><td>守护</td><td>本地进程</td><td><code>--daemon</code> 拉起，退出时发 <code>/panic?peaceful=true</code> 再 kill，避免留孤儿进程</td></tr>
-      <tr><td>房间</td><td>本地 HTTP</td><td>经 <code>127.0.0.1</code> 接口建房 / 加入 / 查状态，邀请码一键复制</td></tr>
-    </table>
-  </div>
-</section>
-
-<div class="sec-divider"></div>
-
-<!-- ============================================================ 联机 -->
-<section class="section" id="multiplayer">
-  <div class="sec-head reveal">
-    <span class="sec-tag">MULTIPLAYER</span>
-    <h2>和朋友开一局，<em>一串邀请码就够</em></h2>
-    <p>内置联机用的是陶瓦联机（Terracotta）协议：不用公网 IP、不用端口映射，和用陶瓦的朋友可以直接互加。</p>
-  </div>
-
-  <div class="mp-grid reveal">
-    <div>
-      <div class="mp-list">
-        <div class="mp-item"><span class="k">01</span><div><b>房主先开放世界</b><span>进存档 → Esc → 对局域网开放，然后回到「联机」页点创建房间。</span></div></div>
-        <div class="mp-item"><span class="k">02</span><div><b>把邀请码发出去</b><span>形如 U/6DRG-BECK-V92T-F9ZZ，几秒就能生成。</span></div></div>
-        <div class="mp-item"><span class="k">03</span><div><b>朋友粘贴就进</b><span>对方加入后，游戏「多人游戏」里会多出「陶瓦联机大厅」，双击进去。</span></div></div>
-      </div>
-      <p class="note" style="margin-top:16px">
-        协议层由陶瓦官方组件负责（首次使用自动下载，约 12 MB），本启动器只驱动它的本地接口；
-        对方的陶瓦客户端同样能加入你的房间，反之亦然。
-      </p>
-      <div class="pill-row">
-        <span class="pill hi">NAT 穿透</span><span class="pill">无需公网 IP</span>
-        <span class="pill">EasyTier · P2P</span><span class="pill">与官方客户端互通</span>
-      </div>
-    </div>
-
-    <div class="mp-side">
-      <div class="code-card">
-        <div class="label">ROOM CODE</div>
-        <div class="room-code">U/6DRG-BECK-V92T-F9ZZ</div>
-        <div class="hint">把这个发给朋友，或者直接复制到聊天窗口。</div>
-        <div class="peers">
-          <span class="peer host"><span class="dot"></span>房主 · GlassMC</span>
-          <span class="peer"><span class="dot"></span>成员 · 2 人</span>
-        </div>
-      </div>
-      <div class="code-card" style="padding:16px 20px">
-        <div class="label">TUNNEL</div>
-        <div class="hint" style="margin-top:6px;font-family:var(--mono);font-size:12px">
-          EasyTier · P2P · NAT 穿透 · 无需公网 IP
-        </div>
-      </div>
     </div>
   </div>
 </section>
@@ -1176,20 +938,20 @@
   <div class="sec-head reveal">
     <span class="sec-tag">INSTALL</span>
     <h2>三步装上，<em>两分钟开玩</em></h2>
-    <p>整个流程只有一个坑：第一次打开会被 macOS 拦下来。下面是绕法。</p>
+    <p>只有一个坑：第一次打开会被系统拦下来。</p>
   </div>
 
   <div class="panel reveal">
     <div class="warn">
       <span class="w-ico">⚠</span>
-      <div><strong>首次打开会被系统拦下。</strong>因为这是没有 Apple 开发者签名的应用，会提示「无法验证开发者」或者「已损坏」。
-      这是正常现象，按下面任一方法放行一次就好，之后不会再问。</div>
+      <div><strong>首次打开会被系统拦下。</strong>这是没有 Apple 开发者签名的应用，会提示「无法验证开发者」或者「已损坏」。
+      正常现象，按下面任一方法放行一次就好，之后不会再问。</div>
     </div>
 
     <ol class="steps">
-      <li class="step"><b>下载并拖进「应用程序」。</b>拿到 <code>GlassMC.dmg</code> 后双击打开，把 GlassMC 图标拖到旁边的 Applications 文件夹。</li>
-      <li class="step"><b>第一次打开时放行一次。</b>双击 GlassMC 弹出拦截提示时点「完成」，然后按下面的方法一或方法二操作。</li>
-      <li class="step"><b>开始用。</b>登录账号 →「安装」页挑一个版本点安装 → 回「版本」页点启动。</li>
+      <li class="step"><b>下载并拖进「应用程序」。</b>双击 <code>GlassMC.dmg</code>，把图标拖到旁边的 Applications 文件夹。</li>
+      <li class="step"><b>第一次打开时放行一次。</b>双击 GlassMC 被拦下时点「完成」，再按方法一或方法二操作。</li>
+      <li class="step"><b>开始用。</b>登录账号 →「安装」页挑个版本点安装 → 回「版本」页点启动。</li>
     </ol>
 
     <div id="permission"></div>
@@ -1197,12 +959,12 @@
 
     <div class="method-title">方法一 · 系统设置里点「仍要打开」<span class="badge">推荐</span></div>
     <ol class="steps">
-      <li class="step">双击 GlassMC，看到「无法打开，因为 Apple 无法验证此 App 是否包含恶意软件」，点 <b>完成</b>。</li>
-      <li class="step">打开 <b>系统设置 → 隐私与安全性</b>，向下滚动到「安全性」区域。</li>
-      <li class="step">会看到一行 <b>“GlassMC” 已被阻止使用，因为它不是来自已识别的开发者</b>，点旁边的 <b>仍要打开</b>，输入开机密码。</li>
-      <li class="step">再双击一次 GlassMC，弹窗里会出现 <b>打开</b> 按钮，点它。以后就能正常启动了。</li>
+      <li class="step">双击 GlassMC，看到「Apple 无法验证此 App 是否包含恶意软件」，点 <b>完成</b>。</li>
+      <li class="step">打开 <b>系统设置 → 隐私与安全性</b>，向下滚到「安全性」区域。</li>
+      <li class="step">看到 <b>“GlassMC” 已被阻止使用…</b> 那一行，点旁边的 <b>仍要打开</b>，输入开机密码。</li>
+      <li class="step">再双击一次 GlassMC，弹窗里出现 <b>打开</b> 按钮，点它。以后就正常了。</li>
     </ol>
-    <p class="note">如果弹窗提示的是 <b style="color:#DCEAF8">「GlassMC 已损坏，应该将它移到废纸篓」</b>，处理方式完全一样：先去系统设置 → 隐私与安全性点「仍要打开」放行一次，再打开应用。<b>不要点「移到废纸篓」</b>——它没坏，只是没签名。</p>
+    <p class="note">如果提示的是 <b style="color:#DCEAF8">「GlassMC 已损坏，应该将它移到废纸篓」</b>，处理方式完全一样：先去系统设置放行一次再打开。<b>不要点「移到废纸篓」</b>——它没坏，只是没签名。</p>
 
     <div class="method-title">方法二 · 终端一行命令</div>
     <div class="code-block">
@@ -1210,64 +972,14 @@
       <code id="xattr-cmd">xattr -dr com.apple.quarantine /Applications/GlassMC.app</code>
       <button class="copy" id="copy-btn">复制</button>
     </div>
-    <p class="note">打开「终端」（聚焦搜索 Terminal），粘贴命令回车即可。这条命令只去掉 macOS 给下载文件打的「待检查」标记，不会修改应用内容。如果 GlassMC 没装在「应用程序」文件夹，把路径换成实际位置。</p>
+    <p class="note">打开「终端」粘贴回车即可。这条命令只去掉 macOS 给下载文件打的「待检查」标记，不改应用内容。装在别处就把路径换成实际位置。</p>
 
-    <div class="method-title" style="margin-top:32px">系统要求</div>
-    <div class="table-wrap">
-      <table>
-        <tr><th>项目</th><th>要求</th></tr>
-        <tr><td><strong>芯片</strong></td><td>Apple Silicon（M1 / M2 / M3 / M4 等）或 Intel，同一个包都支持</td></tr>
-        <tr><td><strong>系统</strong></td><td>macOS 15 Sequoia 或更新；Windows 10 1809+ / 11（需 WebView2）；主流 Linux 发行版（需 WebKitGTK 4.1）</td></tr>
-        <tr><td><strong>磁盘</strong></td><td>启动器本体约 30 MB（解压后）；每个游戏版本约 500 MB ~ 1 GB（含资源文件）</td></tr>
-        <tr><td><strong>Java</strong></td><td>不用自己装，启动器会按版本自动安装合适的 JDK</td></tr>
-        <tr><td><strong>内存</strong></td><td>游戏给 4 GB 起；大型整合包建议 8 ~ 12 GB</td></tr>
-      </table>
-    </div>
-
-    <div class="method-title" style="margin-top:32px">文件都在哪</div>
+    <div class="method-title" style="margin-top:32px">系统要求与数据目录</div>
     <p class="note" style="margin-top:0">
-      想备份、清理或者手动换个版本时用得上。下面是 macOS 的路径，Windows 在 <code>%APPDATA%\GlassMC</code>，
-      Linux 在 <code>~/.local/share/GlassMC</code>，目录结构完全一样。
-    </p>
-    <div class="path-grid">
-      <div class="path-card">
-        <div class="t"><span class="ico">DIR</span>游戏数据</div>
-        <div class="p">~/Library/Application Support/GlassMC/minecraft</div>
-        <div class="n">版本、模组、存档、资源文件都在这里。整个目录拷走就是完整备份。</div>
-      </div>
-      <div class="path-card">
-        <div class="t"><span class="ico">LOG</span>启动日志</div>
-        <div class="p">…/GlassMC/logs/game-latest.log</div>
-        <div class="n">每次启动覆盖。游戏崩溃时把这个文件发出来最有用。</div>
-      </div>
-      <div class="path-card">
-        <div class="t"><span class="ico">CFG</span>设置与账号</div>
-        <div class="p">…/GlassMC/tauri-config.json<br>…/GlassMC/accounts.json</div>
-        <div class="n">账号文件与上一代共用；配置分开存，两个版本可同时存在。</div>
-      </div>
-    </div>
-    <p class="note">
-      想彻底卸载：把 GlassMC.app 拖进废纸篓，再删掉 <code>~/Library/Application Support/GlassMC</code> 即可，
-      不会在系统其它位置留东西。
-    </p>
-  </div>
-</section>
-
-<!-- ============================================================ 下载 -->
-<section class="section" id="download">
-  <div class="download-card reveal">
-    <img src="images/icon-256.png" alt="">
-    <h2>现在就可以下载</h2>
-    <p class="meta">GlassMC 1.3 · macOS 15+ · Windows 10+ · Linux · <code>GPLv3</code> 开源</p>
-    <div class="hero-btns">
-      <a class="btn btn-primary" href="https://github.com/shaun-chen2/GlassMC/releases/latest/download/GlassMC.dmg">↓ macOS · dmg <small>约 10 MB</small></a>
-      <a class="btn btn-ghost" href="https://github.com/shaun-chen2/GlassMC/releases/latest/download/GlassMC-Setup.exe">Windows · exe <small>约 3 MB</small></a>
-      <a class="btn btn-ghost" href="https://github.com/shaun-chen2/GlassMC/releases/latest/download/GlassMC.deb">Linux · deb <small>约 3.4 MB</small></a>
-    </div>
-    <p class="note" style="margin-top:16px">
-      Linux 绿色版是 <a href="https://github.com/shaun-chen2/GlassMC/releases/latest/download/GlassMC-linux.tar.gz">GlassMC-linux.tar.gz</a>，
-      <a href="https://github.com/shaun-chen2/GlassMC/releases">Release 页</a>能看到全部资产和校验和。
-      下载后如被系统拦截，见上方「打不开怎么办」。
+      macOS 15+（Apple Silicon / Intel 同一个包）；Windows 10 1809+ / 11（需 WebView2）；主流 Linux 发行版（需 WebKitGTK 4.1）。
+      Java 不用自己装，启动器按版本自动配。数据都在 <code>~/Library/Application Support/GlassMC</code>
+      （Windows 是 <code>%APPDATA%\GlassMC</code>，Linux 是 <code>~/.local/share/GlassMC</code>），
+      整个目录拷走就是完整备份；卸载时删掉它即可，不会在系统别处留东西。
     </p>
   </div>
 </section>
@@ -1279,90 +991,55 @@
   <div class="sec-head reveal">
     <span class="sec-tag">FAQ</span>
     <h2>遇到问题<em>先看这里</em></h2>
-    <p>十条最常被问到的。</p>
+    <p>六条最常被问到的。</p>
   </div>
 
   <div class="faq-list">
     <details class="reveal">
       <summary><span class="q">Q1</span>提示「GlassMC 已损坏，无法打开」怎么办？</summary>
       <div class="faq-body"><div class="faq-inner">
-        <p><b>去「系统设置 → 隐私与安全性 → 安全性」里点「仍要打开」。</b>做法：先双击一次 GlassMC，弹出提示时点「取消」；然后打开系统设置 → 隐私与安全性，向下滚到「安全性」区域，会看到一行 <code>“GlassMC” 已被阻止使用…</code>，点右边的 <b>仍要打开</b>，输入开机密码；再双击 GlassMC，弹窗里就会出现 <b>打开</b> 按钮，点它即可。</p>
-        <p>如果「安全性」区域里始终没有这一行（少数 macOS 版本对「已损坏」只给「移到废纸篓」），再用上面的 <code>xattr</code> 命令放行一次；仍然不行说明 dmg 下载不完整，重新下载一次（约 10 MB）。<b>不要点「移到废纸篓」</b>，文件没坏。</p>
+        <p><b>去「系统设置 → 隐私与安全性 → 安全性」里点「仍要打开」。</b>先双击一次 GlassMC，弹提示时点「取消」；打开系统设置 → 隐私与安全性，向下滚到「安全性」，会看到一行 <code>“GlassMC” 已被阻止使用…</code>，点右边的 <b>仍要打开</b>，输入密码；再双击 GlassMC，弹窗里出现 <b>打开</b> 按钮，点它即可。</p>
+        <p>如果「安全性」里始终没有这一行，用上面的 <code>xattr</code> 命令放行一次；仍然不行就是 dmg 没下完整，重下一遍。<b>不要点「移到废纸篓」</b>，文件没坏。</p>
       </div></div>
     </details>
 
     <details class="reveal">
-      <summary><span class="q">Q2</span>从旧版（SwiftUI 版）升级，需要重新装游戏吗？</summary>
+      <summary><span class="q">Q2</span>启动游戏时报 Java 相关的错误？</summary>
       <div class="faq-body"><div class="faq-inner">
-        <p><b>不需要。</b>两代共用同一个数据目录（macOS 是 <code>~/Library/Application Support/GlassMC</code>），
-          已装版本、模组、存档、账号文件全部沿用。配置项分开存（新版的叫 <code>tauri-config.json</code>），
-          所以两个版本可以同时装着，设置不会互相覆盖。</p>
-        <p>第一次打开新版如果版本列表是空的，去「设置」确认一下游戏目录指向的是同一个位置。</p>
+        <p>去「安装 → Java 环境」看有没有可用运行时。没有就点安装，选 17 或 21（1.17 及更新用 17/21，1.16 及更早用 8）。导入来的实例也可以选「使用实例自带的 Java」。</p>
+        <p>日志里出现 <code>UnsupportedClassVersionError</code>，就是 Java 版本比游戏要求的低，换更高的。</p>
       </div></div>
     </details>
 
     <details class="reveal">
-      <summary><span class="q">Q3</span>启动游戏时报 Java 相关的错误？</summary>
+      <summary><span class="q">Q3</span>内存该给多少？</summary>
       <div class="faq-body"><div class="faq-inner">
-        <p>去「安装 → Java 环境」看看有没有可用的运行时。没有就点安装，选 17 或 21（1.17 及更新版本用 17/21，1.16 及更早用 8）。如果是从别处导入的实例，也可以在启动时选择「使用实例自带的 Java」。</p>
-        <p>日志里如果出现 <code>UnsupportedClassVersionError</code>，就是 Java 版本比游戏要求的低，换一个更高的。</p>
+        <p>8 GB 内存给 4 GB，16 GB 给 6~8 GB，大型整合包可以到 8~12 GB。别全给游戏，否则系统本身会卡。判断标准：游戏里按 <span class="kbd">F3</span> 看右上角内存占用，长期贴着上限就该加。</p>
       </div></div>
     </details>
 
     <details class="reveal">
-      <summary><span class="q">Q4</span>内存该给多少？</summary>
+      <summary><span class="q">Q4</span>皮肤站登录了，游戏里还是默认皮肤？</summary>
       <div class="faq-body"><div class="faq-inner">
-        <p>8 GB 内存的机器给 4 GB，16 GB 给 6~8 GB，装了大型整合包可以到 8~12 GB。别把全部内存都给游戏，否则系统本身会卡。判断标准：游戏里按 <span class="kbd">F3</span> 看右上角内存占用，长时间贴着上限就该加。</p>
+        <p>确认启动的实例用的是那个皮肤站账号。外置登录会在启动时注入 authlib-injector，日志里应该出现 <code>Authentication server: 你的皮肤站地址</code> 和 <code>Httpd is running</code>。</p>
+        <p>看不到的话：去「设置 → 外置登录」确认注入器已就绪，点一次下载，再重启启动器启动游戏。</p>
       </div></div>
     </details>
 
     <details class="reveal">
-      <summary><span class="q">Q5</span>皮肤站登录了，但游戏里还是默认皮肤？</summary>
+      <summary><span class="q">Q5</span>以前 HMCL 的整合包和存档能直接用吗？</summary>
       <div class="faq-body"><div class="faq-inner">
-        <p>确认启动的实例用的是那个皮肤站账号。外置登录会在启动时自动注入 authlib-injector，日志里应该出现 <code>Authentication server: 你的皮肤站地址</code>，以及 <code>Httpd is running</code>。</p>
-        <p>看不到的话：检查「设置 → 外置登录」里注入器是否已就绪，点一次下载；然后重启启动器再启动游戏。</p>
-      </div></div>
-    </details>
-
-    <details class="reveal">
-      <summary><span class="q">Q6</span>加了模组进不去游戏？</summary>
-      <div class="faq-body"><div class="faq-inner">
-        <p>看窗口里的日志，最常见的原因是缺前置模组或版本区间不匹配。「已装模组」里会标出缺失的依赖；也可以用「禁用」按钮逐个排查（只改后缀，随时能改回来）。</p>
-        <p>NeoForge 如果报 <code>Module named … was already on the JVMs module path</code>，通常是同一个库出现了两个版本，属于启动器该处理的问题，欢迎提 issue。</p>
-      </div></div>
-    </details>
-
-    <details class="reveal">
-      <summary><span class="q">Q7</span>以前 HMCL 的整合包和存档能直接用吗？</summary>
-      <div class="faq-body"><div class="faq-inner">
-        <p>能。左侧「导入」会自动扫描 HMCL、官方启动器、Prism / MultiMC 的目录，选一个点导入，账号、版本、模组、存档都会复制过来，原目录不受影响。</p>
+        <p>能。左侧「导入」会自动扫描 HMCL、官方启动器、Prism / MultiMC 的目录，选一个点导入，账号、版本、模组、存档都复制过来，原目录不受影响。</p>
         <p>HMCL 的版本隔离实例（<code>versions/xxx/</code> 里带 mods 和 saves 的那种）会被识别成隔离实例，启动时 <code>--gameDir</code> 指到该目录，不会串档。</p>
       </div></div>
     </details>
 
     <details class="reveal">
-      <summary><span class="q">Q8</span>Windows / Linux 真的能用吗？</summary>
+      <summary><span class="q">Q6</span>Windows / Linux 真的能用吗？</summary>
       <div class="faq-body"><div class="faq-inner">
-        <p><b>编译、打包、安装都跑通了；Linux 的界面也已经在虚拟显示里实际看过。</b></p>
-        <p><b>Windows</b>：交叉编译出的是 PE32+ 可执行文件，<code>objdump</code> 确认只依赖系统 DLL 和 <code>WebView2Loader.dll</code>（mingw 运行时已静态链接，不需要额外装东西）。装进 wine 之后走完了「静默安装 → 从 <code>Program Files</code> 启动 → 卸载无残留」，exe 能正常执行到读配置、找 Java。真实 Windows 上的窗口长什么样没看到。</p>
-        <p><b>Linux</b>：在 Ubuntu 26.04 上原生编译，然后在 Xvfb 虚拟显示里跑了一遍完整流程——八个页面全部正常渲染（没白屏、没错位），点安装真实下载了 1.21.11（62 个文件 + 4591 个资源对象，0 失败），再从这台机器拉起 Minecraft，进到了主菜单。窗口模糊本身没看到：测试环境没有合成器，档位直接落在「磨砂」。</p>
-        <p>最可能出问题的两处：<code>glass.rs</code>（Windows 的 Mica / Acrylic API 版本差异、Linux 的合成器行为）和 <code>game.rs</code>（进程组管理、Windows 下控制台窗口是否弹出）。遇到了欢迎提 issue。</p>
-      </div></div>
-    </details>
-
-    <details class="reveal">
-      <summary><span class="q">Q9</span>为什么安装包比上一代大了 4 倍？</summary>
-      <div class="faq-body"><div class="faq-inner">
-        <p>因为要打包一个 WebView 宿主和一个 Rust 运行时。上一代 2.3 MB 是因为 SwiftUI 直接用系统框架，几乎没有额外体积。</p>
-        <p>10 MB 换三个平台，这个交易是划算的——而且它不占常驻内存：界面渲染交给系统自带的 WebView，不像 Electron 那样自带一整个 Chromium（那通常是 100 MB 起）。</p>
-      </div></div>
-    </details>
-
-    <details class="reveal">
-      <summary><span class="q">Q10</span>支持 Intel Mac 吗？</summary>
-      <div class="faq-body"><div class="faq-inner">
-        <p>支持。这一版是 universal 二进制（<code>x86_64</code> + <code>arm64</code>），同一个 dmg 在两种芯片上都能跑，系统会自动选对应架构。</p>
-        <p>上一代（SwiftUI 版）只提供 Apple Silicon 版本，如果你之前因为这个没用上，现在可以了。</p>
+        <p><b>Windows</b>：交叉编译出的是 PE32+ 可执行文件，只依赖系统 DLL 和 <code>WebView2Loader.dll</code>。装进 wine 走完了「静默安装 → 从 Program Files 启动 → 卸载无残留」。真实 Windows 上的窗口长什么样还没看到。</p>
+        <p><b>Linux</b>：Ubuntu 26.04 原生编译，在 Xvfb 里跑了一遍完整流程——八个页面正常渲染、真实下载 1.21.11（62 个文件 + 4591 个资源对象，0 失败）、启动进到主菜单。窗口模糊没看到：测试环境没有合成器，档位落在「磨砂」。</p>
+        <p>最可能出问题的是 <code>glass.rs</code>（Mica / Acrylic 版本差异、合成器行为）和 <code>game.rs</code>（进程组管理、Windows 控制台窗口）。遇到了欢迎提 issue。</p>
       </div></div>
     </details>
   </div>
@@ -1379,8 +1056,7 @@
       <a href="https://github.com/shaun-chen2/GlassMC/blob/main/LICENSE">GPLv3 许可</a>
     </div>
     <p class="footer-copy">
-      游戏文件来自 BMCLAPI 镜像，Java 运行时来自清华大学开源软件镜像站，模组数据来自 Modrinth，
-      联机协议来自陶瓦联机（Terracotta）。
+      游戏文件来自 BMCLAPI 镜像，Java 运行时来自清华大学开源软件镜像站，模组数据来自 Modrinth，联机协议来自陶瓦联机。
       本项目与 Mojang / Microsoft 无关联，连接正版服务器需自备正版账号。Minecraft 是 Mojang Studios 的商标。
     </p>
   </div>
