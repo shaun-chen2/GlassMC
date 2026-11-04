@@ -1,34 +1,44 @@
 # GlassMC
 
 **一个把「装游戏」这件事藏起来的 Minecraft 启动器。**
-界面是液态玻璃——窗口本身申请系统的原生毛玻璃，不是网页里堆出来的假透明。
+界面是液态玻璃——窗口本身向系统申请原生毛玻璃，不是网页里堆出来的假透明。
+
+[![Release](https://img.shields.io/github/v/release/shaun-chen2/GlassMC?style=flat-square&label=release)](https://github.com/shaun-chen2/GlassMC/releases/latest)
+[![CI](https://github.com/shaun-chen2/GlassMC/actions/workflows/ci.yml/badge.svg)](https://github.com/shaun-chen2/GlassMC/actions/workflows/ci.yml)
+[![License](https://img.shields.io/badge/license-GPLv3-2f7cf6?style=flat-square)](LICENSE)
+[![Downloads](https://img.shields.io/github/downloads/shaun-chen2/GlassMC/total?style=flat-square&color=2f7cf6)](https://github.com/shaun-chen2/GlassMC/releases)
+[![Issues](https://img.shields.io/github/issues/shaun-chen2/GlassMC?style=flat-square)](https://github.com/shaun-chen2/GlassMC/issues)
+[![PRs welcome](https://img.shields.io/badge/PRs-welcome-7fd3a0?style=flat-square)](CONTRIBUTING.md)
 
 [![macOS](https://img.shields.io/badge/macOS-下载%20dmg-2f7cf6?style=for-the-badge&logo=apple&logoColor=white)](https://github.com/shaun-chen2/GlassMC/releases/latest/download/GlassMC.dmg)
 [![Windows](https://img.shields.io/badge/Windows-下载%20exe-2f7cf6?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/shaun-chen2/GlassMC/releases/latest/download/GlassMC-Setup.exe)
 [![Linux](https://img.shields.io/badge/Linux-下载%20deb-2f7cf6?style=for-the-badge&logo=linux&logoColor=white)](https://github.com/shaun-chen2/GlassMC/releases/latest/download/GlassMC.deb)
 [![介绍页](https://img.shields.io/badge/介绍页-GitHub.io-111?style=for-the-badge)](https://shaun-chen2.github.io/GlassMC/)
-[![许可](https://img.shields.io/badge/许可-GPLv3-2f7cf6?style=for-the-badge)](LICENSE)
 
 ![GlassMC 主界面](docs/images/app-window.jpg)
 
 选一个版本点安装，剩下的它自己来：下载游戏文件、配 Java、装加载器、拉模组。
 装完直接点启动，中间不用碰任何配置文件。
 
+| 390+ | 4 | 3 | GPLv3 |
+|:---:|:---:|:---:|:---:|
+| 可装版本 | 模组加载器 | 操作系统 | 开源许可 |
+
 ---
 
 ## 下载
 
-| 平台 | 状态 | 文件 |
+| 平台 | 要求 | 文件 |
 |---|---|---|
-| **macOS** 15+（Apple Silicon / Intel 通用） | 已在真机跑过完整流程 | [`GlassMC.dmg`](GlassMC.dmg) 约 10 MB |
-| **Windows** 10 1809+ / 11（64 位） | 已编译，安装 / 运行 / 卸载在 wine 下验证通过 | `GlassMC-Setup.exe` 约 3 MB |
-| **Linux**（WebKitGTK 4.1） | 已在 Ubuntu 26.04 上实测：界面、下载安装、启动进主菜单均通过 | `GlassMC.deb` 约 3.4 MB / `GlassMC-linux.tar.gz` 约 4.6 MB |
+| **macOS** | 15 Sequoia 或更新，Apple Silicon / Intel 通用 | [`GlassMC.dmg`](https://github.com/shaun-chen2/GlassMC/releases/latest/download/GlassMC.dmg) · 约 9 MB |
+| **Windows** | 10 1809+ / 11，64 位 | [`GlassMC-Setup.exe`](https://github.com/shaun-chen2/GlassMC/releases/latest/download/GlassMC-Setup.exe) · 约 3 MB |
+| **Linux** | 需要 WebKitGTK 4.1 | [`GlassMC.deb`](https://github.com/shaun-chen2/GlassMC/releases/latest/download/GlassMC.deb) · 约 3.4 MB<br>[`GlassMC-linux.tar.gz`](https://github.com/shaun-chen2/GlassMC/releases/latest/download/GlassMC-linux.tar.gz) · 约 4.6 MB（绿色版） |
 
-**macOS** 要求 **15 Sequoia 或更新**。装法：双击 dmg，把 GlassMC 拖进「应用程序」。
+> **第一次打开会被系统拦下来**，提示「无法验证开发者」「已损坏」或 SmartScreen 警告。
+> 这不是文件坏了，是发布包没有代码签名证书的正常现象。
+> 三个平台各自的放行方法见[安装说明](https://shaun-chen2.github.io/GlassMC/#install)，只需操作一次。
 
-> **第一次打开会被系统拦下来**，提示「无法验证开发者」或「已损坏」——
-> 这不是文件坏了，是没有 Apple 开发者签名的正常现象。处理方法见下面
-> [打不开怎么办](#打不开怎么办)。
+Release 页面附有每个文件的 SHA-256，下载后可以核对。
 
 ---
 
@@ -92,86 +102,89 @@ HMCL 配置里存着的登录令牌也会顺手带过来。
 
 ---
 
-## 打不开怎么办
+## 安装
 
-三个平台都会因为「没有代码签名证书」被系统拦一次。都只需要放行一次。
+**macOS**：双击 dmg，把 GlassMC 拖进「应用程序」。第一次打开被拦时，
+去 **系统设置 → 隐私与安全性** 点「仍要打开」；或者终端执行
+`xattr -dr com.apple.quarantine /Applications/GlassMC.app`。
 
-### macOS：系统设置里点「仍要打开」（推荐）
+**Windows**：双击 exe，若出现蓝色「Windows 已保护你的电脑」，
+点 **更多信息 → 仍要运行**。装完从开始菜单启动。
 
-因为没买 Apple 开发者证书（一年 99 美元），应用只有 ad-hoc 签名。
+**Linux**：`sudo apt install ./GlassMC.deb`，装完菜单里就有（`./` 不能省）。
+Fedora / Arch 用绿色版：`tar xzf GlassMC-linux.tar.gz && ./glassmc`。
 
-1. 双击 GlassMC，弹出「无法打开，因为 Apple 无法验证…」时点 **完成**；
-2. 打开 **系统设置 → 隐私与安全性**，向下滚到「安全性」区域；
-3. 会看到 `"GlassMC" 已被阻止使用，因为它不是来自已识别的开发者`，点右边的 **仍要打开**，输开机密码；
-4. 再双击一次 GlassMC，弹窗里会出现 **打开** 按钮，点它。
+三个平台的详细步骤、缺依赖怎么办、白窗口怎么办，都在
+[介绍页的安装一节](https://shaun-chen2.github.io/GlassMC/#install)。
 
-> 如果提示的是 **「GlassMC 已损坏，应该将它移到废纸篓」**，处理方式完全一样：
-> 先去隐私与安全性点「仍要打开」放行，再打开应用。**不要点「移到废纸篓」。**
-
-### macOS：终端一行命令
-
-```bash
-xattr -dr com.apple.quarantine /Applications/GlassMC.app
-```
-
-这条命令只是去掉 macOS 给下载文件打的「待检查」标记，不改应用内容。
-没装在「应用程序」文件夹的话，把路径换成实际位置。
-
-### Windows：SmartScreen 拦了
-
-双击 `GlassMC-Setup.exe` 时，如果出现蓝色的 **「Windows 已保护你的电脑」**：
-
-1. 点框里的 **更多信息**；
-2. 下面会多出一行 **仍要运行**，点它；
-3. 安装完成后从开始菜单启动，若再被拦一次，同样点「更多信息 → 仍要运行」。
-
-装完是标准程序：控制面板 / 设置里能卸载，开始菜单和桌面都有快捷方式。
-安装位置默认 `C:\Program Files\GlassMC`，用户数据在 `%APPDATA%\GlassMC`（卸载时会问要不要一并删除）。
-
-### Linux：装完运行
-
-Debian / Ubuntu 系直接装 deb，依赖会自动处理：
-
-```bash
-sudo apt install ./GlassMC.deb
-```
-
-Fedora / Arch 等用绿色版：
-
-```bash
-tar -xzf GlassMC-linux.tar.gz
-chmod +x glassmc && ./glassmc
-```
-
-跑起来报缺库的话，装 WebKitGTK 4.1：
-
-```bash
-# Debian / Ubuntu
-sudo apt install libwebkit2gtk-4.1-0
-# Fedora
-sudo dnf install webkit2gtk4.1
-# Arch
-sudo pacman -S webkit2gtk-4.1
-```
+数据目录：macOS `~/Library/Application Support/GlassMC`、Windows `%APPDATA%\GlassMC`、
+Linux `~/.local/share/GlassMC`。整个目录拷走就是完整备份，卸载时删掉即可。
 
 ---
 
-## 系统要求
+## 从源码跑
 
-| 项目 | 要求 |
+```bash
+cd src-tauri
+cargo run              # 编译并启动；前端没有构建步骤，改完界面重跑即可
+```
+
+```bash
+bash build.sh                          # macOS：build/GlassMC.app + GlassMC.dmg
+bash Scripts/make-linux-package.sh     # Linux：deb + tar.gz
+```
+
+只想调界面不想等编译，可以用浏览器的 mock 模式：
+
+```bash
+python3 -m http.server 8080 --directory src
+# 打开 http://localhost:8080
+```
+
+完整的三端构建步骤、交叉编译、打包脚本说明见 [开发说明](docs/development.md)，
+模块划分与启动链见 [架构说明](docs/architecture.md)。
+
+---
+
+## 参与贡献
+
+这个项目欢迎任何人参与，包括第一次给开源项目提 PR 的人。
+
+| 你能做的 | 从哪开始 |
 |---|---|
-| 芯片 | macOS：Apple Silicon 或 Intel 都行（universal 二进制） |
-| 系统 | macOS 15 Sequoia 或更新；Windows 10 1809+；主流 Linux 发行版 |
-| 磁盘 | 每个游戏版本约 500 MB ~ 1 GB；整合包另算 |
-| Java | 不用自己装，启动器按版本要求自动配 |
-| 内存 | 游戏给 4 GB 起，大整合包建议 8~12 GB |
+| 报一个能复现的 bug | [新建 issue](https://github.com/shaun-chen2/GlassMC/issues/new/choose)——按表单填，日志比截图有用 |
+| 认领一个小任务练手 | [`good first issue`](https://github.com/shaun-chen2/GlassMC/labels/good%20first%20issue) |
+| 在真机上验证 | [`help wanted`](https://github.com/shaun-chen2/GlassMC/labels/help%20wanted)：Windows 真机、各种桌面环境都缺人 |
+| 改代码、修文档、翻译 | [CONTRIBUTING.md](CONTRIBUTING.md) 里有本地开发、代码约定和 PR 流程 |
+| 提问、聊想法 | [Discussions](https://github.com/shaun-chen2/GlassMC/discussions) |
+
+提 PR 之前请跑一遍 `cargo fmt --all --check` 和 `cargo clippy --all-targets -- -D warnings`，
+CI 会检查同样的东西，外加三端编译。
+
+参与本项目即表示你同意遵守[贡献者行为准则](CODE_OF_CONDUCT.md)。
+安全问题请走[私下报告](SECURITY.md)，不要开公开 issue。
+
+---
+
+## 项目状态
+
+三端都由 CI 编译验证，但**运行验证的程度不一样**，这里如实写清楚：
+
+- **macOS**：在本机跑过完整流程——装机、装版本、装加载器、启动进主菜单。
+  窗口毛玻璃是真实的 `NSVisualEffectView`。
+- **Windows**：交叉编译产物，在 wine 里走完了「静默安装 → 从 `Program Files` 启动 → 卸载无残留」，
+  能执行到读配置、找 Java。**真实 Windows 上的界面还没人看过**，最可能出问题的是
+  Mica / Acrylic 的版本差异和进程管理。欢迎有 Windows 机器的朋友帮忙验证。
+- **Linux**：在 Ubuntu 26.04 上原生编译，并在虚拟显示里跑完整条链路：
+  八个页面正常渲染、真实下载 1.21.11（62 个文件 + 4591 个资源对象，0 失败）、
+  启动后进到主菜单。模糊取决于桌面合成器，测试环境没有合成器，所以实际是磨砂效果。
 
 ---
 
 ## 常见问题
 
 **Q：提示「已损坏」是不是下载坏了？**
-不是。是没有开发者签名。按上面「打不开怎么办」放行一次即可，不用重新下载。
+不是。是没有开发者签名。按[安装说明](https://shaun-chen2.github.io/GlassMC/#install)放行一次即可，不用重新下载。
 
 **Q：启动游戏报 Java 相关的错？**
 去「安装 → Java 环境」看有没有可用运行时。没有就点安装，选 17 或 21
@@ -190,53 +203,39 @@ sudo pacman -S webkit2gtk-4.1
 **Q：以前 HMCL 的整合包和存档能直接用吗？**
 能。「导入」页会自动扫描 HMCL / 官方 / Prism 的目录，导入时复制过来，原目录不受影响。
 
-**Q：Windows 和 Linux 真的能用吗？**
-两个平台的包都是交叉编译出来的，编译期错误已经清干净了：
-
-- **Windows**：装到 wine 里走完了「静默安装 → 从 Program Files 启动 → 卸载无残留」，
-  exe 在 wine 下能正常执行到业务逻辑（读配置、找 Java）。真实 Windows 上的界面没看过——
-  最可能出问题的是毛玻璃 API（Win11 Mica / Win10 Acrylic 的版本差异）。
-- **Linux**：在 Ubuntu 26.04 上原生编译，并在虚拟显示（Xvfb）里把整条链路跑了一遍：
-  八个页面全部正常渲染、真实下载 1.21.11（62 个文件 + 4591 个资源对象，0 失败）、
-  启动后进到了主菜单。窗口模糊取决于桌面合成器，测试环境没有合成器，
-  所以「磨砂」实际长什么样还没看到——多数桌面会退化成半透明。
-
-遇到问题欢迎提 issue，附上 `logs/game-latest.log` 和启动器日志。
-
 **Q：和上一代原生版是什么关系？**
 上一代是纯 SwiftUI 写的，只能在 macOS 跑。这一代换成 Tauri 2（Rust + Web 前端），
 界面和功能重做了一遍，为的是能跑三个平台。两代**共用同一个数据目录**，
-已装的版本、账号、设置都直接沿用，可以同时装着互不影响。
-Swift 源码保留在 [`swift-v1.1`](https://github.com/shaun-chen2/GlassMC/tree/swift-v1.1) 标签里。
+已装的版本、账号、设置都直接沿用。Swift 源码保留在
+[`swift-v1.1`](https://github.com/shaun-chen2/GlassMC/tree/swift-v1.1) 标签里。
 
 ---
 
-## 从源码跑
+## 项目结构
 
-```bash
-cd src-tauri
-cargo run --release
+```
+src/                前端：一个 index.html + 几个 js/css，没有构建步骤
+src-tauri/src/      Rust 后端：23 个模块，一个模块一件事
+Scripts/            打包脚本（NSIS、deb、DMG 配置、图标生成）
+docs/               介绍页与文档
 ```
 
-打包 macOS 应用与 dmg：
+细节在 [架构说明](docs/architecture.md)。
 
-```bash
-bash build.sh
-```
+## 致谢
 
-Windows / Linux 的依赖与构建方式、目录结构、实现细节，都在 [开发说明](docs/development.md)。
+界面与功能的设计大量参考了 [HMCL](https://github.com/HMCL-dev/HMCL) 和
+[PCL2](https://github.com/Hex-Dragon/PCL2) 的使用习惯；联机协议来自
+[陶瓦联机 Terracotta](https://github.com/burningtnt/Terracotta)；外置登录注入用
+[authlib-injector](https://github.com/yushijinhun/authlib-injector)。
 
----
-
-## 许可与致谢
-
-**GPLv3**。用到的公共服务与项目：
+用到的公共服务：
 
 - 游戏文件：BMCLAPI 镜像（HMCL 默认国内源）
 - Java 运行时：Adoptium，走清华大学开源软件镜像站
 - 模组数据：Modrinth API
-- 外置登录注入：authlib-injector
-- 联机协议：[陶瓦联机 Terracotta](https://github.com/burningtnt/Terracotta)
 
-本项目与 Mojang / Microsoft 无关联。连接正版服务器需要自备正版账号。
+## 许可
+
+**GPLv3**。本项目与 Mojang / Microsoft 无关联，连接正版服务器需要自备正版账号。
 Minecraft 是 Mojang Studios 的商标。

@@ -5,9 +5,15 @@ target/
 # Tauri 生成的 schema
 src-tauri/gen/schemas/
 
-# 打包中间产物（发布用的 GlassMC.dmg 放在根目录，会提交）
+# 打包中间产物
 build/
 *.app/
+
+# 安装包不入库：发布走 GitHub Release（releases/latest/download/...）
+/GlassMC.dmg
+/GlassMC-Setup.exe
+/GlassMC.deb
+/GlassMC-linux.tar.gz
 
 # 系统与编辑器
 .DS_Store
