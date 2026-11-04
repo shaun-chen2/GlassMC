@@ -9,10 +9,14 @@ updates:
       day: monday
       time: "09:00"
       timezone: Asia/Shanghai
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 3
     labels: ["dependencies"]
     commit-message:
       prefix: "chore(deps)"
+    # 大版本几乎都要改代码（zip 4→9、base64 0.22→0.23 这种），手动升，别自动提
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
     groups:
       tauri:
         patterns:
