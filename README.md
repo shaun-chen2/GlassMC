@@ -13,7 +13,7 @@
 [![macOS](https://img.shields.io/badge/macOS-下载%20dmg-2f7cf6?style=for-the-badge&logo=apple&logoColor=white)](https://github.com/shaun-chen2/GlassMC/releases/latest/download/GlassMC.dmg)
 [![Windows](https://img.shields.io/badge/Windows-下载%20exe-2f7cf6?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/shaun-chen2/GlassMC/releases/latest/download/GlassMC-Setup.exe)
 [![Linux](https://img.shields.io/badge/Linux-下载%20deb-2f7cf6?style=for-the-badge&logo=linux&logoColor=white)](https://github.com/shaun-chen2/GlassMC/releases/latest/download/GlassMC.deb)
-[![介绍页](https://img.shields.io/badge/介绍页-GitHub.io-111?style=for-the-badge)](https://shaun-chen2.github.io/GlassMC/)
+[![介绍页](https://img.shields.io/badge/%E4%BB%8B%E7%BB%8D%E9%A1%B5-GitHub.io-111?style=for-the-badge)](https://shaun-chen2.github.io/GlassMC/)
 
 ![GlassMC 主界面](docs/images/app-window.jpg)
 
