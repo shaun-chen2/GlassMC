@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 装不上 / 打不开
+    url: https://shaun-chen2.github.io/GlassMC/#install
+    about: 首次打开被系统拦下、提示已损坏、缺少依赖、窗口白屏 —— 三个平台的放行方法都在这一页
+  - name: 使用问题与闲聊
+    url: https://github.com/shaun-chen2/GlassMC/discussions
+    about: 「这个版本能不能用」「怎么给整合包加内存」这类问题请在 Discussions 里问
+  - name: 我想自己编译 / 改代码
+    url: https://github.com/shaun-chen2/GlassMC/blob/main/docs/development.md
+    about: 三端构建步骤、交叉编译、打包脚本说明

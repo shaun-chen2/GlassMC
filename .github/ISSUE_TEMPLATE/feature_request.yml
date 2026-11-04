@@ -1,0 +1,61 @@
+name: 提一个需求
+description: 想要的新功能、想改掉的体验问题
+title: "[Feature] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        提之前先想一个问题：**这是「启动器该做的事」吗？** GlassMC 的目标是把装游戏这件事藏起来，
+        所以「自动配好一切」在这，而「内置一个模组编辑器」大概率不在这。
+
+  - type: textarea
+    id: need
+    attributes:
+      label: 你想要什么
+      description: 用一句话描述你希望发生的事
+      placeholder: 希望导入整合包时能选择跳过哪些模组
+    validations:
+      required: true
+
+  - type: textarea
+    id: why
+    attributes:
+      label: 为什么需要它
+      description: 你现在是怎么做的？哪一步让你觉得麻烦？
+      placeholder: 现在只能先导入再一个个禁用，模组多的包要点上百次。
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: 属于哪块
+      options:
+        - 安装 / 下载
+        - 启动 / Java
+        - 账号 / 皮肤
+        - 模组 / 整合包
+        - 联机
+        - 界面 / 交互
+        - 其他
+    validations:
+      required: true
+
+  - type: textarea
+    id: alt
+    attributes:
+      label: 有别的办法吗
+      description: 其他启动器怎么做的，或者你觉得哪种设计更合理
+
+  - type: dropdown
+    id: contribute
+    attributes:
+      label: 愿意自己实现吗
+      description: 说愿意不等于必须做，只是方便维护者判断怎么配合你
+      options:
+        - 可以，我会提 PR
+        - 可以，但需要有人带一下
+        - 我只能提需求
+    validations:
+      required: true

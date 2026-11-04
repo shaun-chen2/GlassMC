@@ -1,0 +1,116 @@
+name: 报告一个问题
+description: 崩溃、装不上、启动不了、界面错乱、联机失败
+title: "[Bug] "
+labels: ["bug", "needs-info"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        先看这三条，能省掉一半来回：
+
+        - **装不上 / 打不开**，多半是系统拦截，按[安装说明](https://shaun-chen2.github.io/GlassMC/#install)放行一次就好。
+        - **只是问用法**，请去 [Discussions](https://github.com/shaun-chen2/GlassMC/discussions)，issue 区留给确定的缺陷。
+        - **启动失败**的问题，九成能在日志最后几十行里直接看到原因。日志比截图有用得多。
+
+  - type: input
+    id: version
+    attributes:
+      label: 启动器版本
+      description: 设置页最下面、或者 Release 页面上的版本号
+      placeholder: v1.3.1
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: 操作系统
+      options:
+        - macOS
+        - Windows
+        - Linux
+        - 其他（写在下面）
+    validations:
+      required: true
+
+  - type: input
+    id: os-version
+    attributes:
+      label: 系统版本
+      description: macOS 15.3 / Windows 11 23H2 / Ubuntu 24.04 这样写
+      placeholder: macOS 15.3
+    validations:
+      required: true
+
+  - type: input
+    id: game-version
+    attributes:
+      label: 出问题的游戏版本
+      description: 版本页里那一行的名字，带加载器的一起写上
+      placeholder: 新蒸程1.7（1.21.1 + NeoForge 21.1.236）
+
+  - type: dropdown
+    id: java
+    attributes:
+      label: 使用的 Java
+      description: 设置页「Java 环境」里选中的那个
+      options:
+        - JDK 21
+        - JDK 17
+        - JDK 11
+        - JDK 8
+        - 实例自带的 Java
+        - 不确定
+    validations:
+      required: true
+
+  - type: textarea
+    id: what
+    attributes:
+      label: 发生了什么
+      description: 一句话说清现象，别只写「启动不了」
+      placeholder: 点「启动」之后进度条走完，游戏窗口闪一下就退出，没有画面。
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: 复现步骤
+      value: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+
+  - type: textarea
+    id: log
+    attributes:
+      label: 日志
+      description: |
+        把**最后 100 行**贴进来，不要整份上传。
+
+        - 启动器日志：`设置 → 启动日志` 面板里能直接看到，也可以打开数据目录下的 `logs/game-latest.log`
+        - 游戏自己的日志：数据目录下 `minecraft/logs/latest.log`
+
+        数据目录位置：macOS `~/Library/Application Support/GlassMC`、Windows `%APPDATA%\GlassMC`、Linux `~/.local/share/GlassMC`
+      render: shell
+    validations:
+      required: false
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: 截图 / 其他信息
+      description: 截图直接拖进这个框。装了哪些模组、用了哪个皮肤站，也写在这里。
+
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: 确认
+      options:
+        - label: 我搜过现有 issue，没有重复
+          required: true
+        - label: 我用的是[最新版本](https://github.com/shaun-chen2/GlassMC/releases/latest)，不是旧包
+          required: true

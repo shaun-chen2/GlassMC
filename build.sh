@@ -16,9 +16,12 @@ cd "$(dirname "$0")"
 
 APP_NAME="GlassMC"
 BUNDLE_ID="com.glassmc.launcher"
-VERSION="1.3.1"
 OUT="build"
 SRC_TAURI="src-tauri"
+
+# 版本号只在 tauri.conf.json 里写一份，这里读出来用
+VERSION="$(python3 -c 'import json,sys;print(json.load(open("src-tauri/tauri.conf.json"))["version"])')"
+[[ -n "$VERSION" ]] || { echo "读不到版本号"; exit 1; }
 
 SKIP_BUILD=0
 [[ "${1:-}" == "--skip-build" ]] && SKIP_BUILD=1
