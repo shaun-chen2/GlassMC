@@ -8,12 +8,9 @@ on:
       - "**/*.md"
       - "LICENSE"
       - ".github/ISSUE_TEMPLATE/**"
+  # PR 不做路径过滤：main 要求检查必须变绿才能合并，
+  # 一旦跳过，纯文档 PR 会永远卡在 "Expected — Waiting for status"。
   pull_request:
-    paths-ignore:
-      - "docs/**"
-      - "**/*.md"
-      - "LICENSE"
-      - ".github/ISSUE_TEMPLATE/**"
   workflow_dispatch:
 
 # 同一个分支连续 push 时，取消上一轮还在跑的检查
