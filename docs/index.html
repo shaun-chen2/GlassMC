@@ -407,10 +407,13 @@
   .code-block {
     display: flex; align-items: center; gap: 12px; border-radius: 10px; padding: 13px 15px;
     background: rgba(8, 16, 28, .85); border: 1px solid rgba(95, 159, 214, .24);
-    font-family: var(--mono); font-size: 13px; overflow-x: auto;
+    font-family: var(--mono); font-size: 13px; overflow: hidden;
   }
   .code-block .prompt { color: var(--primary); flex: none; }
-  .code-block code { color: #9FE8B0; white-space: nowrap; }
+  .code-block code {
+    flex: 1 1 auto; min-width: 0; overflow-x: auto; white-space: nowrap;
+    color: #9FE8B0; scrollbar-width: thin;
+  }
   .code-block .copy {
     margin-left: auto; flex: none; font-family: var(--sans); font-size: 12px; color: var(--text-dim);
     background: rgba(95, 159, 214, .1); border: 1px solid rgba(95, 159, 214, .24);
@@ -418,6 +421,39 @@
   }
   .code-block .copy:hover { color: #fff; background: rgba(95, 159, 214, .2); }
   .code-block .copy.ok { color: var(--green); border-color: rgba(127, 211, 160, .45); background: rgba(127, 211, 160, .12); }
+
+  /* 平台切换 */
+  .ptabs {
+    display: flex; gap: 6px; padding: 5px; margin-bottom: 24px;
+    border-radius: 13px; background: rgba(6, 13, 24, .6);
+    border: 1px solid rgba(95, 159, 214, .2);
+  }
+  .ptab {
+    flex: 1 1 0; min-width: 84px; padding: 9px 10px; border-radius: 9px;
+    font-family: var(--sans); font-size: 13.5px; font-weight: 700; letter-spacing: .02em;
+    color: var(--text-dim); background: transparent; border: 1px solid transparent;
+    cursor: pointer; transition: color .22s, background .22s, border-color .22s, box-shadow .22s;
+  }
+  .ptab:hover { color: #DCEAF8; background: rgba(95, 159, 214, .1); }
+  .ptab.on {
+    color: #fff;
+    background: linear-gradient(180deg, rgba(95, 159, 214, .3), rgba(95, 159, 214, .13));
+    border-color: rgba(95, 159, 214, .48);
+    box-shadow: 0 8px 20px -12px rgba(95, 159, 214, .9), inset 0 1px 0 rgba(255, 255, 255, .1);
+  }
+  .pane { display: none; }
+  .pane.on { display: block; animation: paneIn .3s ease both; }
+  @keyframes paneIn { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: none; } }
+
+  .req-list { display: grid; gap: 8px; }
+  .req {
+    display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap;
+    padding: 11px 14px; border-radius: 10px; font-size: 13px; color: var(--text-dim);
+    background: rgba(95, 159, 214, .04); border: 1px solid rgba(95, 159, 214, .12);
+  }
+  .req b { color: #E8F2FD; font-weight: 700; min-width: 176px; }
+  .req span { flex: 1 1 200px; }
+  .req code { font-family: var(--mono); font-size: 12px; color: #9FE8B0; overflow-wrap: anywhere; }
 
   /* 表格 */
   .table-wrap { overflow-x: auto; border-radius: 12px; border: 1px solid var(--card-border); margin-top: 14px; }
@@ -546,6 +582,12 @@
     .gallery { grid-template-columns: 1fr; }
     .section { padding: 52px 20px; }
     .panel { padding: 22px; }
+    .ptabs { gap: 4px; padding: 4px; }
+    .ptab { font-size: 12.5px; padding: 8px 4px; min-width: 0; }
+    .req b { min-width: 0; width: 100%; }
+    .code-block { align-items: flex-start; }
+    .code-block code { white-space: pre-wrap; overflow-wrap: anywhere; overflow-x: visible; }
+    .code-block .copy { margin-top: -2px; }
     .hero-side-cards { grid-template-columns: repeat(3, 1fr); }
     .term-body { font-size: 11.5px; min-height: 210px; }
     .faq-inner p { padding-left: 20px; }
@@ -938,49 +980,142 @@
   <div class="sec-head reveal">
     <span class="sec-tag">INSTALL</span>
     <h2>三步装上，<em>两分钟开玩</em></h2>
-    <p>只有一个坑：第一次打开会被系统拦下来。</p>
+    <p>三个平台的包都会被系统拦一次，放行方法各不相同。</p>
   </div>
 
   <div class="panel reveal">
-    <div class="warn">
-      <span class="w-ico">⚠</span>
-      <div><strong>首次打开会被系统拦下。</strong>这是没有 Apple 开发者签名的应用，会提示「无法验证开发者」或者「已损坏」。
-      正常现象，按下面任一方法放行一次就好，之后不会再问。</div>
+    <div class="ptabs" role="tablist" aria-label="选择平台">
+      <button class="ptab on" role="tab" aria-selected="true" data-os="mac">macOS</button>
+      <button class="ptab" role="tab" aria-selected="false" data-os="win">Windows</button>
+      <button class="ptab" role="tab" aria-selected="false" data-os="linux">Linux</button>
     </div>
 
-    <ol class="steps">
-      <li class="step"><b>下载并拖进「应用程序」。</b>双击 <code>GlassMC.dmg</code>，把图标拖到旁边的 Applications 文件夹。</li>
-      <li class="step"><b>第一次打开时放行一次。</b>双击 GlassMC 被拦下时点「完成」，再按方法一或方法二操作。</li>
-      <li class="step"><b>开始用。</b>登录账号 →「安装」页挑个版本点安装 → 回「版本」页点启动。</li>
-    </ol>
+    <!-- ---------------------------------------------------- macOS -->
+    <div class="pane on" data-os="mac">
+      <div class="warn">
+        <span class="w-ico">⚠</span>
+        <div><strong>首次打开会被系统拦下。</strong>这个包没有 Apple 开发者签名，会提示「无法验证开发者」或者「已损坏」。
+        属于正常现象，按下面任一方法放行一次，之后不再询问。</div>
+      </div>
 
-    <div id="permission"></div>
-    <div class="method-title" style="margin-top:34px">打不开怎么办 <span class="badge pink">二选一</span></div>
+      <ol class="steps">
+        <li class="step"><b>下载并拖进「应用程序」。</b>双击 <code>GlassMC.dmg</code>，把图标拖到旁边的 Applications 文件夹。</li>
+        <li class="step"><b>第一次打开时放行一次。</b>双击 GlassMC 被拦下时点「完成」，再按下面方法一或方法二操作。</li>
+        <li class="step"><b>开始用。</b>登录账号 →「安装」页挑个版本点安装 → 回「版本」页点启动。</li>
+      </ol>
 
-    <div class="method-title">方法一 · 系统设置里点「仍要打开」<span class="badge">推荐</span></div>
-    <ol class="steps">
-      <li class="step">双击 GlassMC，看到「Apple 无法验证此 App 是否包含恶意软件」，点 <b>完成</b>。</li>
-      <li class="step">打开 <b>系统设置 → 隐私与安全性</b>，向下滚到「安全性」区域。</li>
-      <li class="step">看到 <b>“GlassMC” 已被阻止使用…</b> 那一行，点旁边的 <b>仍要打开</b>，输入开机密码。</li>
-      <li class="step">再双击一次 GlassMC，弹窗里出现 <b>打开</b> 按钮，点它。以后就正常了。</li>
-    </ol>
-    <p class="note">如果提示的是 <b style="color:#DCEAF8">「GlassMC 已损坏，应该将它移到废纸篓」</b>，处理方式完全一样：先去系统设置放行一次再打开。<b>不要点「移到废纸篓」</b>——它没坏，只是没签名。</p>
+      <div class="method-title" style="margin-top:30px">打不开怎么办 <span class="badge pink">二选一</span></div>
 
-    <div class="method-title">方法二 · 终端一行命令</div>
-    <div class="code-block">
-      <span class="prompt">$</span>
-      <code id="xattr-cmd">xattr -dr com.apple.quarantine /Applications/GlassMC.app</code>
-      <button class="copy" id="copy-btn">复制</button>
+      <div class="method-title">方法一 · 系统设置里点「仍要打开」<span class="badge">推荐</span></div>
+      <ol class="steps">
+        <li class="step">双击 GlassMC，看到「Apple 无法验证此 App 是否包含恶意软件」，点 <b>完成</b>。</li>
+        <li class="step">打开 <b>系统设置 → 隐私与安全性</b>，向下滚到「安全性」区域。</li>
+        <li class="step">看到 <b>“GlassMC” 已被阻止使用…</b> 那一行，点旁边的 <b>仍要打开</b>，输入开机密码。</li>
+        <li class="step">再双击一次 GlassMC，弹窗里出现 <b>打开</b> 按钮，点它。以后就正常了。</li>
+      </ol>
+      <p class="note">如果提示的是 <b style="color:#DCEAF8">「GlassMC 已损坏，应该将它移到废纸篓」</b>，处理方式完全一样：先去系统设置放行一次再打开。<b>不要点「移到废纸篓」</b>——它没坏，只是没签名。</p>
+
+      <div class="method-title">方法二 · 终端一行命令</div>
+      <div class="code-block">
+        <span class="prompt">$</span>
+        <code>xattr -dr com.apple.quarantine /Applications/GlassMC.app</code>
+        <button class="copy">复制</button>
+      </div>
+      <p class="note">打开「终端」粘贴回车即可。这条命令只去掉 macOS 给下载文件打的「待检查」标记，不改应用内容。装在别处就把路径换成实际位置。</p>
     </div>
-    <p class="note">打开「终端」粘贴回车即可。这条命令只去掉 macOS 给下载文件打的「待检查」标记，不改应用内容。装在别处就把路径换成实际位置。</p>
 
-    <div class="method-title" style="margin-top:32px">系统要求与数据目录</div>
-    <p class="note" style="margin-top:0">
-      macOS 15+（Apple Silicon / Intel 同一个包）；Windows 10 1809+ / 11（需 WebView2）；主流 Linux 发行版（需 WebKitGTK 4.1）。
-      Java 不用自己装，启动器按版本自动配。数据都在 <code>~/Library/Application Support/GlassMC</code>
-      （Windows 是 <code>%APPDATA%\GlassMC</code>，Linux 是 <code>~/.local/share/GlassMC</code>），
-      整个目录拷走就是完整备份；卸载时删掉它即可，不会在系统别处留东西。
-    </p>
+    <!-- ---------------------------------------------------- Windows -->
+    <div class="pane" data-os="win">
+      <div class="warn">
+        <span class="w-ico">⚠</span>
+        <div><strong>SmartScreen 会拦一次。</strong>提示「Windows 已保护你的电脑」，点「更多信息」再点「仍要运行」就能装。
+        安装到 <code>C:\Program Files\GlassMC</code>，需要管理员权限，UAC 会再弹一次。</div>
+      </div>
+
+      <ol class="steps">
+        <li class="step"><b>下载并运行安装包。</b>双击 <code>GlassMC-Setup.exe</code>，UAC 弹窗点「是」。安装向导有简体中文。</li>
+        <li class="step"><b>被 SmartScreen 拦下时放行。</b>点「更多信息」→「仍要运行」，只需一次。</li>
+        <li class="step"><b>开始用。</b>开始菜单或桌面打开 GlassMC → 登录账号 →「安装」页挑版本 → 「版本」页启动。</li>
+      </ol>
+
+      <div class="method-title" style="margin-top:30px">打不开怎么办 <span class="badge pink">二选一</span></div>
+
+      <div class="method-title">方法一 · 在 SmartScreen 窗口里放行<span class="badge">推荐</span></div>
+      <ol class="steps">
+        <li class="step">双击 exe，出现蓝底的「Windows 已保护你的电脑」。</li>
+        <li class="step">点窗口里的 <b>更多信息</b>，下面会展开出 <b>仍要运行</b> 按钮。</li>
+        <li class="step">点 <b>仍要运行</b>，UAC 点 <b>是</b>，安装向导就出来了。</li>
+      </ol>
+      <p class="note">如果窗口里没有「更多信息」而只有「不运行」，说明文件被系统策略挡住了：右键 exe → 属性 → 底部勾选 <b>解除锁定</b> → 确定，再双击。</p>
+
+      <div class="method-title">方法二 · PowerShell 解除文件锁定</div>
+      <div class="code-block">
+        <span class="prompt">&gt;</span>
+        <code>Unblock-File "$HOME\Downloads\GlassMC-Setup.exe"</code>
+        <button class="copy">复制</button>
+      </div>
+      <p class="note">文件从网上下载后会带一个「来自其他计算机」的标记，这条命令只去掉这个标记，不改安装包内容。路径按你实际下载的位置改。</p>
+
+      <div class="method-title">装好后窗口一片空白？</div>
+      <p class="note" style="margin-top:0">GlassMC 的界面跑在 WebView2 上。Windows 11 自带，Windows 10 大多随 Edge 装好了；如果打开后只有一块空白，去微软官网搜 <b>WebView2 Evergreen Bootstrapper</b> 装一次即可。启动器本身不需要 .NET，也没有其他运行时依赖。</p>
+    </div>
+
+    <!-- ---------------------------------------------------- Linux -->
+    <div class="pane" data-os="linux">
+      <div class="warn">
+        <span class="w-ico">⚠</span>
+        <div><strong>需要 WebKitGTK 4.1。</strong>Ubuntu 22.04+ / Debian 12+ 自带，deb 会替你检查。
+        另外窗口模糊取决于桌面合成器：KWin 开了 blur 才有真玻璃，GNOME 默认没有，会自动降级成磨砂。</div>
+      </div>
+
+      <ol class="steps">
+        <li class="step"><b>装 deb 包。</b>在下载目录执行下面的命令，<code>./</code> 不能省，否则 apt 会去软件源里找包名。</li>
+        <li class="step"><b>从应用菜单启动。</b>装完菜单里直接就有 GlassMC，图标和分类都已注册，不用注销重登；终端里输 <code>glassmc</code> 也行。</li>
+        <li class="step"><b>开始用。</b>登录账号 →「安装」页挑版本 →「版本」页启动。</li>
+      </ol>
+
+      <div class="code-block" style="margin-top:14px">
+        <span class="prompt">$</span>
+        <code>sudo apt install ./GlassMC.deb</code>
+        <button class="copy">复制</button>
+      </div>
+      <p class="note">卸载 <code>sudo apt remove glassmc</code>。游戏数据在 <code>~/.local/share/GlassMC</code>，卸载不会动它，重装回来接着用。</p>
+
+      <div class="method-title" style="margin-top:30px">其他发行版 · 用绿色版</div>
+      <p class="note" style="margin-top:0">Fedora、Arch、openSUSE 这些没有 apt，下 <code>GlassMC-linux.tar.gz</code>，解压后直接运行：</p>
+      <div class="code-block">
+        <span class="prompt">$</span>
+        <code>tar xzf GlassMC-linux.tar.gz &amp;&amp; ./glassmc</code>
+        <button class="copy">复制</button>
+      </div>
+      <p class="note">这样会把 <code>glassmc</code> 解压到当前目录。想全局可用就 <code>sudo mv glassmc /usr/local/bin/</code>。绿色版不会自动补依赖，缺库时看下一节。</p>
+
+      <div class="method-title" style="margin-top:30px">打不开怎么办 <span class="badge pink">二选一</span></div>
+
+      <div class="method-title">方法一 · 补上运行库<span class="badge">推荐</span></div>
+      <div class="code-block">
+        <span class="prompt">$</span>
+        <code>sudo apt install libwebkit2gtk-4.1-0 libgtk-3-0</code>
+        <button class="copy">复制</button>
+      </div>
+      <p class="note">报错是 <code>error while loading shared libraries</code> 就是缺库，装完再启动一次。Fedora 上是 <code>sudo dnf install webkit2gtk4.1</code>，Arch 上是 <code>sudo pacman -S webkit2gtk-4.1</code>。</p>
+
+      <div class="method-title">方法二 · 手动给执行权限</div>
+      <div class="code-block">
+        <span class="prompt">$</span>
+        <code>chmod +x glassmc &amp;&amp; ./glassmc</code>
+        <button class="copy">复制</button>
+      </div>
+      <p class="note">部分文件管理器解压时会丢掉可执行位，表现是「双击没反应」或 <code>Permission denied</code>，加一次权限就好。</p>
+    </div>
+
+    <div class="method-title" style="margin-top:36px">系统要求与数据目录</div>
+    <div class="req-list">
+      <div class="req"><b>macOS 15+</b><span>Apple Silicon 与 Intel 共用一个包</span><code>~/Library/Application Support/GlassMC</code></div>
+      <div class="req"><b>Windows 10 1809+ / 11</b><span>x64，需要 WebView2</span><code>%APPDATA%\GlassMC</code></div>
+      <div class="req"><b>Linux</b><span>主流发行版，需要 WebKitGTK 4.1</span><code>~/.local/share/GlassMC</code></div>
+    </div>
+    <p class="note">Java 不用自己装，启动器按版本自动配 8 / 11 / 17 / 21。整个数据目录拷走就是完整备份，卸载时删掉它即可，不会在系统别处留东西。</p>
   </div>
 </section>
 
@@ -1166,23 +1301,46 @@
     document.addEventListener('keydown', e => { if (e.key === 'Escape') lb.classList.remove('on'); });
 
     /* 5. 复制命令 */
-    const copyBtn = document.getElementById('copy-btn');
-    if (copyBtn) {
+    /* 5. 复制命令（每个代码块各一个按钮） */
+    document.querySelectorAll('.code-block').forEach(block => {
+      const copyBtn = block.querySelector('.copy');
+      const codeEl = block.querySelector('code');
+      if (!copyBtn || !codeEl) return;
       copyBtn.addEventListener('click', async () => {
-        const text = document.getElementById('xattr-cmd').textContent;
+        const text = codeEl.textContent;
         try {
           await navigator.clipboard.writeText(text);
           copyBtn.textContent = '已复制';
         } catch (e) {
           const r = document.createRange();
-          r.selectNode(document.getElementById('xattr-cmd'));
+          r.selectNode(codeEl);
           window.getSelection().removeAllRanges();
           window.getSelection().addRange(r);
-          copyBtn.textContent = '请按 ⌘C';
+          copyBtn.textContent = '请按 Ctrl+C';
         }
         copyBtn.classList.add('ok');
         setTimeout(() => { copyBtn.textContent = '复制'; copyBtn.classList.remove('ok'); }, 1800);
       });
+    });
+
+    /* 5.1 安装页平台切换：默认选访客自己的系统 */
+    const ptabs = Array.from(document.querySelectorAll('#install .ptab'));
+    const panes = Array.from(document.querySelectorAll('#install .pane'));
+    if (ptabs.length && panes.length) {
+      const ua = navigator.userAgent;
+      const guess = /Windows|Win32|Win64/.test(ua) ? 'win'
+        : /Android|Linux|X11|CrOS/.test(ua) ? 'linux'
+        : 'mac';
+      const pick = os => {
+        ptabs.forEach(t => {
+          const on = t.dataset.os === os;
+          t.classList.toggle('on', on);
+          t.setAttribute('aria-selected', on ? 'true' : 'false');
+        });
+        panes.forEach(p => p.classList.toggle('on', p.dataset.os === os));
+      };
+      ptabs.forEach(t => t.addEventListener('click', () => pick(t.dataset.os)));
+      if (ptabs.some(t => t.dataset.os === guess)) pick(guess);
     }
 
     /* 6. FAQ 高度过渡 */
