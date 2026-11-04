@@ -239,3 +239,4 @@ docs/               介绍页与文档
 
 **GPLv3**。本项目与 Mojang / Microsoft 无关联，连接正版服务器需要自备正版账号。
 Minecraft 是 Mojang Studios 的商标。
+
