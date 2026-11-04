@@ -57,6 +57,15 @@ cd src-tauri
 cargo run            # 编译并启动，第一次要几分钟
 ```
 
+**先留够磁盘空间。** `src-tauri/target/` 首次全量构建要 3~5 GB，
+跑 `build.sh`（arm64 与 x86_64 各编一遍）会更多。空间不足时的报错是
+`ld: write() failed, errno=28 (No space left on device)` —— 看着像编译失败，
+其实是磁盘写满了，`cargo clean` 腾出空间，或者把构建目录挪到大盘：
+
+```bash
+CARGO_TARGET_DIR=/path/to/big-disk/glassmc-target cargo build --release
+```
+
 前端是**没有构建步骤**的纯 HTML/JS/CSS，直接被编进二进制。改完界面要重新 `cargo run` 才生效。
 
 只想调界面不想等 Rust 编译，可以用浏览器 mock 模式（数据是假的，不会真下载游戏）：
