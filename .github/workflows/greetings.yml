@@ -1,0 +1,33 @@
+name: 欢迎新朋友
+
+# 第一次开 issue / 提 PR 的人自动留一句话，免得石沉大海。
+on:
+  issues:
+    types: [opened]
+  pull_request_target:
+    types: [opened]
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  welcome:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/first-interaction@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          issue-message: |
+            第一次在这里开 issue 吧，欢迎。
+
+            两件事麻烦确认一下：**日志贴了吗**（启动失败的问题没有日志基本查不了），
+            **版本号填了吗**。信息齐的话通常几天内会有回复。
+
+            等回复的时间里，可以翻翻 [Discussions](https://github.com/shaun-chen2/GlassMC/discussions)，
+            说不定已经有人问过同样的事。
+          pr-message: |
+            第一个 PR，谢谢。
+
+            CI 会自动跑格式检查、clippy 和三端编译，失败点进去看日志就行。
+            我也会尽快看一遍——如果一周没动静，直接在 PR 里 @ 我。

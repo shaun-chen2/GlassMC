@@ -1,0 +1,30 @@
+# Release 说明按标签自动分组（gh release create --generate-notes 会读这个文件）
+changelog:
+  categories:
+    - title: 新功能
+      labels:
+        - enhancement
+    - title: 修复
+      labels:
+        - bug
+    - title: 界面与交互
+      labels:
+        - "area: ui"
+    - title: 安装与启动
+      labels:
+        - "area: install"
+        - "area: launch"
+    - title: 文档与构建
+      labels:
+        - documentation
+        - ci
+        - dependencies
+    - title: 其他改动
+      labels:
+        - "*"
+  exclude:
+    labels:
+      - duplicate
+      - invalid
+      - wontfix
+      - question

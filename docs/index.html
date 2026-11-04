@@ -660,6 +660,8 @@
   .plat .tagline { font-size: 13px; color: var(--text-dim); line-height: 1.75; min-height: 66px; }
   .plat .foot { display: flex; align-items: center; gap: 8px; margin-top: 14px;
                 padding-top: 13px; border-top: 1px solid rgba(95, 159, 214, .12); font-size: 12px; color: var(--text-dimmer); }
+  .plat .foot a { color: var(--primary-bright); font-weight: 700; text-decoration: none; }
+  .plat .foot a:hover { text-decoration: underline; }
   .state {
     display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 700;
     padding: 3px 9px; border-radius: 999px;
@@ -805,6 +807,7 @@
       <a href="#features">功能</a>
       <a href="#platforms">平台</a>
       <a href="#install">安装</a>
+      <a href="#community">社区</a>
       <a href="#faq">常见问题</a>
     </div>
     <a class="nav-cta" href="#download">下载</a>
@@ -1121,6 +1124,51 @@
 
 <div class="sec-divider"></div>
 
+<!-- ============================================================ 社区 -->
+<section class="section" id="community">
+  <div class="sec-head reveal">
+    <span class="sec-tag">COMMUNITY</span>
+    <h2>这是开源项目，<em>不是一个人的作品</em></h2>
+    <p>代码、文档、测试设备，都可以来自别人。</p>
+  </div>
+
+  <div class="plat-grid">
+    <div class="plat reveal">
+      <div class="os">ISSUE</div>
+      <h3>报一个问题</h3>
+      <p class="tagline">
+        能复现的 bug 是最有价值的贡献。表单会问你要日志、版本号和系统版本，填全了通常几天内就能定位。
+      </p>
+      <div class="foot"><a href="https://github.com/shaun-chen2/GlassMC/issues/new/choose">新建 issue →</a>按表单填</div>
+    </div>
+
+    <div class="plat reveal">
+      <div class="os">DISCUSSION</div>
+      <h3>问一句、聊两句</h3>
+      <p class="tagline">
+        「这个整合包能不能跑」「皮肤站怎么填」这类问题去 Discussions，不问也能看看别人踩过什么坑。
+      </p>
+      <div class="foot"><a href="https://github.com/shaun-chen2/GlassMC/discussions">进入讨论区 →</a>不需要开 issue</div>
+    </div>
+
+    <div class="plat reveal">
+      <div class="os">PULL REQUEST</div>
+      <h3>直接改代码</h3>
+      <p class="tagline">
+        Rust 后端加纯静态前端，没有构建步骤。标注 good first issue 的都是半天能做完的小事，第一次提 PR 也欢迎。
+      </p>
+      <div class="foot"><a href="https://github.com/shaun-chen2/GlassMC/blob/main/CONTRIBUTING.md">怎么参与 →</a>GPLv3 开源</div>
+    </div>
+  </div>
+
+  <p class="note" style="margin-top:18px;text-align:center">
+    贡献者名单在 <a href="https://github.com/shaun-chen2/GlassMC/graphs/contributors">GitHub 上</a>；
+    参与即表示同意<a href="https://github.com/shaun-chen2/GlassMC/blob/main/CODE_OF_CONDUCT.md">贡献者行为准则</a>。
+  </p>
+</section>
+
+<div class="sec-divider"></div>
+
 <!-- ============================================================ FAQ -->
 <section class="section" id="faq">
   <div class="sec-head reveal">
@@ -1186,6 +1234,8 @@
     <div class="footer-links">
       <a href="https://github.com/shaun-chen2/GlassMC">GitHub</a>
       <a href="https://github.com/shaun-chen2/GlassMC/issues">反馈问题</a>
+      <a href="https://github.com/shaun-chen2/GlassMC/discussions">讨论区</a>
+      <a href="https://github.com/shaun-chen2/GlassMC/blob/main/CONTRIBUTING.md">参与贡献</a>
       <a href="https://github.com/shaun-chen2/GlassMC/releases">历史版本</a>
       <a href="https://github.com/shaun-chen2/GlassMC/blob/main/docs/development.md">开发说明</a>
       <a href="https://github.com/shaun-chen2/GlassMC/blob/main/LICENSE">GPLv3 许可</a>
