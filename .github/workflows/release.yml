@@ -163,12 +163,14 @@ jobs:
         run: |
           set -e
           cd dist
-          mv ./*.dmg GlassMC.dmg
-          mv ./*.exe GlassMC-Setup.exe
-          mv ./*_amd64.deb GlassMC.deb
-          mv ./*linux-amd64.tar.gz GlassMC-linux.tar.gz
+          # 各 job 产出的文件名不统一，这里归一。目标名已存在时跳过，
+          # 否则 mv 会因为「源和目标是同一个文件」直接失败。
+          [ -f GlassMC.dmg ] || mv ./*.dmg GlassMC.dmg
+          [ -f GlassMC-Setup.exe ] || mv ./*.exe GlassMC-Setup.exe
+          [ -f GlassMC.deb ] || mv ./*_amd64.deb GlassMC.deb
+          [ -f GlassMC-linux.tar.gz ] || mv ./*linux-amd64.tar.gz GlassMC-linux.tar.gz
           ls -lh
-          sha256sum GlassMC.* > SHA256SUMS.txt
+          sha256sum GlassMC.dmg GlassMC-Setup.exe GlassMC.deb GlassMC-linux.tar.gz > SHA256SUMS.txt
           cat SHA256SUMS.txt
 
       - name: 检查 tag 与版本号是否一致
