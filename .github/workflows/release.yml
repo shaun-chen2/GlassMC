@@ -47,7 +47,7 @@ jobs:
           codesign --verify --deep --strict build/GlassMC.app
           ls -lh build/GlassMC.dmg
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: macos
           path: build/GlassMC.dmg
@@ -89,7 +89,7 @@ jobs:
           dpkg-deb -I build/linux/*.deb | head -20
           ls -lh build/linux/*.deb build/linux/*.tar.gz
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: linux
           path: |
@@ -138,7 +138,7 @@ jobs:
           ls -lh build/windows/GlassMC-Setup.exe
           ls -lh build/windows/GlassMC-Setup.exe
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: windows
           path: build/windows/GlassMC-Setup.exe
