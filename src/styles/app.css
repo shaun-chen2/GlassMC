@@ -111,10 +111,13 @@ body {
   transition: background-color .28s ease, color .28s ease;
 }
 
-/* DWM 的圆角半径写死 8px（不是 DIP 可配的），Windows 上只能跟着它走。
-   两个半径不一致时，CSS 弧线之外的窗口底色会从角上透出来。 */
+/* Windows 上圆角由 DWM 裁（8px），外壳保持直角把内容铺满，角上就不会留缝。
+   只有系统不认这个属性（Win10 及更早）时才退回来自己画。 */
 :root[data-os="windows"] {
-  --shell-radius: 8px;
+  --shell-radius: 0px;
+}
+:root[data-os="windows"][data-corners="css"] {
+  --shell-radius: 14px;
 }
 
 /* ---------------------------------- 标题栏 */

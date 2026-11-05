@@ -20,6 +20,7 @@
     arch: 'arm64',
     platform: 'macOS',
     glassHint: 'liquid',
+    dwmRound: false,
     config: {
       glassOpacity: 1,
       theme: 'dark',
@@ -872,6 +873,8 @@
 
     // 平台的观感差异（圆角半径等）让 CSS 自己判断，别在样式里猜 userAgent
     document.documentElement.dataset.os = String(S.boot.os || '').toLowerCase();
+    // Windows 的圆角是 DWM 裁的，外壳再画一条弧线只会在角上留缝
+    document.documentElement.dataset.corners = S.boot.dwmRound ? 'dwm' : 'css';
 
     applyTheme();
     applyAlpha();

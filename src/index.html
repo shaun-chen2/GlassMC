@@ -6,6 +6,11 @@
 <title>GlassMC</title>
 <link rel="stylesheet" href="styles/baseline.css">
 <link rel="stylesheet" href="styles/app.css">
+<script>
+// 首帧就按平台取圆角策略，免得 Windows 上先闪一下 14px 再跳成直角。
+// 只做 UA 兜底，真正的值由 bootstrap 的 dwmRound 决定。
+if (/Windows/i.test(navigator.userAgent)) document.documentElement.dataset.os = 'windows';
+</script>
 </head>
 <body>
 

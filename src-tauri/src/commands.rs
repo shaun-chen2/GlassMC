@@ -22,6 +22,8 @@ pub struct Bootstrap {
     pub arch: String,
     pub platform: String,
     pub glass_hint: String,
+    /// 窗口圆角是否由系统（Windows DWM）裁。true 时前端不画圆角，避免两条弧线之间露边。
+    pub dwm_round: bool,
     pub config: Config,
     pub accounts: Vec<Account>,
     pub active_account: Account,
@@ -83,6 +85,7 @@ pub fn bootstrap(state: State<'_, ConfigState>, tier: State<'_, glass::TierState
         arch: launch::arch_name(),
         platform: platform_label(),
         glass_hint: tier_now,
+        dwm_round: glass::dwm_rounded(),
         installed: manifest::scan_installed(),
         java: java::installed(&cfg.java_path),
         running: game::is_running(),
