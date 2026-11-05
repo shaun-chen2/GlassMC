@@ -26,7 +26,7 @@ mod win {
     use tauri::WebviewWindow;
 
     /// DWM 是否接管了圆角裁剪。告诉前端要不要自己画圆角。
-    static ROUNDED: AtomicBool = AtomicBool::new(false);
+    pub static ROUNDED: AtomicBool = AtomicBool::new(false);
 
     #[link(name = "dwmapi")]
     extern "system" {
