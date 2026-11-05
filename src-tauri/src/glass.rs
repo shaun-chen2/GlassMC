@@ -40,26 +40,27 @@ mod win {
     const CORNER_ROUND: u32 = 2;
     const COLOR_NONE: u32 = 0xFFFF_FFFE;
 
-    /// 设一个 DWM 属性；系统不认这个属性（老版本）时返回 false。
-    unsafe fn set(hwnd: *mut c_void, attr: u32, value: u32) -> bool {
+    /// 设一个 DWM 属性。系统不认这个属性（老版本）时调用会失败，忽略即可。
+    unsafe fn set(hwnd: *mut c_void, attr: u32, value: u32) {
         DwmSetWindowAttribute(
             hwnd,
             attr,
             &value as *const u32 as *const c_void,
             std::mem::size_of::<u32>() as u32,
-        ) == 0
+        );
     }
 
-    /// 修整窗口本身的观感，返回 DWM 圆角是否生效（即 Windows 11 22000+）。
-    pub fn prepare(window: &WebviewWindow) -> bool {
+    /// 修整窗口本身的观感：深色材质、无描边、圆角交给 DWM。
+    /// 老系统不认的属性会静默失败，不影响其余设置。
+    pub fn prepare(window: &WebviewWindow) {
         let Ok(hwnd) = window.hwnd() else {
-            return false;
+            return;
         };
         let hwnd = hwnd.0;
         unsafe {
             set(hwnd, USE_IMMERSIVE_DARK_MODE, 1);
             set(hwnd, BORDER_COLOR, COLOR_NONE);
-            set(hwnd, WINDOW_CORNER_PREFERENCE, CORNER_ROUND)
+            set(hwnd, WINDOW_CORNER_PREFERENCE, CORNER_ROUND);
         }
     }
 }
@@ -84,12 +85,12 @@ pub fn apply(window: &WebviewWindow) -> String {
     {
         use window_vibrancy::{apply_acrylic, apply_mica};
 
-        let win11 = win::prepare(window);
+        // 先修窗口本身（深色、无描边、DWM 圆角），再谈背景材质
+        win::prepare(window);
 
-        // Acrylic（DWMSBT_TRANSIENTWINDOW）会实时模糊窗口后面的桌面，这才是「液态玻璃」；
+        // Acrylic 会实时模糊窗口后面的桌面，这才是「液态玻璃」；
         // Mica 只把壁纸调暗铺满，桌面上有别的东西挡着就基本看不出来。
-        // 老系统没有圆角裁剪，Acrylic 会把四个角铺成方块，所以只在 Win11 用。
-        if win11 && apply_acrylic(window, Some((16, 24, 38, 170))).is_ok() {
+        if apply_acrylic(window, Some((16, 24, 38, 140))).is_ok() {
             return "liquid".into();
         }
         if apply_mica(window, Some(true)).is_ok() {
