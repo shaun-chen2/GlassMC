@@ -74,12 +74,18 @@ jobs:
             libwebkit2gtk-4.1-dev libgtk-3-dev libayatana-appindicator3-dev \
             librsvg2-dev libsoup-3.0-dev patchelf
 
+      - name: 编译
+        working-directory: src-tauri
+        run: cargo build --release --locked
+
       - name: 编译并打包
         run: bash Scripts/make-linux-package.sh
 
       - name: 校验
         run: |
-          ldd build/glassmc 2>/dev/null | grep "not found" && exit 1 || true
+          BIN=$(ls build/linux/glassmc_*/usr/bin/glassmc | head -1)
+          missing=$(ldd "$BIN" | grep "not found" || true)
+          if [ -n "$missing" ]; then echo "缺库：$missing"; exit 1; fi
           dpkg-deb -I build/linux/*.deb | head -20
           ls -lh build/linux/*.deb build/linux/*.tar.gz
 
@@ -117,15 +123,19 @@ jobs:
         run: |
           export PATH="/c/Program Files (x86)/NSIS:$PATH"
           mkdir -p build/windows
-          cp src-tauri/target/release/glassmc.exe build/windows/
+          ls -lh src-tauri/target/release/ | head -20
+          cp -v src-tauri/target/release/glassmc.exe build/windows/
           cp src-tauri/target/release/WebView2Loader.dll build/windows/ 2>/dev/null \
             || echo "警告：没找到 WebView2Loader.dll，装到没有 WebView2 的机器上会起不来"
+          ls -lh build/windows/
+          # makensis 是原生程序，路径统一转成 C:\ 形式，Git Bash 的 /d/... 它不认
           makensis \
-            -DEXE_PATH="$(pwd)/build/windows/glassmc.exe" \
-            -DICON_PATH="$(pwd)/src-tauri/icons/icon.ico" \
-            -DEXTRA_DIR="$(pwd)/build/windows" \
-            -DOUTFILE="$(pwd)/build/windows/GlassMC-Setup.exe" \
+            -DEXE_PATH="$(cygpath -w "$PWD/build/windows/glassmc.exe")" \
+            -DICON_PATH="$(cygpath -w "$PWD/src-tauri/icons/icon.ico")" \
+            -DEXTRA_DIR="$(cygpath -w "$PWD/build/windows")" \
+            -DOUTFILE="$(cygpath -w "$PWD/build/windows/GlassMC-Setup.exe")" \
             Scripts/windows-installer.nsi
+          ls -lh build/windows/GlassMC-Setup.exe
           ls -lh build/windows/GlassMC-Setup.exe
 
       - uses: actions/upload-artifact@v4
