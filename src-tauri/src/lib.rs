@@ -115,10 +115,16 @@ pub fn run() {
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_opener::init())
         .manage(config::ConfigState(std::sync::Mutex::new(initial)))
+        .manage(glass::TierState(std::sync::Mutex::new("frosted".to_string())))
         .setup(|app| {
             if let Some(win) = app.get_webview_window("main") {
                 let tier = glass::apply(&win);
                 println!("[glass] 窗口玻璃档位 = {tier}");
+                if let Some(state) = app.try_state::<glass::TierState>() {
+                    if let Ok(mut slot) = state.0.lock() {
+                        *slot = tier;
+                    }
+                }
             }
             Ok(())
         })

@@ -1,6 +1,6 @@
 [package]
 name = "glassmc"
-version = "1.3.1"
+version = "1.3.2"
 description = "GlassMC — 原生液态玻璃 Minecraft 启动器（跨平台）"
 edition = "2021"
 rust-version = "1.85"

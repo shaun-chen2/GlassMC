@@ -20,6 +20,9 @@
   --radius-md: 10px;
   --radius-sm: 7px;
 
+  /* 外壳圆角：Windows 由 DWM 裁 8px，这里必须跟它一致，否则角上会露出一条底色 */
+  --shell-radius: 14px;
+
   /* 玻璃不透明度：设置页滑块改这个 */
   --glass-alpha: 1;
 
@@ -102,10 +105,16 @@ body {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  border-radius: 14px;
+  border-radius: var(--shell-radius);
   overflow: hidden;
   background: rgba(var(--shell-rgb), calc(var(--shell-base) * var(--glass-alpha)));
   transition: background-color .28s ease, color .28s ease;
+}
+
+/* DWM 的圆角半径写死 8px（不是 DIP 可配的），Windows 上只能跟着它走。
+   两个半径不一致时，CSS 弧线之外的窗口底色会从角上透出来。 */
+:root[data-os="windows"] {
+  --shell-radius: 8px;
 }
 
 /* ---------------------------------- 标题栏 */

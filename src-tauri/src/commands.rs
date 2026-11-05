@@ -6,6 +6,7 @@ use tauri::{AppHandle, Manager, State};
 use crate::account::{self, Account};
 use crate::config::{self, Config, ConfigState};
 use crate::game;
+use crate::glass;
 use crate::java::{self, JavaInstall};
 use crate::launch::{self, BuiltCommand};
 use crate::manifest::{self, InstalledVersion, VersionEntry};
@@ -65,10 +66,15 @@ pub fn resolve_account(cfg: &Config) -> Account {
 }
 
 #[tauri::command]
-pub fn bootstrap(state: State<'_, ConfigState>) -> Bootstrap {
+pub fn bootstrap(state: State<'_, ConfigState>, tier: State<'_, glass::TierState>) -> Bootstrap {
     let cfg = state.0.lock().unwrap().clone();
     let accounts = account::load_all();
     let active = resolve_account(&cfg);
+    let tier_now = tier
+        .0
+        .lock()
+        .map(|s| s.clone())
+        .unwrap_or_else(|_| glass_hint());
     Bootstrap {
         version: env!("CARGO_PKG_VERSION").to_string(),
         data_root: paths::paths().data_root.to_string_lossy().to_string(),
@@ -76,7 +82,7 @@ pub fn bootstrap(state: State<'_, ConfigState>) -> Bootstrap {
         os: launch::os_name().to_string(),
         arch: launch::arch_name(),
         platform: platform_label(),
-        glass_hint: glass_hint(),
+        glass_hint: tier_now,
         installed: manifest::scan_installed(),
         java: java::installed(&cfg.java_path),
         running: game::is_running(),

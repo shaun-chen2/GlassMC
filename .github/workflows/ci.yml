@@ -115,3 +115,14 @@ jobs:
         shell: bash
         run: |
           ls -lh src-tauri/target/debug/glassmc* 2>/dev/null || true
+
+      # 别人报平台相关的问题时，直接丢一个可运行的调试版给他复现，比来回猜快
+      - name: 上传调试产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: glassmc-debug-${{ matrix.name }}
+          path: |
+            src-tauri/target/debug/glassmc
+            src-tauri/target/debug/glassmc.exe
+          if-no-files-found: ignore
+          retention-days: 7

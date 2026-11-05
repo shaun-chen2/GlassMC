@@ -13,7 +13,7 @@
 
   // ---------------------------------------------------------------- mock
   const MOCK_STATE = {
-    version: '1.3.1',
+    version: '1.3.2',
     dataRoot: '/Users/demo/Library/Application Support/GlassMC',
     gameDir: '/Users/demo/Library/Application Support/GlassMC/minecraft',
     os: 'osx',
@@ -869,6 +869,9 @@
     S.config = S.boot.config;
     S.installed = S.boot.installed || [];
     S.running = !!S.boot.running;
+
+    // 平台的观感差异（圆角半径等）让 CSS 自己判断，别在样式里猜 userAgent
+    document.documentElement.dataset.os = String(S.boot.os || '').toLowerCase();
 
     applyTheme();
     applyAlpha();
