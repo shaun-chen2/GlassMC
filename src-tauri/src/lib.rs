@@ -115,7 +115,9 @@ pub fn run() {
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_opener::init())
         .manage(config::ConfigState(std::sync::Mutex::new(initial)))
-        .manage(glass::TierState(std::sync::Mutex::new("frosted".to_string())))
+        .manage(glass::TierState(std::sync::Mutex::new(
+            "frosted".to_string(),
+        )))
         .setup(|app| {
             if let Some(win) = app.get_webview_window("main") {
                 let tier = glass::apply(&win);
