@@ -17,7 +17,7 @@ jobs:
     # dependabot 和自己开的 PR 不欢迎，否则每次都刷一条
     if: github.actor != 'dependabot[bot]' && github.actor != 'github-actions[bot]'
     steps:
-      - uses: actions/first-interaction@v1
+      - uses: actions/first-interaction@v3
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           issue-message: |
