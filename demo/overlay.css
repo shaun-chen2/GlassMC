@@ -1,0 +1,256 @@
+/* ==========================================================================
+   GlassMC 在线体验页的外壳
+   只在 demo 部署里加载，正式客户端不含这些样式。
+   作用：把应用包进「桌面壁纸 + 悬浮窗口」的展示环境，并明确标注是示例数据。
+   应用自身的样式一律不动，这里只做外层布局与遮罩。
+   ========================================================================== */
+
+html[data-demo] {
+  --demo-gap: 26px;
+  --demo-top: 54px;
+
+  /* 壁纸用纯 CSS 拼，不额外塞图片文件：几层径向渐变叠出深色氛围光 */
+  background-color: #05070d;
+  background-image:
+    radial-gradient(1100px 720px at 8% 4%, rgba(58, 104, 194, .82), transparent 62%),
+    radial-gradient(900px 640px at 94% 10%, rgba(128, 66, 172, .68), transparent 60%),
+    radial-gradient(1000px 800px at 78% 98%, rgba(22, 120, 114, .58), transparent 58%),
+    radial-gradient(760px 540px at 16% 94%, rgba(173, 84, 48, .40), transparent 62%),
+    linear-gradient(165deg, #0b1224 0%, #05070d 72%);
+  background-attachment: fixed;
+}
+
+/* 上方留出提示条的位置，窗口在剩余空间里居中 */
+html[data-demo] body {
+  height: 100dvh;
+  padding: calc(var(--demo-gap) + var(--demo-top)) var(--demo-gap) var(--demo-gap);
+  display: grid;
+  place-items: center;
+  background: transparent;
+}
+
+/* 悬浮窗：圆角、外发光、把壁纸模糊掉当作系统毛玻璃 */
+html[data-demo] .app-root {
+  width: min(1200px, 100%);
+  height: min(780px, 100%);
+  border-radius: 14px !important;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, .075),
+    0 46px 100px -36px rgba(0, 0, 0, .92);
+  -webkit-backdrop-filter: blur(24px) saturate(150%);
+  backdrop-filter: blur(24px) saturate(150%);
+}
+
+/* ---------------------------------- 顶部提示条 */
+.demo-bar {
+  position: fixed;
+  top: 13px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: calc(100% - 20px);
+  padding: 7px 8px 7px 14px;
+  border: 1px solid rgba(150, 190, 235, .22);
+  border-radius: 999px;
+  background: rgba(10, 17, 28, .74);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  backdrop-filter: blur(18px) saturate(160%);
+  box-shadow: 0 18px 44px -24px rgba(0, 0, 0, .92);
+  color: #E6F0FB;
+  font-size: 12.5px;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.demo-bar .demo-dot {
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #4ADE80;
+  box-shadow: 0 0 0 3px rgba(74, 222, 128, .16);
+}
+
+.demo-bar .demo-txt {
+  color: #A9BCD2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.demo-bar .demo-txt b {
+  color: #E6F0FB;
+  font-weight: 650;
+}
+
+.demo-bar .demo-cta {
+  flex: none;
+  padding: 6px 13px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #72B0E3, #4E8FC8);
+  color: #06121F;
+  font-size: 12px;
+  font-weight: 650;
+  text-decoration: none;
+  transition: filter .16s ease, transform .16s ease;
+}
+
+.demo-bar .demo-cta:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+.demo-bar .demo-x {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: #7E92A9;
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.demo-bar .demo-x:hover {
+  background: rgba(255, 255, 255, .08);
+  color: #E6F0FB;
+}
+
+/* ---------------------------------- 体验版自己的提示（不复用应用的 toast） */
+.demo-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  z-index: 1000;
+  max-width: min(420px, calc(100% - 32px));
+  padding: 9px 15px;
+  border: 1px solid rgba(136, 178, 220, .34);
+  border-radius: 10px;
+  background: rgba(16, 26, 40, .96);
+  box-shadow: 0 18px 44px -20px rgba(0, 0, 0, .9);
+  color: #E9F2FC;
+  font-size: 12.5px;
+  opacity: 0;
+  transform: translate(-50%, 8px);
+  transition: opacity .22s ease, transform .22s ease;
+  pointer-events: none;
+}
+
+.demo-toast.on {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+/* ---------------------------------- 窄屏拦截卡
+   应用本身是桌面布局（208px 侧边栏 + 多列卡片），390px 的手机上会挤成一团。
+   与其让人以为页面坏了，不如先问一句；点「还是想看看」再放进去。 */
+.demo-gate {
+  position: fixed;
+  inset: 0;
+  z-index: 998;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 20px;
+  color: #E6F0FB;
+  text-align: center;
+}
+
+.demo-gate .gate-card {
+  width: min(370px, 100%);
+  padding: 26px 22px 22px;
+  border: 1px solid rgba(150, 190, 235, .22);
+  border-radius: 18px;
+  background: rgba(12, 20, 32, .80);
+  -webkit-backdrop-filter: blur(22px) saturate(150%);
+  backdrop-filter: blur(22px) saturate(150%);
+  box-shadow: 0 40px 90px -40px rgba(0, 0, 0, .95);
+}
+
+.demo-gate h3 {
+  margin: 0 0 10px;
+  font-size: 16px;
+  font-weight: 650;
+}
+
+.demo-gate p {
+  margin: 0 0 18px;
+  color: #A9BCD2;
+  font-size: 12.5px;
+  line-height: 1.75;
+}
+
+.demo-gate .gate-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  justify-content: center;
+}
+
+.demo-gate a,
+.demo-gate button {
+  padding: 8px 16px;
+  border: 1px solid rgba(150, 190, 235, .26);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .05);
+  color: #E6F0FB;
+  font-size: 12.5px;
+  font-family: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.demo-gate a {
+  border-color: transparent;
+  background: linear-gradient(180deg, #72B0E3, #4E8FC8);
+  color: #06121F;
+  font-weight: 650;
+}
+
+.demo-gate button:hover {
+  background: rgba(255, 255, 255, .1);
+}
+
+/* ---------------------------------- 窄屏 */
+@media (max-width: 760px) {
+  html[data-demo] {
+    --demo-gap: 0px;
+    --demo-top: 46px;
+  }
+
+  html[data-demo] .app-root {
+    border-radius: 0 !important;
+    box-shadow: none;
+  }
+
+  /* 还没点「还是想看看」时，把它藏起来，只留说明卡 */
+  html[data-demo]:not([data-demo-open]) .app-root,
+  html[data-demo]:not([data-demo-open]) .demo-bar {
+    display: none;
+  }
+
+  html[data-demo]:not([data-demo-open]) .demo-gate {
+    display: flex;
+  }
+
+  .demo-bar {
+    gap: 8px;
+    padding: 6px 6px 6px 11px;
+    font-size: 11.5px;
+  }
+
+  .demo-bar .demo-cta {
+    padding: 5px 10px;
+    font-size: 11px;
+  }
+
+  /* 窄屏放不下整句，只留标题 */
+  .demo-bar .demo-more {
+    display: none;
+  }
+}

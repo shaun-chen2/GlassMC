@@ -23,3 +23,6 @@ build/
 # 本地游戏数据，绝不上传
 minecraft/
 *.part
+
+# 体验页构建产物（由 Scripts/build-demo.sh 生成）
+demo/site/
