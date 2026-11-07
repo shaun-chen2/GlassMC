@@ -4,11 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GlassMC · 液态玻璃 Minecraft 启动器 · macOS / Windows / Linux</title>
-<meta name="description" content="GlassMC 是一个跨平台的 Minecraft 启动器：液态玻璃界面，一键装版本、加载器与模组，支持离线 / 微软正版 / 皮肤站登录，内置 Modrinth、整合包导入与陶瓦联机。Rust + Tauri 2 实现，macOS（Apple Silicon / Intel）、Windows、Linux 同一套代码。">
-<meta name="keywords" content="Minecraft 启动器, MC 启动器, 我的世界启动器, Tauri, Rust, 液态玻璃, 跨平台, Fabric, NeoForge, Modrinth">
+<meta name="description" content="GlassMC 是一个跨平台的 Minecraft 启动器：液态玻璃界面，一键装版本、加载器与模组，支持离线 / 微软正版 / 皮肤站登录，内置 Modrinth、整合包导入与陶瓦联机。Rust + Tauri 2 实现，macOS（Apple Silicon / Intel）、Windows、Linux 同一套代码，并提供浏览器在线体验页。">
+<meta name="keywords" content="Minecraft 启动器, MC 启动器, 我的世界启动器, Tauri, Rust, 液态玻璃, 跨平台, Fabric, NeoForge, Modrinth, 在线体验">
 <meta property="og:type" content="website">
 <meta property="og:title" content="GlassMC · 液态玻璃 Minecraft 启动器">
-<meta property="og:description" content="跨平台（macOS / Windows / Linux），一键装版本与模组，支持离线 / 微软正版 / 认证服务器登录，内置陶瓦联机。">
+<meta property="og:description" content="跨平台（macOS / Windows / Linux），一键装版本与模组，支持离线 / 微软正版 / 认证服务器登录，内置陶瓦联机。不想先安装，可以直接在浏览器里在线体验。">
 <meta property="og:image" content="images/overview.jpg">
 <meta name="theme-color" content="#060B14">
 <link rel="icon" href="images/icon-256.png">
@@ -143,6 +143,16 @@
     transition: transform .2s, box-shadow .2s;
   }
   .nav-cta:hover { transform: translateY(-1px); box-shadow: 0 10px 24px -10px rgba(95, 159, 214, .9); }
+  .nav-demo {
+    flex: none; padding: 7px 15px; border-radius: 9px; font-size: 13.5px; font-weight: 700;
+    color: var(--primary-bright); background: rgba(95, 159, 214, .08);
+    border: 1px solid rgba(95, 159, 214, .32);
+    transition: background .2s, border-color .2s, transform .2s;
+  }
+  .nav-demo:hover {
+    background: rgba(95, 159, 214, .17); border-color: rgba(95, 159, 214, .52); transform: translateY(-1px);
+  }
+  .nav-demo .arrow { opacity: .65; font-weight: 500; }
 
   /* ---------- Hero ---------- */
   .hero { position: relative; z-index: 1; max-width: var(--maxw); margin: 0 auto; padding: 78px 24px 24px; }
@@ -482,6 +492,20 @@
   .download-card .meta code { color: var(--primary-bright); }
   .download-card .hero-btns { justify-content: center; }
 
+  /* 在线体验条：下载区下方的一行入口 */
+  .demo-strip {
+    margin-top: 14px; padding: 15px 20px 15px 24px; border-radius: 14px;
+    display: flex; align-items: center; justify-content: space-between; gap: 18px;
+    background: rgba(95, 159, 214, .05);
+    border: 1px dashed rgba(95, 159, 214, .3);
+    transition: border-color .25s, background .25s;
+  }
+  .demo-strip:hover { border-color: rgba(95, 159, 214, .5); background: rgba(95, 159, 214, .08); }
+  .demo-strip .txt { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+  .demo-strip b { color: #DCEAF8; font-size: 14.5px; }
+  .demo-strip .txt span { color: var(--text-dim); font-size: 13.5px; line-height: 1.7; }
+  .demo-strip .btn { flex: none; padding: 10px 20px; font-size: 14px; border-radius: 10px; }
+
   /* ---------- FAQ ---------- */
   .faq-list { display: grid; gap: 10px; }
   details {
@@ -576,6 +600,10 @@
   @media (max-width: 760px) {
     .nav-links { display: none; }
     .nav-cta { margin-left: auto; }
+    .nav-demo { display: none; }
+    .demo-strip { flex-direction: column; align-items: stretch; gap: 12px; padding: 18px; text-align: center; }
+    .demo-strip .txt { justify-content: center; }
+    .demo-strip .btn { justify-content: center; }
     .hero { padding-top: 48px; }
     .hero-title { font-size: clamp(40px, 12vw, 58px); }
     .feature-grid { grid-template-columns: 1fr; }
@@ -810,6 +838,7 @@
       <a href="#community">社区</a>
       <a href="#faq">常见问题</a>
     </div>
+    <a class="nav-demo" href="https://glassmc.shuan.uk/" target="_blank" rel="noopener">在线体验 <span class="arrow">↗</span></a>
     <a class="nav-cta" href="#download">下载</a>
   </div>
 </nav>
@@ -827,6 +856,7 @@
       </p>
       <div class="hero-btns">
         <a class="btn btn-primary" href="#download">↓ 选一个平台下载</a>
+        <a class="btn btn-ghost" href="https://glassmc.shuan.uk/" target="_blank" rel="noopener">在线体验 <span class="arrow">↗</span></a>
         <a class="btn btn-ghost" href="https://github.com/shaun-chen2/GlassMC">查看源码</a>
       </div>
       <p class="hero-hint">三个平台都会被系统拦一次 —— <a href="#install">怎么放行 →</a></p>
@@ -892,6 +922,14 @@
       <a href="https://github.com/shaun-chen2/GlassMC/releases">Release 页</a>有全部资产和 SHA-256。
       装完第一次打开会被系统拦一下，<a href="#install">放行方法在下面</a>。
     </p>
+  </div>
+
+  <div class="demo-strip reveal">
+    <div class="txt">
+      <b>不想先下载？</b>
+      <span>在线体验版跑在浏览器里，八个页面都能点，示例数据，不装游戏、不连账号。</span>
+    </div>
+    <a class="btn btn-ghost" href="https://glassmc.shuan.uk/" target="_blank" rel="noopener">打开体验页 <span class="arrow">↗</span></a>
   </div>
 </section>
 
@@ -1174,7 +1212,7 @@
   <div class="sec-head reveal">
     <span class="sec-tag">FAQ</span>
     <h2>遇到问题<em>先看这里</em></h2>
-    <p>六条最常被问到的。</p>
+    <p>七条最常被问到的。</p>
   </div>
 
   <div class="faq-list">
@@ -1225,6 +1263,14 @@
         <p>最可能出问题的是 <code>glass.rs</code>（Mica / Acrylic 版本差异、合成器行为）和 <code>game.rs</code>（进程组管理、Windows 控制台窗口）。遇到了欢迎提 issue。</p>
       </div></div>
     </details>
+
+    <details class="reveal">
+      <summary><span class="q">Q7</span>能不安装先看看界面吗？</summary>
+      <div class="faq-body"><div class="faq-inner">
+        <p>可以，<a href="https://glassmc.shuan.uk/" target="_blank" rel="noopener">glassmc.shuan.uk</a> 是同一套前端跑在浏览器里，八个页面都能点，安装、启动、联机走的是示例数据。</p>
+        <p>它只是让人先看一眼界面：真的下版本、开游戏还是得装桌面版。</p>
+      </div></div>
+    </details>
   </div>
 </section>
 
@@ -1232,6 +1278,7 @@
   <div class="footer-inner">
     <div class="footer-brand"><img src="images/icon-256.png" alt="">GlassMC</div>
     <div class="footer-links">
+      <a href="https://glassmc.shuan.uk/" target="_blank" rel="noopener">在线体验</a>
       <a href="https://github.com/shaun-chen2/GlassMC">GitHub</a>
       <a href="https://github.com/shaun-chen2/GlassMC/issues">反馈问题</a>
       <a href="https://github.com/shaun-chen2/GlassMC/discussions">讨论区</a>
