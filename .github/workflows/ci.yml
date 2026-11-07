@@ -78,7 +78,7 @@ jobs:
           PY
 
       - name: 前端脚本语法
-        run: for f in src/js/*.js src/vendor/*.js; do node --check "$f"; done
+        run: for f in src/js/*.js src/vendor/*.js demo/*.js; do node --check "$f"; done
 
   build:
     name: 编译 (${{ matrix.name }})
