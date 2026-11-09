@@ -13,7 +13,8 @@
 [![macOS](https://img.shields.io/badge/macOS-下载%20dmg-2f7cf6?style=for-the-badge&logo=apple&logoColor=white)](https://github.com/shaun-chen2/GlassMC/releases/latest/download/GlassMC.dmg)
 [![Windows](https://img.shields.io/badge/Windows-下载%20exe-2f7cf6?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/shaun-chen2/GlassMC/releases/latest/download/GlassMC-Setup.exe)
 [![Linux](https://img.shields.io/badge/Linux-下载%20deb-2f7cf6?style=for-the-badge&logo=linux&logoColor=white)](https://github.com/shaun-chen2/GlassMC/releases/latest/download/GlassMC.deb)
-[![介绍页](https://img.shields.io/badge/%E4%BB%8B%E7%BB%8D%E9%A1%B5-GitHub.io-111?style=for-the-badge)](https://shaun-chen2.github.io/GlassMC/)
+[![介绍页](https://img.shields.io/badge/%E4%BB%8B%E7%BB%8D%E9%A1%B5-glassmc.shuan.uk-111?style=for-the-badge)](https://glassmc.shuan.uk/)
+[![在线体验](https://img.shields.io/badge/%E5%9C%A8%E7%BA%BF%E4%BD%93%E9%AA%8C-%E6%B5%8F%E8%A7%88%E5%99%A8%E9%87%8C%E8%AF%95%E8%AF%95-7fd3a0?style=for-the-badge)](https://glassmc.shuan.uk/web/)
 
 ![GlassMC 主界面](docs/images/app-window.jpg)
 
@@ -216,9 +217,13 @@ CI 会检查同样的东西，外加三端编译。
 ```
 src/                前端：一个 index.html + 几个 js/css，没有构建步骤
 src-tauri/src/      Rust 后端：23 个模块，一个模块一件事
-Scripts/            打包脚本（NSIS、deb、DMG 配置、图标生成）
+demo/               在线体验页的展示外壳（壁纸、悬浮窗、说明条）
+Scripts/            打包与部署脚本（NSIS、deb、DMG 配置、图标生成、整站部署）
 docs/               介绍页与文档
 ```
+
+站点：`docs/` 出介绍页，`demo/` 出 `/web` 体验页，`Scripts/deploy-site.sh` 一次构建并部署到
+[glassmc.shuan.uk](https://glassmc.shuan.uk/)。
 
 细节在 [架构说明](docs/architecture.md)。
 
