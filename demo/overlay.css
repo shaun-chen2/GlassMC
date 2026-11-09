@@ -65,6 +65,20 @@ html[data-demo] .app-root {
   white-space: nowrap;
 }
 
+.demo-bar .demo-back {
+  flex: none;
+  padding-right: 10px;
+  margin-right: -2px;
+  border-right: 1px solid rgba(150, 190, 235, .16);
+  color: #7E92A9;
+  font-size: 12px;
+  text-decoration: none;
+}
+
+.demo-bar .demo-back:hover {
+  color: #E6F0FB;
+}
+
 .demo-bar .demo-dot {
   flex: none;
   width: 7px;

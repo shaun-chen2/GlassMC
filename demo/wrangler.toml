@@ -1,10 +1,13 @@
-# 在线体验页：把 demo/site 当纯静态资源挂到 Cloudflare Workers
+# 整站：把 demo/site 当纯静态资源挂到 Cloudflare Workers
 #
-# 生产域名 glassmc.shuan.uk 绑在这个 Worker 上，**名字不能改**，
+#   https://glassmc.shuan.uk/      介绍页
+#   https://glassmc.shuan.uk/web   在线体验
+#
+# 生产域名绑在这个 Worker 上，**名字不能改**，
 # 改了等于新建一个 Worker，自定义域名不会跟着走。
 #
 # 步骤：
-#   bash Scripts/build-demo.sh          # 生成 demo/site
+#   bash Scripts/build-site.sh          # 生成 demo/site
 #   cd demo && npx wrangler deploy      # 上传并切流量
 name = "drop-0adcc71b-0d7"
 compatibility_date = "2025-09-01"

@@ -34,6 +34,7 @@
     bar.className = 'demo-bar';
     bar.setAttribute('role', 'note');
     bar.innerHTML =
+      '<a class="demo-back" href="/">← 介绍页</a>' +
       '<span class="demo-dot"></span>' +
       '<span class="demo-txt"><b>在线体验版</b>' +
       '<span class="demo-more"> · 示例数据，不会真的安装或启动游戏</span></span>' +
