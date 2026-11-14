@@ -831,6 +831,10 @@
   .spotlight { display: none !important; }
   *, *::before, *::after { transition: none !important; }
 
+  /* 按钮的 ::after 是 hover 时的斜向高光条（left:-75% + overflow:hidden 裁掉）。
+     引擎把百分比按 px 解析、也不认 overflow 裁剪，会在按钮左边画出一块白斑。 */
+  html.swarm-playing .btn::after { display: none !important; }
+
   /* 渐变字（color:transparent + background-clip:text）在快照里会被当成透明而丢掉，
      播放期间先换成同色系的实色；淡出真实页面时 html.swarm-playing 被摘掉，渐变自动回来 */
   html.swarm-playing .hero-title,
@@ -5419,6 +5423,10 @@
     // 本页只重建首屏：首屏的活儿干完就淡回真实页面，不往下滚。
     // （引擎自带的总进度依赖滚动，这里改写完成条件。）
     let faded = false;
+    let baseF = 0;              // 开场那一刻的视口底，钉住，不随滚动放大
+    let lastDone = -1;
+    let lastMove = performance.now();
+    let armed = false;
     const reveal = () => {
       if (faded) return;
       faded = true;
@@ -5430,15 +5438,36 @@
     const poll = setInterval(() => {
       const a = app;
       if (!a || !a.engine || !a.model || !a.view) return;
-      // 用引擎自己的推进线判完成：超出一条线的世界层任务它本来就不会做
-      const f = a.engine.frontier;
-      const left = a.engine.tasks.filter((t) => {
-        return t.state !== "done" && (t.layer !== "world" || t.gate <= f);
-      }).length;
-      if (left === 0) setTimeout(reveal, 1200);
+      // 引擎的 frontier 会跟着滚动无限增长。若拿它当判据，用户滚一下再停下，
+      // 上方那些没做的任务就永远算不完，只能干等超时被切掉 —— 所以钉死在首屏。
+      if (!baseF) baseF = Math.max(a.engine.frontier, a.view.H);
+      const f = baseF;
+      const tasks = a.engine.tasks;
+      let left = 0;
+      let done = 0;
+      for (let i = 0; i < tasks.length; i++) {
+        const t = tasks[i];
+        if (t.state === "done") { done++; continue; }
+        if (t.layer !== "world" || t.gate <= f) left++;
+      }
+      const now = performance.now();
+      if (done !== lastDone) { lastDone = done; lastMove = now; }
+      if (done === 0) { lastMove = now; return; }   // 还没开工，不算停滞
+      let active = 0;
+      for (let i = 0; i < tasks.length; i++) if (tasks[i].state === "active") active++;
+      const quiet = now - lastMove;
+      // 收工条件：
+      //   1) 首屏任务全部做完；
+      //   2) 没人在干活、且 2.5 秒没有任何新完成 —— 剩下的任务引擎本来就不会做；
+      //   3) 有人在干活但 8 秒一个都没做完 —— 卡死了。
+      const idle = (active === 0 && quiet > 2500) || quiet > 8000;
+      if ((left === 0 || idle) && !armed) {
+        armed = true;
+        setTimeout(reveal, left === 0 ? 1200 : 450);
+      }
     }, 300);
-    // 兜底：建卡住或出错时，别把页面永远盖着
-    const guard = setTimeout(reveal, 40000);
+    // 兜底：capture 卡死或出错时，别把页面永远盖着
+    const guard = setTimeout(reveal, 25000);
     // 点一下跳过
     document.addEventListener("pointerdown", reveal, { once: true, passive: true });
     document.addEventListener("keydown", (e) => { if (e.key === "Escape") reveal(); }, true);
