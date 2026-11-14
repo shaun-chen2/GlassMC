@@ -39,7 +39,7 @@ for y in range(H):
               int(13 + 11 * (1 - t) + 7 * k),
               int(24 + 24 * (1 - t) + 12 * k)),
     )
-base = mul(base, 0.72)
+base = mul(base, 0.92)
 
 # ---------- 2. 低频：五块大色团 ----------
 blobs = [
@@ -57,7 +57,22 @@ for cx, cy, rr, col, amt in blobs:
     dl.ellipse([x - r, y - r, x + r, y + r], fill=tuple(int(c * amt) for c in col))
 layer = layer.filter(ImageFilter.GaussianBlur(210))
 
-img = ImageChops.add(base, mul(layer, 0.92))
+img = ImageChops.add(base, mul(layer, 1.02))
+
+# ---------- 2.5 两束大光带：大尺度、高亮度，用来「看得见在动」
+# 玻璃后面只有小尺度细节在动，肉眼很难察觉；一条亮带的缓慢横移一眼就能看出来。
+glow = Image.new("RGB", (W, H), (0, 0, 0))
+dg = ImageDraw.Draw(glow)
+for cx, cy, rx, ry, col, amt in [
+    (0.30, 0.34, 0.34, 0.10, (120, 190, 255), 0.30),
+    (0.72, 0.60, 0.30, 0.09, (110, 240, 220), 0.22),
+]:
+    dg.ellipse(
+        [(cx - rx) * W, (cy - ry) * H, (cx + rx) * W, (cy + ry) * H],
+        fill=tuple(int(c * amt) for c in col),
+    )
+glow = glow.filter(ImageFilter.GaussianBlur(120))
+img = ImageChops.add(img, glow)
 
 # ---------- 3. 暗角：中心偏上最亮，四角压下去 ----------
 rad = Image.radial_gradient("L").resize((int(W * 1.45), int(H * 1.55)), Image.LANCZOS)

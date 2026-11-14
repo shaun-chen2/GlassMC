@@ -14,22 +14,20 @@ html[data-demo] {
      调到 .70，壁纸能透上来，毛玻璃才有存在感。 */
   --shell-base: .70;
 
-  /* 壁纸由 ::before 铺（要能被 transform 驱动），这里只留兜底色 */
+  /* 壁纸由 .demo-wall 铺（JS 插入的真实元素），这里只留兜底色 */
   background-color: #05070d;
 }
 
-/* 壁纸层：比视口更大一圈，靠 JS 慢速随机位移。
-   inset 用负值放大，位移和轻微旋转都不会露出边缘。 */
-html[data-demo]::before {
-  content: "";
+/* 壁纸层：比视口更大一圈，靠 JS 慢速随机平移。
+   用真实元素而不是 ::before —— 直接改 element.style.transform 最稳，
+   不依赖 var() 去驱动 transform（伪元素 + 自定义属性这条路上，
+   个别 Safari 版本不会为变化后的值补间，表现就是「一动不动」）。 */
+html[data-demo] .demo-wall {
   position: fixed;
-  inset: -9vmax;
+  inset: -12vmax;
   z-index: -1;
   background: #05070d url("wallpaper.jpg") center / cover no-repeat;
-  transform: translate3d(var(--demo-wall-x, 0px), var(--demo-wall-y, 0px), 0)
-             rotate(var(--demo-wall-rot, 0deg))
-             scale(1.02);
-  transition: transform var(--demo-wall-dur, 70s) cubic-bezier(.37, .02, .32, 1);
+  transform: scale(1.12);
   will-change: transform;
   pointer-events: none;
 }

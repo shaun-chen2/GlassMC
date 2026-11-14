@@ -93,46 +93,78 @@
   );
 
   /* ---------------------------------- 壁纸慢速随机漂移
-     目的不是「有动画」，而是让壁纸动起来 —— 玻璃窗口后面有东西在缓慢移动，
-     blur 才看得出来。所以幅度小、周期长：一次位移四十秒往上，
-     且还没走完就换下一个目标，动作永远不落停，也不会「一顿一顿」。 */
-  var root = document.documentElement;
+     目的不是「有动画」，而是让玻璃窗后面有东西在动 —— 有东西动，才看得出毛玻璃。
+     上一版每秒只挪 1~2px、幅度 ±100px：数值上确实在动，肉眼基本看不出来。
+     这一版改成随机游走：
+       每次目标 90~170px，22~34 秒走完（约 4~11px/s），没走完就换下一个目标，
+     所以永远在缓慢移动、又不会「一顿一顿」。用真实元素 + inline transform，
+     不依赖 var() 驱动 transform，Safari 上也一样会动。 */
+  var wall = document.createElement('div');
+  wall.className = 'demo-wall';
+  var host = document.body || document.documentElement;
+  host.insertBefore(wall, host.firstChild);
+
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var SCALE = 1.12;
+  var pos = { x: 0, y: 0, rot: 0 };
+  var lim = { x: 120, y: 100 };
   var driftTimer = 0;
 
-  function drift() {
-    clearTimeout(driftTimer);
-    if (reduce) {
-      root.style.setProperty('--demo-wall-x', '0px');
-      root.style.setProperty('--demo-wall-y', '0px');
-      root.style.setProperty('--demo-wall-rot', '0deg');
-      return;
-    }
-
-    // 幅度取短边的 12%（1440×900 上约 ±103px）。
-    // 但壁纸层只比视口大 9vmax，窄高视口（如 820×1000）按短边算会超出这个余量，
-    // 所以再按 inset 夹一次，留出旋转与亚像素的余量。
+  // 安全边界：壁纸层 inset 是 -12vmax，再放大 SCALE，剩下的余量才是能移动的行程。
+  // 旋转会把四个角甩出去，甩出的距离随元素对角线增长（大屏上能到 40px），
+  // 所以这里按实际尺寸算，不能用固定值。
+  function measure() {
     var w = window.innerWidth;
     var h = window.innerHeight;
-    var inset = Math.max(w, h) * 0.09;                 // 与 CSS 的 inset: -9vmax 对齐
-    var amp = Math.min(Math.min(w, h) * 0.12, inset - 26);
-    var x = (Math.random() * 2 - 1) * amp;
-    var y = (Math.random() * 2 - 1) * amp;
-    var rot = (Math.random() * 2 - 1) * 0.7;          // 轻微旋转，避免纯平移的机械感
-    var dur = 52 + Math.random() * 34;                // 52~86 秒走到目标点，约 1.5px/s
-
-    root.style.setProperty('--demo-wall-dur', dur.toFixed(1) + 's');
-    root.style.setProperty('--demo-wall-x', x.toFixed(1) + 'px');
-    root.style.setProperty('--demo-wall-y', y.toFixed(1) + 'px');
-    root.style.setProperty('--demo-wall-rot', rot.toFixed(2) + 'deg');
-
-    // 提前 15% 换目标：过渡还没结束就改方向，运动是连续的，不会走走停停
-    driftTimer = setTimeout(drift, dur * 850);
+    var inset = Math.max(w, h) * 0.12;                 // 与 CSS 的 inset: -12vmax 对齐
+    var ew = w + inset * 2;
+    var eh = h + inset * 2;
+    var rotSlack = Math.sqrt(ew * ew + eh * eh) / 2 * Math.sin(1.2 * Math.PI / 180) + 8;
+    lim.x = Math.max(40, (ew * SCALE - w) / 2 - rotSlack);
+    lim.y = Math.max(30, (eh * SCALE - h) / 2 - rotSlack);
   }
 
-  drift();
+  function apply(duration) {
+    wall.style.transition = duration > 0
+      ? 'transform ' + duration.toFixed(1) + 's cubic-bezier(.42, .03, .36, 1)'
+      : 'none';
+    wall.style.transform =
+      'translate3d(' + pos.x.toFixed(1) + 'px,' + pos.y.toFixed(1) + 'px,0) ' +
+      'rotate(' + pos.rot.toFixed(2) + 'deg) scale(' + SCALE + ')';
+  }
+
+  function drift() {
+    var w = window.innerWidth;
+    var h = window.innerHeight;
+    var ang = Math.random() * Math.PI * 2;
+    var dist = Math.min(w, h) * (0.10 + Math.random() * 0.09);   // 90~170px @900
+    var nx = pos.x + Math.cos(ang) * dist;
+    var ny = pos.y + Math.sin(ang) * dist;
+
+    // 撞到边界就折返到对侧，路径不会在角落里反复蹭
+    if (Math.abs(nx) > lim.x) nx = -nx * (0.45 + Math.random() * 0.35);
+    if (Math.abs(ny) > lim.y) ny = -ny * (0.45 + Math.random() * 0.35);
+    pos.x = Math.max(-lim.x, Math.min(lim.x, nx));
+    pos.y = Math.max(-lim.y, Math.min(lim.y, ny));
+    pos.rot = -1.1 + Math.random() * 2.2;
+
+    var dur = 22 + Math.random() * 12;                 // 22~34 秒，慢但不至于看不出来
+    apply(dur);
+    // 82% 就换目标：过渡还没结束就改方向，看上去是一直在飘，不会走走停停
+    clearTimeout(driftTimer);
+    driftTimer = setTimeout(drift, dur * 820);
+  }
+
+  measure();
+  apply(0);
+  if (!reduce) {
+    driftTimer = setTimeout(drift, 200);
+  }
+
   window.addEventListener('resize', function () {
-    // 视口变了重新取一次幅度，免得窄屏上位移过大露出边缘
-    drift();
+    measure();
+    pos.x = Math.max(-lim.x, Math.min(lim.x, pos.x));
+    pos.y = Math.max(-lim.y, Math.min(lim.y, pos.y));
+    apply(0.8);
   });
 })();
