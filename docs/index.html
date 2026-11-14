@@ -3132,7 +3132,7 @@
       const host = document.createElement("div");
       host.setAttribute("data-swarm-rebuild", "");
       host.style.cssText =
-        "all:initial !important;position:fixed !important;inset:0 !important;z-index:2147483647 !important;display:block !important;pointer-events:auto !important;contain:strict !important;opacity:1;transition:opacity .6s ease;";
+        "all:initial !important;position:fixed !important;inset:0 !important;z-index:2147483647 !important;display:block !important;pointer-events:none !important;contain:strict !important;opacity:1;transition:opacity .6s ease;";
       env.host = host;
       this.host = host;
       const root = host.attachShadow({ mode: "closed" });
@@ -5426,7 +5426,8 @@
     //   1) 整页任务全部做完（用户滚到页底、最后一个元素也落地）；
     //   2) 或者已经滚到页底，引擎手里既没有能做的活、也没有正在做的活
     //      （剩下那些是超出文档高度的元素，永远等不到）；
-    // 想提前看真实页面：点一下，或按 Esc。
+    // 覆盖层的指针事件是穿透的，所以点页面、点按钮都不会打断加载；
+    // 只有按 Esc 才是「不看了，直接给我真实页面」。
     let faded = false;
     let armed = false;
     const reveal = () => {
@@ -5460,7 +5461,6 @@
       const atBottom = vp.sy + vp.vh >= a.view.env.scrollHeight() - 8;
       if (atBottom && active === 0 && e.available().length === 0) arm(900);
     }, 300);
-    document.addEventListener("pointerdown", reveal, { once: true, passive: true });
     document.addEventListener("keydown", (e) => { if (e.key === "Escape") reveal(); }, true);
   }
 })();
