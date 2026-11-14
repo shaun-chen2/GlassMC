@@ -13,10 +13,23 @@
 <meta name="theme-color" content="#0c0c0e">
 <meta name="color-scheme" content="dark">
 <link rel="icon" href="images/icon-256.png">
-<script>document.documentElement.classList.add('js-ready');</script>
+<script>
+/* 这一次要不要播「自建」开场（改造自 swarm-cursors）：桌面 + 未要求减少动效 + 本会话没播过。
+   ?swarm=1 强制播一次，?swarm=0 关闭。决定必须在拆分台词之前做完，否则快照会拍到半透明的字。 */
+(function () {
+  var hard = new URLSearchParams(location.search).get('swarm');
+  /* 原版引擎是「整页快照重建」，和本站的固定导航 + 画布内边距不兼容（会整体错位），
+     所以默认走轻量版；想对照原版效果加 ?swarm=1。 */
+  var skip = hard !== '1' ||
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
+    window.innerWidth < 900;
+  window.__GM_SWARM__ = !skip;
+  if (window.__GM_SWARM__) document.documentElement.classList.add('swarm-mode');
+})();
+document.documentElement.classList.add('js-ready');
+</script>
 <style>
-  /* 视觉参考：Swarm Cursors（DhvanilPatel/swarm-cursors，动效源自 Joel Califa 的 Swarm）
-     —— 设计工具画布：标尺、蓝色选中框与尺寸徽章、多人光标群、参考线。 */
+  /* 视觉参考：设计工具画布 —— 标尺、蓝色选中框与尺寸徽章、参考线。 */
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
   /* ============================================================
@@ -125,17 +138,6 @@
     background: var(--guide); padding: 3px 4px; border-radius: 2px; white-space: nowrap;
   }
 
-  /* ---------- 光标群 ---------- */
-  .swarm { position: fixed; inset: 0; z-index: 70; pointer-events: none; }
-  .cur { position: absolute; left: 0; top: 0; width: 20px; height: 20px; will-change: transform; }
-  .cur svg { display: block; overflow: visible; filter: drop-shadow(0 2px 3px rgba(0, 0, 0, .45)); }
-  .cur .tag {
-    position: absolute; left: 15px; top: 15px;
-    font: 600 10px/1 var(--mono); color: #fff; letter-spacing: .01em;
-    padding: 3px 5px; border-radius: 3px; white-space: nowrap;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, .4);
-  }
-
   /* ---------- 选中框（悬停） ---------- */
   .selbox {
     position: fixed; left: 0; top: 0; z-index: 64; pointer-events: none;
@@ -153,7 +155,8 @@
   .selbox i.tr { right: -4px; top: -4px; }
   .selbox i.bl { left: -4px; bottom: -4px; }
   .selbox i.br { right: -4px; bottom: -4px; }
-  .selbox.board .size { left: auto; right: 4px; bottom: 3px; transform: none; }
+  .selbox.board .size { left: auto; right: 4px; top: -16px; bottom: auto; transform: none; }
+  .selbox.board .label { display: none; }
   .selbox .size {
     position: absolute; left: 50%; bottom: -10px; transform: translateX(-50%);
     background: var(--sel); color: #fff; font: 600 10px/1 var(--mono);
@@ -164,31 +167,6 @@
     font: 600 10px/1 var(--mono); color: #7fb0ff; white-space: nowrap;
   }
   .selbox.orange .label { color: #ff8a76; }
-
-  /* ---------- 底部 HUD ---------- */
-  .hud {
-    position: fixed; left: 50%; bottom: 16px; transform: translateX(-50%);
-    z-index: 80; display: flex; align-items: center; gap: 10px;
-    padding: 7px 12px 7px 9px; border-radius: 999px;
-    background: rgba(16, 16, 19, .93); border: 1px solid #2b2b33;
-    box-shadow: 0 12px 30px rgba(0, 0, 0, .55);
-    backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
-    font: 600 10.5px/1 var(--mono); color: #b6b6c2; white-space: nowrap;
-  }
-  .hud .dots { display: flex; }
-  .hud .dots i {
-    width: 13px; height: 13px; border-radius: 50%;
-    border: 1.5px solid #101013; margin-left: -3px;
-  }
-  .hud .dots i:first-child { margin-left: 0; }
-  .hud .bar { width: 96px; height: 3px; background: #2a2a32; border-radius: 2px; overflow: hidden; }
-  .hud .bar i { display: block; height: 100%; width: 0; background: var(--sel); }
-  .hud b { color: #fff; font-weight: 600; }
-  .hud .up {
-    appearance: none; border: 0; background: #26262e; color: #d8d8e2;
-    font: 600 10.5px/1 var(--mono); padding: 5px 8px; border-radius: 999px; cursor: pointer;
-  }
-  .hud .up:hover { background: #33333d; }
 
   /* ---------- 顶部进度 ---------- */
   .progress { position: fixed; left: var(--ruler); right: 0; top: 0; height: 2px; z-index: 61; pointer-events: none; }
@@ -278,7 +256,7 @@
     font-size: clamp(58px, 8.6vw, 104px); line-height: .92; letter-spacing: -.055em;
     font-weight: 800; color: #fff; margin: 22px 0 0;
   }
-  .hero-title span { color: #fff; }
+  .hero-title > span { color: #fff; }
   .hero-title .dotp { color: var(--sel); }
 
   .hero-cn {
@@ -325,7 +303,7 @@
   .hero-side-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-top: 0; }
   .mini { background: #0f0f13; padding: 14px 12px; }
   .mini b { display: block; font-size: 22px; letter-spacing: -.03em; color: #fff; font-weight: 750; line-height: 1.1; }
-  .mini span { display: block; margin-top: 4px; font: 500 10px/1 var(--mono); color: var(--dimmer); letter-spacing: .06em; }
+  .mini > span { display: block; margin-top: 4px; font: 500 10px/1 var(--mono); color: var(--dimmer); letter-spacing: .06em; }
 
   /* ============================================================
      Marquee → 图层条
@@ -408,7 +386,7 @@
   }
   .demo-strip .txt { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
   .demo-strip b { font: 650 13px/1.5 var(--sans); color: #fff; }
-  .demo-strip span { color: #8b8b97; font-size: 12.8px; }
+  .demo-strip .txt > span { color: #8b8b97; font-size: 12.8px; }
   .demo-strip .btn { flex: none; }
 
   /* ============================================================
@@ -612,14 +590,48 @@
   .to-top:hover { background: #202028; color: #fff; }
 
   /* ============================================================
-     入场
+     入场：从零放大 → 再逐字打上字
+     transform 不影响布局，所以页面高度始终稳定
      ============================================================ */
   .reveal { opacity: 1; transform: none; }
   html.js-ready .reveal {
-    opacity: 0; transform: translateY(14px);
-    transition: opacity .55s cubic-bezier(.2, .7, .2, 1), transform .55s cubic-bezier(.2, .7, .2, 1);
+    opacity: 0; transform: scale(.001);
+    transform-origin: 50% 50%;
+    transition:
+      opacity .42s cubic-bezier(.32, .72, .32, 1),
+      transform .92s cubic-bezier(.16, .92, .28, 1);
+    pointer-events: none;
   }
-  html.js-ready .reveal.in { opacity: 1; transform: none; }
+  html.js-ready .reveal.in {
+    opacity: 1; transform: none; pointer-events: auto;
+  }
+
+  /* 逐字：占位不变，只切透明度 */
+  .tw { display: inline; }
+  .ch { display: inline; opacity: 0; transition: opacity .1s linear; }
+  .ch.on { opacity: 1; }
+  .type-caret {
+    display: inline-block; width: .56em; height: 1em; vertical-align: -.12em;
+    margin-left: 1px; background: var(--sel); border-radius: 1px;
+    animation: caret 1s steps(1) infinite;
+  }
+
+  /* 「自建」开场播放期间：内容直接是终态（快照要拍到完整页面），
+     页面自带的标尺/选中框/网格先让位，交给引擎那套画布。 */
+  html.swarm-mode .reveal,
+  html.swarm-mode .ch {
+    opacity: 1 !important; transform: none !important;
+    transition: none !important; pointer-events: auto !important;
+  }
+  html.swarm-mode .ch { display: inline !important; }
+  /* 引擎靠精确 scrollTo 做快照，平滑滚动会让坐标整体错位 */
+  html.swarm-mode, html.swarm-mode body { scroll-behavior: auto !important; }
+  html.swarm-mode .rulers,
+  html.swarm-mode .guides,
+  html.swarm-mode .progress,
+  html.swarm-mode .selbox,
+  html.swarm-mode .canvas-grid,
+  html.swarm-mode .to-top { display: none !important; }
 
   /* ============================================================
      响应式
@@ -655,9 +667,6 @@
     .req code { grid-column: 1; }
     .faq-inner { padding-left: 0; }
     .footer-inner { padding: 32px 18px 88px; }
-    .hud { display: none; }
-    .hud .bar { width: 58px; }
-    .hud .up { display: none; }
     .ruler-x span:nth-child(2n), .ruler-y span:nth-child(2n) { display: none; }
   }
 
@@ -665,6 +674,8 @@
     .term-line { opacity: 1; transform: none; }
     .marquee-track { animation: none; }
     .term-cursor { animation: none; }
+    .type-caret { display: none; }
+    .ch { opacity: 1; transition: none; }
     html.js-ready .reveal { opacity: 1; transform: none; transition: none; }
   }
 
@@ -685,14 +696,12 @@
   <i class="gx"></i><i class="gy"></i><span class="hint"></span>
 </div>
 
-<div class="swarm" id="swarm" aria-hidden="true"></div>
-
 <div class="selbox" id="selbox" aria-hidden="true">
   <i class="tl"></i><i class="tr"></i><i class="bl"></i><i class="br"></i>
   <span class="label"></span><span class="size"></span>
 </div>
 
-<div class="selbox on board" id="board" aria-hidden="true">
+<div class="selbox board" id="board" aria-hidden="true">
   <i class="tl"></i><i class="tr"></i><i class="bl"></i><i class="br"></i>
   <span class="label">GlassMC / hero</span><span class="size"></span>
 </div>
@@ -715,24 +724,24 @@
 <header class="hero" id="top">
   <div class="hero-grid">
     <div class="hero-left">
-      <span class="hero-badge"><span class="dot"></span>macOS · Windows · Linux&nbsp;&nbsp;|&nbsp;&nbsp;v1.3.2&nbsp;&nbsp;|&nbsp;&nbsp;约 10 MB</span>
-      <h1 class="hero-title">GlassMC<span class="dotp">.</span></h1>
-      <p class="hero-cn">液态玻璃 · MINECRAFT 启动器</p>
-      <p class="hero-slogan">装版本、装模组、开游戏，<br>三次点击的事。</p>
-      <p class="hero-desc">
+      <span class="hero-badge reveal" style="--d:0ms"><span class="dot"></span>macOS · Windows · Linux&nbsp;&nbsp;|&nbsp;&nbsp;v1.3.2&nbsp;&nbsp;|&nbsp;&nbsp;约 10 MB</span>
+      <h1 class="hero-title reveal" style="--d:120ms">GlassMC<span class="dotp">.</span></h1>
+      <p class="hero-cn reveal" style="--d:340ms">液态玻璃 · MINECRAFT 启动器</p>
+      <p class="hero-slogan reveal" style="--d:460ms">装版本、装模组、开游戏，<br>三次点击的事。</p>
+      <p class="hero-desc reveal" style="--d:600ms">
         玻璃是窗口本身向系统申请的毛玻璃，不是在网页里堆一层滤镜假装。
         选一个版本点安装，剩下的下载、补依赖、配 Java、拼启动参数，它自己来。
       </p>
-      <div class="hero-btns">
+      <div class="hero-btns reveal" style="--d:740ms">
         <a class="btn btn-primary" href="#download">↓ 选一个平台下载</a>
         <a class="btn btn-ghost" href="https://glassmc.shuan.uk/web/" target="_blank" rel="noopener">在线体验 <span class="arrow">↗</span></a>
         <a class="btn btn-ghost" href="https://github.com/shaun-chen2/GlassMC">查看源码</a>
       </div>
-      <p class="hero-hint">三个平台都会被系统拦一次 —— <a href="#install">怎么放行 →</a></p>
+      <p class="hero-hint reveal" style="--d:860ms">三个平台都会被系统拦一次 —— <a href="#install">怎么放行 →</a></p>
     </div>
 
     <div class="hero-right">
-      <div class="terminal">
+      <div class="terminal reveal" style="--d:280ms">
         <div class="term-bar">
           <span class="term-dot r"></span><span class="term-dot y"></span><span class="term-dot g"></span>
           <span class="term-title">glassmc — launch</span>
@@ -750,9 +759,9 @@
         </div>
       </div>
       <div class="hero-side-cards">
-        <div class="mini"><b>393</b><span>可装版本</span></div>
-        <div class="mini"><b>4</b><span>模组加载器</span></div>
-        <div class="mini"><b>3</b><span>操作系统</span></div>
+        <div class="mini reveal" style="--d:460ms"><b>393</b><span>可装版本</span></div>
+        <div class="mini reveal" style="--d:540ms"><b>4</b><span>模组加载器</span></div>
+        <div class="mini reveal" style="--d:620ms"><b>3</b><span>操作系统</span></div>
       </div>
     </div>
   </div>
@@ -1165,15 +1174,6 @@
 
 <div class="lightbox" id="lightbox"><img alt=""></div>
 
-<div class="hud" id="hud">
-  <span class="dots" id="hud-dots"></span>
-  <span class="agents"><b id="hud-agents">8</b> cursors</span>
-  <span style="color:#4a4a54">·</span>
-  <span><b id="hud-pct">0%</b> 已构建</span>
-  <span class="bar"><i id="hud-bar"></i></span>
-  <button class="up" id="hud-up" aria-label="回到顶部">↑</button>
-</div>
-
 <button class="to-top" id="to-top" aria-label="回到顶部">↑</button>
 
 <script>
@@ -1181,35 +1181,176 @@
   const html = document.documentElement;
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  /* 播「自建」开场时不拆台词：快照要拍到完整文本，拆成单字会被 clone 成奇怪的排版 */
+  const swarmMode = !!window.__GM_SWARM__;
 
-  /* 0. 滚动淡入：内容可见性优先，出错也不影响展示 */
+  /* ============================================================
+     0. 入场：元素按顺序从零放大，放大到位后逐字打上文字
+     ============================================================ */
+  const TYPE_SEL = [
+    '.hero-badge', '.hero-title', '.hero-cn', '.hero-slogan', '.hero-desc', '.hero-hint',
+    '.download-card h2', '.demo-strip .txt b', '.demo-strip .txt span',
+    '.sec-head h2', '.sec-head p',
+    '.feature-card h3', '.feature-card p',
+    '.plat h3', '.plat .tagline',
+    '.mini b', '.mini span'
+  ].join(',');
+
+  const typeJobs = new WeakMap();
+
+  /* 把元素里的文本节点拆成单字 span：占位不变，只改透明度 */
+  function splitChars(el) {
+    const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, {
+      acceptNode(n) {
+        return n.nodeValue.trim() ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+      }
+    });
+    const nodes = [];
+    while (walker.nextNode()) nodes.push(walker.currentNode);
+
+    const chars = [];
+    nodes.forEach(node => {
+      const prev = node.previousSibling;
+      const next = node.nextSibling;
+      const lineStart = !prev || prev.nodeName === 'BR' ||
+        (prev.nodeType === 3 && !prev.nodeValue.trim());
+      const lineEnd = !next || next.nodeName === 'BR' ||
+        (next.nodeType === 3 && !next.nodeValue.trim());
+
+      let text = node.nodeValue;
+      /* 源码里的换行缩进压成一个空格，不然拆字后会变成一大段空隙 */
+      text = text.replace(/[ \t\r\n]+/g, ' ');
+      if (lineStart) text = text.replace(/^\s+/, '');
+      if (lineEnd) text = text.replace(/\s+$/, '');
+      if (!text) return;
+
+      /* 字符要包在一个 wrapper 里：直接散成 span 会让 flex 容器的 gap 作用到每个字之间 */
+      const wrap = document.createElement('span');
+      wrap.className = 'tw';
+      Array.from(text).forEach(ch => {
+        const sp = document.createElement('span');
+        sp.className = 'ch';
+        sp.textContent = ch === ' ' ? '\u00a0' : ch;
+        wrap.appendChild(sp);
+        chars.push(sp);
+      });
+      node.parentNode.replaceChild(wrap, node);
+    });
+    return chars;
+  }
+
+  function playType(el, per, done) {
+    const job = typeJobs.get(el);
+    if (!job || job.played || !job.chars.length) { if (done) done(); return; }
+    job.played = true;
+
+    const caret = document.createElement('i');
+    caret.className = 'type-caret';
+    el.appendChild(caret);
+
+    const gap = Math.max(8, Math.min(44, per || 900 / job.chars.length));
+    let i = 0;
+    (function step() {
+      if (i >= job.chars.length) {
+        setTimeout(() => caret.remove(), 360);
+        document.dispatchEvent(new CustomEvent('gm:typed', { detail: { el: el } }));
+        if (done) done();
+        return;
+      }
+      job.chars[i++].classList.add('on');
+      setTimeout(step, gap);
+    })();
+  }
+
+  /* 一个容器里的文字按顺序打：h3 打完再打 p */
+  function typeInto(root, startAt) {
+    if (reduce) return;
+    const list = [];
+    if (root.matches && root.matches(TYPE_SEL)) list.push(root);
+    if (root.querySelectorAll) root.querySelectorAll(TYPE_SEL).forEach(el => list.push(el));
+
+    let t = startAt || 0;
+    list.forEach(el => {
+      const job = typeJobs.get(el);
+      if (!job || job.played || !job.chars.length) return;
+      const per = Math.max(8, Math.min(44, 900 / job.chars.length));
+      setTimeout(() => playType(el, per), t);
+      t += job.chars.length * per + 110;
+    });
+  }
+
+  function revealNow(el) {
+    if (el.classList.contains('in')) return;
+    el.classList.add('in');
+    document.dispatchEvent(new CustomEvent('gm:reveal', { detail: { el: el } }));
+    typeInto(el, 560);   /* 放大基本到位后再落字 */
+  }
+
   try {
     if (!('IntersectionObserver' in window)) {
       html.classList.remove('js-ready');
     } else {
-      const io = new IntersectionObserver(entries => {
-        entries.forEach(en => {
-          if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); }
+      if (!reduce && !swarmMode) {
+        document.querySelectorAll(TYPE_SEL).forEach(el => {
+          const chars = splitChars(el);
+          if (chars.length) typeJobs.set(el, { chars: chars, played: false });
         });
-      }, { rootMargin: '0px 0px -8% 0px', threshold: 0.05 });
-      document.querySelectorAll('.reveal').forEach((el, i) => {
-        el.style.transitionDelay = (Math.min(i % 5 * 70, 280)) + 'ms';
-        io.observe(el);
-      });
+        /* 终端日志逐行打：最后那行只有提示符和方块光标，不拆 */
+        document.querySelectorAll('#term-body .term-line').forEach(el => {
+          if (el.querySelector('.term-cursor')) return;
+          const chars = splitChars(el);
+          if (chars.length) typeJobs.set(el, { chars: chars, played: false });
+        });
+      }
+
+      const io = new IntersectionObserver(entries => {
+        const hits = entries.filter(en => en.isIntersecting);
+        hits.sort((a, b) => a.target.getBoundingClientRect().top - b.target.getBoundingClientRect().top);
+        hits.forEach((en, i) => {
+          const el = en.target;
+          io.unobserve(el);
+          const raw = el.style.getPropertyValue('--d');
+          const d = raw ? parseFloat(raw) : i * 130;
+          if (d > 0) setTimeout(() => revealNow(el), d);
+          else revealNow(el);
+        });
+      }, { rootMargin: '0px 0px -6% 0px', threshold: 0.05 });
+
+      document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+      /* 兜底：首屏元素永远要出现，别因为观察器异常整页空着 */
       setTimeout(() => document.querySelectorAll('.reveal:not(.in)').forEach(el => {
-        if (el.getBoundingClientRect().top < window.innerHeight) el.classList.add('in');
-      }), 3000);
+        if (el.getBoundingClientRect().top < window.innerHeight) revealNow(el);
+      }), 2600);
     }
   } catch (err) {
     html.classList.remove('js-ready');
   }
 
   try {
-    /* 1. 终端逐行输出 */
-    const lines = document.querySelectorAll('#term-body .term-line');
-    lines.forEach((el, i) => {
-      setTimeout(() => el.classList.add('on'), 500 + i * 320);
-    });
+    /* 1. 终端：整块放大到位后，一行一行打出来 */
+    const lines = Array.from(document.querySelectorAll('#term-body .term-line'));
+    const termEl = document.querySelector('.terminal');
+    let termStarted = false;
+    function startTerminal() {
+      if (termStarted) return;
+      termStarted = true;
+      lines.forEach((el, i) => {
+        setTimeout(() => {
+          el.classList.add('on');
+          playType(el, 7);
+        }, 420 + i * 300);
+      });
+    }
+    if (termEl) {
+      if (termEl.classList.contains('in')) setTimeout(startTerminal, 620);
+      else {
+        document.addEventListener('gm:reveal', e => {
+          if (e.detail && e.detail.el === termEl) setTimeout(startTerminal, 620);
+        });
+        setTimeout(startTerminal, 5000);
+      }
+    }
 
     /* 2. 滚动：进度条 / 导航 / 回顶 */
     const bar = document.querySelector('.progress i');
@@ -1345,7 +1486,7 @@
 
 <script>
 /* ============================================================
-   画布层：标尺刻度、参考线、光标群、悬停选中框、HUD
+   画布层：标尺刻度、参考线、悬停选中框
    ============================================================ */
 (function () {
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -1397,85 +1538,21 @@
   const gy = guides && guides.querySelector('.gy');
   const hint = guides && guides.querySelector('.hint');
 
-  /* ---------- 光标群 ---------- */
-  const swarm = document.getElementById('swarm');
-  const AGENTS = [
-    { c: '#3ddc97', n: 'Rin' },
-    { c: '#a78bfa', n: 'Maya' },
-    { c: '#60a5fa', n: 'Leo' },
-    { c: '#fb7185', n: 'Iris' },
-    { c: '#fbbf24', n: 'Kai' },
-    { c: '#22d3ee', n: 'Nia' },
-    { c: '#f97316', n: 'Theo' },
-    { c: '#f472b6', n: 'Yui' }
-  ];
-  const PATH = 'M3 2 L3 19.4 L7.6 14.7 L10.9 21 L13.9 19.6 L10.5 13.3 L17.4 13.3 Z';
-  const cursors = [];
-
-  if (swarm) {
-    AGENTS.forEach((a, i) => {
-      const el = document.createElement('div');
-      el.className = 'cur';
-      el.innerHTML =
-        '<svg width="20" height="22" viewBox="0 0 20 22">' +
-        '<path d="' + PATH + '" fill="' + a.c + '" stroke="#fff" stroke-width="1.5" stroke-linejoin="round" paint-order="stroke"/>' +
-        '</svg>' +
-        '<span class="tag" style="background:' + a.c + '">' + a.n + '</span>';
-      swarm.appendChild(el);
-      cursors.push({
-        el: el,
-        x: W() * .5 + Math.cos(i / AGENTS.length * 6.283) * 90,
-        y: H() * .34 + Math.sin(i / AGENTS.length * 6.283) * 90,
-        vx: 0, vy: 0,
-        r: 34 + (i % 4) * 20,
-        a0: i / AGENTS.length * 6.283,
-        speed: (i % 2 ? -1 : 1) * (.00016 + (i % 3) * .00005)
-      });
-    });
-
-    /* HUD 头像点 */
-    const dots = document.getElementById('hud-dots');
-    if (dots) AGENTS.forEach(a => {
-      const d = document.createElement('i');
-      d.style.background = a.c;
-      dots.appendChild(d);
-    });
-  }
-
-  let px = W() * .62, py = H() * .30;      /* 指针 */
-  let lastMove = 0;
-  let hasPointer = false;
-  let idleAnchor = { x: W() * .30, y: H() * .34 };
-
-  const heroTitle = document.querySelector('.hero-title');
-  function anchor() {
-    /* 鼠标动过就一直围着它；从没动过才围着标题 */
-    if (hasPointer) return { x: px, y: py };
-    if (!heroTitle) return idleAnchor;
-    const r = heroTitle.getBoundingClientRect();
-    idleAnchor = { x: r.left + r.width * .52, y: r.top + r.height * .55 };
-    return idleAnchor;
-  }
-  setTimeout(anchor, 60);
-
   window.addEventListener('pointermove', e => {
-    px = e.clientX;
-    py = e.clientY;
-    lastMove = performance.now();
-    hasPointer = true;
-    if (guides) {
-      guides.classList.add('on');
-      if (gx) gx.style.left = px + 'px';
-      if (gy) gy.style.top = py + 'px';
-      if (hint) {
-        hint.textContent = 'x ' + Math.round(px) + '  y ' + Math.round(py);
-        const below = py < H() - 40;
-        hint.style.left = Math.min(px + 12, W() - 90) + 'px';
-        hint.style.top = (below ? py + 12 : py - 26) + 'px';
-      }
-      if (markX) markX.style.left = px + 'px';
-      if (markY) markY.style.top = py + 'px';
+    const px = e.clientX;
+    const py = e.clientY;
+    if (!guides) return;
+    guides.classList.add('on');
+    if (gx) gx.style.left = px + 'px';
+    if (gy) gy.style.top = py + 'px';
+    if (hint) {
+      hint.textContent = 'x ' + Math.round(px) + '  y ' + Math.round(py);
+      const below = py < H() - 40;
+      hint.style.left = Math.min(px + 12, W() - 90) + 'px';
+      hint.style.top = (below ? py + 12 : py - 26) + 'px';
     }
+    if (markX) markX.style.left = px + 'px';
+    if (markY) markY.style.top = py + 'px';
   }, { passive: true });
 
   document.addEventListener('pointerleave', () => {
@@ -1483,37 +1560,6 @@
     if (markX) markX.style.left = '-9px';
     if (markY) markY.style.top = '-9px';
   });
-
-  const canSwarm = fine && !reduce && cursors.length;
-  let raf = null;
-
-  function tick(now) {
-    const idle = now - lastMove > 1400;
-    const home = anchor();
-    const cx = idle ? home.x : px;
-    const cy = idle ? home.y : py;
-    const t = now;
-
-    for (let i = 0; i < cursors.length; i++) {
-      const c = cursors[i];
-      const ang = c.a0 + t * c.speed * (idle ? 2.2 : 1);
-      const wobble = Math.sin(t * .0007 + i) * 8;
-      const tx = cx + Math.cos(ang) * (c.r + wobble) * (idle ? 1.45 : 1);
-      const ty = cy + Math.sin(ang) * (c.r + wobble) * (idle ? .78 : .62);
-
-      c.vx += (tx - c.x) * .022;
-      c.vy += (ty - c.y) * .022;
-      c.vx *= .90;
-      c.vy *= .90;
-      c.x += c.vx;
-      c.y += c.vy;
-
-      c.el.style.transform = 'translate3d(' + c.x.toFixed(1) + 'px,' + c.y.toFixed(1) + 'px,0)';
-    }
-    raf = requestAnimationFrame(tick);
-  }
-  if (canSwarm && window.innerWidth >= 900) raf = requestAnimationFrame(tick);
-  else if (swarm) swarm.style.display = 'none';
 
   /* ---------- 悬停选中框 ---------- */
   const sel = document.getElementById('selbox');
@@ -1570,20 +1616,32 @@
     window.addEventListener('resize', () => { if (hoverEl) paintSel(); });
   }
 
-  /* ---------- 标题常驻框 ---------- */
+  /* ---------- 标题常驻框：等标题打完字再落框 ---------- */
   const board = document.getElementById('board');
   const boardSize = board && board.querySelector('.size');
   const h1 = document.querySelector('.hero-title');
   function paintBoard() {
-    if (!board || !h1) return;
+    if (!board || !h1 || !h1.classList.contains('in')) return;
     const r = h1.getBoundingClientRect();
+    const w = h1.offsetWidth, h = h1.offsetHeight;
     board.style.left = (r.left - 8) + 'px';
     board.style.top = (r.top - 8) + 'px';
-    board.style.width = (r.width + 16) + 'px';
-    board.style.height = (r.height + 16) + 'px';
-    if (boardSize) boardSize.textContent = Math.round(r.width) + ' × ' + Math.round(r.height);
+    board.style.width = (w + 16) + 'px';
+    board.style.height = (h + 16) + 'px';
+    if (boardSize) boardSize.textContent = Math.round(w) + ' × ' + Math.round(h);
   }
-  paintBoard();
+  let boardShown = false;
+  function showBoard() {
+    if (boardShown || !board) return;
+    boardShown = true;
+    paintBoard();
+    board.classList.add('on');
+  }
+  document.addEventListener('gm:typed', e => {
+    if (e.detail && e.detail.el === h1) setTimeout(showBoard, 700);
+  });
+  setTimeout(showBoard, reduce ? 900 : 7000);
+
   window.addEventListener('scroll', paintBoard, { passive: true });
   window.addEventListener('resize', paintBoard);
   if (h1 && 'ResizeObserver' in window) new ResizeObserver(paintBoard).observe(h1);
@@ -1595,23 +1653,19 @@
     const n = String(i + 1).padStart(2, '0');
     el.innerHTML = '<span class="idx">' + n + '</span>' + el.innerHTML;
   });
-
-  /* ---------- HUD 进度 ---------- */
-  const pct = document.getElementById('hud-pct');
-  const hb = document.getElementById('hud-bar');
-  const up = document.getElementById('hud-up');
-  function paintHud() {
-    const max = document.documentElement.scrollHeight - H();
-    const p = max > 0 ? Math.min(window.scrollY / max, 1) : 0;
-    if (pct) pct.textContent = Math.round(p * 100) + '%';
-    if (hb) hb.style.width = (p * 100).toFixed(1) + '%';
-  }
-  window.addEventListener('scroll', paintHud, { passive: true });
-  window.addEventListener('resize', paintHud);
-  paintHud();
-  if (up) up.addEventListener('click', () => window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' }));
 })();
 </script>
 
+<script>
+/* 「自建」开场：改造自 github.com/DhvanilPatel/swarm-cursors 的 swarm-rebuild
+   —— 去掉了光标群与底部控制条，建完自动淡回真实页面。
+   是否播由 <head> 里的 __GM_SWARM__ 决定（?swarm=1 强制重播、?swarm=0 关闭）。 */
+if (window.__GM_SWARM__) {
+  var sw = document.createElement('script');
+  sw.src = 'swarm-embed.js';
+  sw.onerror = function () { document.documentElement.classList.remove('swarm-mode'); };
+  document.body.appendChild(sw);
+}
+</script>
 </body>
 </html>

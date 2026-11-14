@@ -19,6 +19,7 @@ mkdir -p "$OUT/web"
 
 # ---- 介绍页
 cp docs/index.html "$OUT/index.html"
+cp docs/swarm-embed.js "$OUT/swarm-embed.js"
 cp -R docs/images "$OUT/images"
 
 # ---- 体验页
