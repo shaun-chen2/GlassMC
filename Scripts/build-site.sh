@@ -23,7 +23,7 @@ cp -R docs/images "$OUT/images"
 
 # ---- 体验页
 cp -R src/. "$OUT/web"/
-cp demo/overlay.css demo/overlay.js "$OUT/web"/
+cp demo/overlay.css demo/overlay.js demo/wallpaper.jpg "$OUT/web"/
 
 # 首帧就要带上 data-demo，否则会先闪一下「铺满视口」再缩成悬浮窗
 perl -0pi -e 's{</head>}{<link rel="stylesheet" href="overlay.css">\n<script>document.documentElement.setAttribute("data-demo","")</script>\n</head>}' "$OUT/web/index.html"
@@ -35,6 +35,7 @@ for f in "$OUT/web/index.html"; do
   grep -q 'data-demo' "$f" || { echo "注入失败：$f 里没找到 data-demo" >&2; exit 1; }
 done
 [ -f "$OUT/images/icon-256.png" ] || { echo "缺少介绍页图标 images/icon-256.png" >&2; exit 1; }
+[ -f "$OUT/web/wallpaper.jpg" ] || { echo "缺少体验页壁纸 demo/wallpaper.jpg" >&2; exit 1; }
 
 echo "整站已生成：${OUT}（$(du -sh "$OUT" | cut -f1)）"
 echo "  /     介绍页"

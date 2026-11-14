@@ -91,4 +91,48 @@
     },
     true
   );
+
+  /* ---------------------------------- 壁纸慢速随机漂移
+     目的不是「有动画」，而是让壁纸动起来 —— 玻璃窗口后面有东西在缓慢移动，
+     blur 才看得出来。所以幅度小、周期长：一次位移四十秒往上，
+     且还没走完就换下一个目标，动作永远不落停，也不会「一顿一顿」。 */
+  var root = document.documentElement;
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var driftTimer = 0;
+
+  function drift() {
+    clearTimeout(driftTimer);
+    if (reduce) {
+      root.style.setProperty('--demo-wall-x', '0px');
+      root.style.setProperty('--demo-wall-y', '0px');
+      root.style.setProperty('--demo-wall-rot', '0deg');
+      return;
+    }
+
+    // 幅度取短边的 12%（1440×900 上约 ±103px）。
+    // 但壁纸层只比视口大 9vmax，窄高视口（如 820×1000）按短边算会超出这个余量，
+    // 所以再按 inset 夹一次，留出旋转与亚像素的余量。
+    var w = window.innerWidth;
+    var h = window.innerHeight;
+    var inset = Math.max(w, h) * 0.09;                 // 与 CSS 的 inset: -9vmax 对齐
+    var amp = Math.min(Math.min(w, h) * 0.12, inset - 26);
+    var x = (Math.random() * 2 - 1) * amp;
+    var y = (Math.random() * 2 - 1) * amp;
+    var rot = (Math.random() * 2 - 1) * 0.7;          // 轻微旋转，避免纯平移的机械感
+    var dur = 52 + Math.random() * 34;                // 52~86 秒走到目标点，约 1.5px/s
+
+    root.style.setProperty('--demo-wall-dur', dur.toFixed(1) + 's');
+    root.style.setProperty('--demo-wall-x', x.toFixed(1) + 'px');
+    root.style.setProperty('--demo-wall-y', y.toFixed(1) + 'px');
+    root.style.setProperty('--demo-wall-rot', rot.toFixed(2) + 'deg');
+
+    // 提前 15% 换目标：过渡还没结束就改方向，运动是连续的，不会走走停停
+    driftTimer = setTimeout(drift, dur * 850);
+  }
+
+  drift();
+  window.addEventListener('resize', function () {
+    // 视口变了重新取一次幅度，免得窄屏上位移过大露出边缘
+    drift();
+  });
 })();

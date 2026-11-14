@@ -9,15 +9,29 @@ html[data-demo] {
   --demo-gap: 26px;
   --demo-top: 54px;
 
-  /* 壁纸用纯 CSS 拼，不额外塞图片文件：几层径向渐变叠出深色氛围光 */
+  /* 只影响体验页：真实客户端是 NSVisualEffectView 真通透，
+     网页里外壳 .84 的实色会把壁纸遮死，玻璃就「看不出来」。
+     调到 .70，壁纸能透上来，毛玻璃才有存在感。 */
+  --shell-base: .70;
+
+  /* 壁纸由 ::before 铺（要能被 transform 驱动），这里只留兜底色 */
   background-color: #05070d;
-  background-image:
-    radial-gradient(1100px 720px at 8% 4%, rgba(58, 104, 194, .82), transparent 62%),
-    radial-gradient(900px 640px at 94% 10%, rgba(128, 66, 172, .68), transparent 60%),
-    radial-gradient(1000px 800px at 78% 98%, rgba(22, 120, 114, .58), transparent 58%),
-    radial-gradient(760px 540px at 16% 94%, rgba(173, 84, 48, .40), transparent 62%),
-    linear-gradient(165deg, #0b1224 0%, #05070d 72%);
-  background-attachment: fixed;
+}
+
+/* 壁纸层：比视口更大一圈，靠 JS 慢速随机位移。
+   inset 用负值放大，位移和轻微旋转都不会露出边缘。 */
+html[data-demo]::before {
+  content: "";
+  position: fixed;
+  inset: -9vmax;
+  z-index: -1;
+  background: #05070d url("wallpaper.jpg") center / cover no-repeat;
+  transform: translate3d(var(--demo-wall-x, 0px), var(--demo-wall-y, 0px), 0)
+             rotate(var(--demo-wall-rot, 0deg))
+             scale(1.02);
+  transition: transform var(--demo-wall-dur, 70s) cubic-bezier(.37, .02, .32, 1);
+  will-change: transform;
+  pointer-events: none;
 }
 
 /* 上方留出提示条的位置，窗口在剩余空间里居中 */
@@ -37,8 +51,9 @@ html[data-demo] .app-root {
   box-shadow:
     0 0 0 1px rgba(255, 255, 255, .075),
     0 46px 100px -36px rgba(0, 0, 0, .92);
-  -webkit-backdrop-filter: blur(24px) saturate(150%);
-  backdrop-filter: blur(24px) saturate(150%);
+  /* 壁纸上的光带 / 光斑被这一层糊掉，就是网页里的「毛玻璃」 */
+  -webkit-backdrop-filter: blur(26px) saturate(175%);
+  backdrop-filter: blur(26px) saturate(175%);
 }
 
 /* ---------------------------------- 顶部提示条 */
