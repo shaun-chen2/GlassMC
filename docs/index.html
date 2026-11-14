@@ -5430,12 +5430,13 @@
     // 只有按 Esc 才是「不看了，直接给我真实页面」。
     let faded = false;
     let armed = false;
-    const reveal = () => {
+    const reveal = (soft) => {
       if (faded) return;
       faded = true;
       clearInterval(poll);
       document.documentElement.classList.remove("swarm-playing");
-      if (app) stop(true);
+      // soft === false：用户点了会改页面的控件，立刻让位，别让他等淡出动画
+      if (app) stop(soft !== false);
     };
     const arm = (wait) => {
       if (armed) return;
@@ -5461,6 +5462,13 @@
       const atBottom = vp.sy + vp.vh >= a.view.env.scrollHeight() - 8;
       if (atBottom && active === 0 && e.available().length === 0) arm(900);
     }, 300);
+    // 快照是「死」的：平台切换、FAQ 展开、截图灯箱这几类点击会真的改页面内容，
+    // 覆盖层跟不上，看起来就像「点不动」。这类点击一发生就让位（250ms 快速淡出），
+    // 页面自己的操作照常执行。滚动、锚点跳转、下载链接不受影响，动画继续往下画。
+    document.addEventListener("pointerdown", (e) => {
+      const t = e.target;
+      if (t && t.closest && t.closest("#install .ptab, #faq summary, .shot-main, .gallery figure, #lightbox")) reveal(false);
+    }, true);
     document.addEventListener("keydown", (e) => { if (e.key === "Escape") reveal(); }, true);
   }
 })();
