@@ -21,7 +21,10 @@ jobs:
   # ---------------------------------------------------------------- macOS
   macos:
     name: macOS（universal）
-    runs-on: macos-14
+    # 别写死 macos-14：这个标签在部分仓库会被解析成不存在的 arm64 runner 配置
+    # （报 "The configuration 'macos-14-arm64-us-default' is not supported"），
+    # 任务会在 1 秒内失败。macos-latest 与 ci.yml 保持一致。
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
 
