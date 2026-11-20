@@ -37,7 +37,7 @@
 
 > **第一次打开会被系统拦下来**，提示「无法验证开发者」「已损坏」或 SmartScreen 警告。
 > 这不是文件坏了，是发布包没有代码签名证书的正常现象。
-> 三个平台各自的放行方法见[安装说明](https://shaun-chen2.github.io/GlassMC/#install)，只需操作一次。
+> 三个平台各自的放行方法见[安装说明](https://glassmc.shuan.uk/#install)，只需操作一次。
 
 Release 页面附有每个文件的 SHA-256，下载后可以核对。
 
@@ -116,7 +116,7 @@ HMCL 配置里存着的登录令牌也会顺手带过来。
 Fedora / Arch 用绿色版：`tar xzf GlassMC-linux.tar.gz && ./glassmc`。
 
 三个平台的详细步骤、缺依赖怎么办、白窗口怎么办，都在
-[介绍页的安装一节](https://shaun-chen2.github.io/GlassMC/#install)。
+[介绍页的安装一节](https://glassmc.shuan.uk/#install)。
 
 数据目录：macOS `~/Library/Application Support/GlassMC`、Windows `%APPDATA%\GlassMC`、
 Linux `~/.local/share/GlassMC`。整个目录拷走就是完整备份，卸载时删掉即可。
@@ -185,7 +185,7 @@ CI 会检查同样的东西，外加三端编译。
 ## 常见问题
 
 **Q：提示「已损坏」是不是下载坏了？**
-不是。是没有开发者签名。按[安装说明](https://shaun-chen2.github.io/GlassMC/#install)放行一次即可，不用重新下载。
+不是。是没有开发者签名。按[安装说明](https://glassmc.shuan.uk/#install)放行一次即可，不用重新下载。
 
 **Q：启动游戏报 Java 相关的错？**
 去「安装 → Java 环境」看有没有可用运行时。没有就点安装，选 17 或 21

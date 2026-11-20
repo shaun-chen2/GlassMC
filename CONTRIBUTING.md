@@ -32,7 +32,7 @@
 **能复现的 bug 是最有价值的贡献**，比「加个功能」有用得多。提之前：
 
 1. 先搜一遍 issue，避免重复；
-2. 装不上 / 打不开，先看[安装说明](https://shaun-chen2.github.io/GlassMC/#install)，九成是系统拦截；
+2. 装不上 / 打不开，先看[安装说明](https://glassmc.shuan.uk/#install)，九成是系统拦截；
 3. 启动失败，把日志最后 100 行贴进表单——没有日志的启动问题基本无法排查。
 
 日志在数据目录的 `logs/game-latest.log`，游戏自己的在 `minecraft/logs/latest.log`。
