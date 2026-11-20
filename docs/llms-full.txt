@@ -1,0 +1,886 @@
+# GlassMC 全文语料
+
+> 站点：https://glassmc.shuan.uk/
+> 内容更新时间：2026-11-20（由 Scripts/gen-geo.py 自动生成）
+> 内容：介绍页正文 + 仓库内技术文档。许可 GPLv3。
+
+---
+
+# 一、介绍页正文
+
+macOS · Windows · Linux | v1.3.2 | 约 10 MB
+
+# GlassMC
+
+液态玻璃 · MINECRAFT 启动器
+
+装版本、装模组、开游戏，
+三次点击的事。
+
+玻璃是窗口本身向系统申请的毛玻璃，不是在网页里堆一层滤镜假装。 选一个版本点安装，剩下的下载、补依赖、配 Java、拼启动参数，它自己来。
+
+↓ 选一个平台下载 在线体验 ↗ 查看源码
+
+三个平台都会被系统拦一次 —— 怎么放行 →
+
+393可装版本
+
+4模组加载器
+
+3操作系统
+
+## 下载
+
+GlassMC 1.3.2 · macOS 15+ · Windows 10+ · Linux · `GPLv3` 开源
+
+↓ macOS · dmg 约 9 MB Windows · exe 约 3 MB Linux · deb 约 3.4 MB
+
+Linux 绿色版是 GlassMC-linux.tar.gz； Release 页有全部资产和 SHA-256。 装完第一次打开会被系统拦一下，放行方法在下面。
+
+不想先下载？ 在线体验版跑在浏览器里，八个页面都能点，示例数据，不装游戏、不连账号。
+
+打开体验页 ↗
+
+## 从下载到进服，中间都不用手动
+
+不用装 Java，不用手拼参数，不用配内网穿透。
+
+01
+
+### 全版本安装
+
+正式版 + 快照共 393 个。清单、版本 JSON、客户端 jar、依赖库、资源对象一路下完，逐项校验 SHA1，已有的跳过。
+
+02
+
+### 加载器与 Java
+
+Fabric、Quilt、Forge、NeoForge 一键装；JDK 8 / 11 / 17 / 21 按版本自动配，从清华镜像下，不用碰环境变量。
+
+03
+
+### 三种登录，皮肤跟着走
+
+离线 / 微软正版 / 外置登录。皮肤站登录后游戏里就是你的皮肤，还带一个在线皮肤库。
+
+04
+
+### 模组与整合包
+
+本地模组开关、缺失依赖提示、Modrinth 搜索安装；整合包能导入，也能导出成 .mrpack 分享。
+
+05
+
+### 从别的启动器搬家
+
+自动扫描 HMCL、官方启动器、Prism / MultiMC。版本、模组、存档、账号一起复制，原目录不动。
+
+06
+
+### 陶瓦联机
+
+不用公网 IP、不用端口映射。生成一串邀请码发给朋友，对方粘进去就能进你的世界。
+
+## 三个平台，同一套代码
+
+数据目录、毛玻璃档位、进程托管都按平台分支，下面写的是真实状态。
+
+MACOS 15+ · UNIVERSAL
+
+### macOS
+
+Apple Silicon 与 Intel 共用一个包。无边框窗口 + 系统毛玻璃，圆角是真的圆角。 装机、装版本、进游戏整条链路都在真机上跑过。
+
+真机全流程直接用 dmg
+
+WINDOWS 10 1809+ / 11 · X64
+
+### Windows
+
+NSIS 安装包，快捷方式和卸载项齐全，卸载时会问要不要连数据一起删。 毛玻璃优先 Mica，退 Acrylic，都不行降级磨砂。
+
+安装/运行已验证wine 下走完整流程
+
+DEB · TAR.GZ · WEBKITGTK 4.1
+
+### Linux
+
+Ubuntu 26.04 原生编译，依赖自检无缺失。虚拟显示里跑完整条链路： 八个页面正常渲染、真实下载 1.21.11、启动进到主菜单。
+
+安装/启动已验证Xvfb 里跑完整流程
+
+## 三步装上，两分钟开玩
+
+三个平台的包都会被系统拦一次，放行方法各不相同。
+
+⚠
+
+首次打开会被系统拦下。这个包没有 Apple 开发者签名，会提示「无法验证开发者」或者「已损坏」。 属于正常现象，按下面任一方法放行一次，之后不再询问。
+
+- 下载并拖进「应用程序」。双击 `GlassMC.dmg`，把图标拖到旁边的 Applications 文件夹。
+
+- 第一次打开时放行一次。双击 GlassMC 被拦下时点「完成」，再按下面方法一或方法二操作。
+
+- 开始用。登录账号 →「安装」页挑个版本点安装 → 回「版本」页点启动。
+
+打不开怎么办 二选一
+
+方法一 · 系统设置里点「仍要打开」推荐
+
+- 双击 GlassMC，看到「Apple 无法验证此 App 是否包含恶意软件」，点 完成。
+
+- 打开 系统设置 → 隐私与安全性，向下滚到「安全性」区域。
+
+- 看到 “GlassMC” 已被阻止使用… 那一行，点旁边的 仍要打开，输入开机密码。
+
+- 再双击一次 GlassMC，弹窗里出现 打开 按钮，点它。以后就正常了。
+
+如果提示的是 「GlassMC 已损坏，应该将它移到废纸篓」，处理方式完全一样：先去系统设置放行一次再打开。不要点「移到废纸篓」——它没坏，只是没签名。
+
+方法二 · 终端一行命令
+
+$ `xattr -dr com.apple.quarantine /Applications/GlassMC.app`
+
+打开「终端」粘贴回车即可。这条命令只去掉 macOS 给下载文件打的「待检查」标记，不改应用内容。装在别处就把路径换成实际位置。
+
+⚠
+
+SmartScreen 会拦一次。提示「Windows 已保护你的电脑」，点「更多信息」再点「仍要运行」就能装。 安装到 `C:\Program Files\GlassMC`，需要管理员权限，UAC 会再弹一次。
+
+- 下载并运行安装包。双击 `GlassMC-Setup.exe`，UAC 弹窗点「是」。安装向导有简体中文。
+
+- 被 SmartScreen 拦下时放行。点「更多信息」→「仍要运行」，只需一次。
+
+- 开始用。开始菜单或桌面打开 GlassMC → 登录账号 →「安装」页挑版本 → 「版本」页启动。
+
+打不开怎么办 二选一
+
+方法一 · 在 SmartScreen 窗口里放行推荐
+
+- 双击 exe，出现蓝底的「Windows 已保护你的电脑」。
+
+- 点窗口里的 更多信息，下面会展开出 仍要运行 按钮。
+
+- 点 仍要运行，UAC 点 是，安装向导就出来了。
+
+如果窗口里没有「更多信息」而只有「不运行」，说明文件被系统策略挡住了：右键 exe → 属性 → 底部勾选 解除锁定 → 确定，再双击。
+
+方法二 · PowerShell 解除文件锁定
+
+> `Unblock-File "$HOME\Downloads\GlassMC-Setup.exe"`
+
+文件从网上下载后会带一个「来自其他计算机」的标记，这条命令只去掉这个标记，不改安装包内容。路径按你实际下载的位置改。
+
+装好后窗口一片空白？
+
+GlassMC 的界面跑在 WebView2 上。Windows 11 自带，Windows 10 大多随 Edge 装好了；如果打开后只有一块空白，去微软官网搜 WebView2 Evergreen Bootstrapper 装一次即可。启动器本身不需要 .NET，也没有其他运行时依赖。
+
+⚠
+
+需要 WebKitGTK 4.1。Ubuntu 22.04+ / Debian 12+ 自带，deb 会替你检查。 另外窗口模糊取决于桌面合成器：KWin 开了 blur 才有真玻璃，GNOME 默认没有，会自动降级成磨砂。
+
+- 装 deb 包。在下载目录执行下面的命令，`./` 不能省，否则 apt 会去软件源里找包名。
+
+- 从应用菜单启动。装完菜单里直接就有 GlassMC，图标和分类都已注册，不用注销重登；终端里输 `glassmc` 也行。
+
+- 开始用。登录账号 →「安装」页挑版本 →「版本」页启动。
+
+$ `sudo apt install ./GlassMC.deb`
+
+卸载 `sudo apt remove glassmc`。游戏数据在 `~/.local/share/GlassMC`，卸载不会动它，重装回来接着用。
+
+其他发行版 · 用绿色版
+
+Fedora、Arch、openSUSE 这些没有 apt，下 `GlassMC-linux.tar.gz`，解压后直接运行：
+
+$ `tar xzf GlassMC-linux.tar.gz && ./glassmc`
+
+这样会把 `glassmc` 解压到当前目录。想全局可用就 `sudo mv glassmc /usr/local/bin/`。绿色版不会自动补依赖，缺库时看下一节。
+
+打不开怎么办 二选一
+
+方法一 · 补上运行库推荐
+
+$ `sudo apt install libwebkit2gtk-4.1-0 libgtk-3-0`
+
+报错是 `error while loading shared libraries` 就是缺库，装完再启动一次。Fedora 上是 `sudo dnf install webkit2gtk4.1`，Arch 上是 `sudo pacman -S webkit2gtk-4.1`。
+
+方法二 · 手动给执行权限
+
+$ `chmod +x glassmc && ./glassmc`
+
+部分文件管理器解压时会丢掉可执行位，表现是「双击没反应」或 `Permission denied`，加一次权限就好。
+
+系统要求与数据目录
+
+macOS 15+Apple Silicon 与 Intel 共用一个包`~/Library/Application Support/GlassMC`
+
+Windows 10 1809+ / 11x64，需要 WebView2`%APPDATA%\GlassMC`
+
+Linux主流发行版，需要 WebKitGTK 4.1`~/.local/share/GlassMC`
+
+Java 不用自己装，启动器按版本自动配 8 / 11 / 17 / 21。整个数据目录拷走就是完整备份，卸载时删掉它即可，不会在系统别处留东西。
+
+## 这是开源项目，不是一个人的作品
+
+代码、文档、测试设备，都可以来自别人。
+
+ISSUE
+
+### 报一个问题
+
+能复现的 bug 是最有价值的贡献。表单会问你要日志、版本号和系统版本，填全了通常几天内就能定位。
+
+新建 issue →按表单填
+
+DISCUSSION
+
+### 问一句、聊两句
+
+「这个整合包能不能跑」「皮肤站怎么填」这类问题去 Discussions，不问也能看看别人踩过什么坑。
+
+进入讨论区 →不需要开 issue
+
+PULL REQUEST
+
+### 直接改代码
+
+Rust 后端加纯静态前端，没有构建步骤。标注 good first issue 的都是半天能做完的小事，第一次提 PR 也欢迎。
+
+怎么参与 →GPLv3 开源
+
+贡献者名单在 GitHub 上； 参与即表示同意贡献者行为准则。
+
+## 遇到问题先看这里
+
+七条最常被问到的。
+
+提示「GlassMC 已损坏，无法打开」怎么办？
+
+去「系统设置 → 隐私与安全性 → 安全性」里点「仍要打开」。先双击一次 GlassMC，弹提示时点「取消」；打开系统设置 → 隐私与安全性，向下滚到「安全性」，会看到一行 `“GlassMC” 已被阻止使用…`，点右边的 仍要打开，输入密码；再双击 GlassMC，弹窗里出现 打开 按钮，点它即可。
+
+如果「安全性」里始终没有这一行，用上面的 `xattr` 命令放行一次；仍然不行就是 dmg 没下完整，重下一遍。不要点「移到废纸篓」，文件没坏。
+
+启动游戏时报 Java 相关的错误？
+
+去「安装 → Java 环境」看有没有可用运行时。没有就点安装，选 17 或 21（1.17 及更新用 17/21，1.16 及更早用 8）。导入来的实例也可以选「使用实例自带的 Java」。
+
+日志里出现 `UnsupportedClassVersionError`，就是 Java 版本比游戏要求的低，换更高的。
+
+内存该给多少？
+
+8 GB 内存给 4 GB，16 GB 给 6~8 GB，大型整合包可以到 8~12 GB。别全给游戏，否则系统本身会卡。判断标准：游戏里按 F3 看右上角内存占用，长期贴着上限就该加。
+
+皮肤站登录了，游戏里还是默认皮肤？
+
+确认启动的实例用的是那个皮肤站账号。外置登录会在启动时注入 authlib-injector，日志里应该出现 `Authentication server: 你的皮肤站地址` 和 `Httpd is running`。
+
+看不到的话：去「设置 → 外置登录」确认注入器已就绪，点一次下载，再重启启动器启动游戏。
+
+以前 HMCL 的整合包和存档能直接用吗？
+
+能。左侧「导入」会自动扫描 HMCL、官方启动器、Prism / MultiMC 的目录，选一个点导入，账号、版本、模组、存档都复制过来，原目录不受影响。
+
+HMCL 的版本隔离实例（`versions/xxx/` 里带 mods 和 saves 的那种）会被识别成隔离实例，启动时 `--gameDir` 指到该目录，不会串档。
+
+Windows / Linux 真的能用吗？
+
+Windows：交叉编译出的是 PE32+ 可执行文件，只依赖系统 DLL 和 `WebView2Loader.dll`。装进 wine 走完了「静默安装 → 从 Program Files 启动 → 卸载无残留」。真实 Windows 上的窗口长什么样还没看到。
+
+Linux：Ubuntu 26.04 原生编译，在 Xvfb 里跑了一遍完整流程——八个页面正常渲染、真实下载 1.21.11（62 个文件 + 4591 个资源对象，0 失败）、启动进到主菜单。窗口模糊没看到：测试环境没有合成器，档位落在「磨砂」。
+
+最可能出问题的是 `glass.rs`（Mica / Acrylic 版本差异、合成器行为）和 `game.rs`（进程组管理、Windows 控制台窗口）。遇到了欢迎提 issue。
+
+能不安装先看看界面吗？
+
+可以，glassmc.shuan.uk/web 是同一套前端跑在浏览器里，八个页面都能点，安装、启动、联机走的是示例数据。
+
+它只是让人先看一眼界面：真的下版本、开游戏还是得装桌面版。
+
+---
+
+# 二、架构说明（docs/architecture.md）
+
+# 架构说明
+
+写给要改代码的人。看完应该能回答三个问题：东西在哪、数据怎么流、动哪里最容易炸。
+
+## 一句话
+
+Tauri 2 应用：**Rust 做所有实事，前端只负责显示**。没有 Node 构建链，前端是几个普通
+`.html/.js/.css` 文件，编译时被嵌进二进制里。
+
+```
+┌─────────────────────────────────────────────────────────┐
+│ WebView（三端各自的内核：WKWebView / WebView2 / WebKitGTK）│
+│   index.html  所有页面写在这一个文件里                     │
+│   app.js      骨架：状态 S、路由、渲染、mock               │
+│   features*.js 按功能挂到 __GM_HOOKS 上的钩子             │
+└───────────────▲──────────────────────┬──────────────────┘
+        event   │                      │ invoke('cmd', args)
+   （progress / log / game-exit）      ▼
+┌─────────────────────────────────────────────────────────┐
+│ Rust（lib.rs 注册 60+ 个 command）                        │
+│   commands.rs / commands_ext.rs   入口，全部 async         │
+│   launch.rs  ← 启动链的核心                                │
+│   install / java / loader / download / net                 │
+│   account / yggdrasil / microsoft / skins / injector       │
+│   modrinth / modpack / importer / terracotta               │
+│   paths.rs  config.rs  glass.rs  game.rs                   │
+└─────────────────────────────────────────────────────────┘
+```
+
+## 数据在哪
+
+| 内容 | 位置 |
+|---|---|
+| 数据根目录 | macOS `~/Library/Application Support/GlassMC`，Windows `%APPDATA%\GlassMC`，Linux `~/.local/share/GlassMC` |
+| 设置 | `<根>/tauri-config.json`（刻意与 Swift 版分文件，两边共存不打架） |
+| 账号 | `<根>/accounts.json` |
+| 游戏 | `<根>/minecraft/`（等价于官方 `.minecraft`） |
+| Java | `<根>/java/<feature>/` |
+| 日志 | `<根>/logs/game-latest.log`；游戏自己的在 `minecraft/logs/latest.log` |
+
+`GLASSMC_DATA` 环境变量可以整体覆盖根目录（便携模式、测试用），见 `paths.rs`。
+
+## 后端模块
+
+按域分组，一个模块一件事。改之前先读文件顶部的 `//!` 注释，那里写了「为什么这么写」。
+
+### 启动链（最核心）
+
+| 模块 | 职责 |
+|---|---|
+| `manifest.rs` | 远程版本清单、本地已装扫描、`inheritsFrom` 深合并 |
+| `launch.rs` | 把版本 JSON 变成一条完整的 java 命令行 |
+| `game.rs` | 进程启动、实时日志、退出通知、强杀 |
+| `java.rs` / `javadl.rs` | 检测已装 JDK / 从清华镜像装 Adoptium |
+
+### 安装
+
+| 模块 | 职责 |
+|---|---|
+| `install.rs` | 客户端 jar → 依赖库 → 资源对象，逐项校验 |
+| `loader.rs` | Fabric / Quilt 落 profile，NeoForge / Forge 跑官方安装器 |
+| `download.rs` | 重试、状态码校验、SHA1 校验、原子落盘 |
+| `net.rs` | 统一 HTTP 客户端（UA、超时、镜像回退） |
+
+### 账号与皮肤
+
+| 模块 | 职责 |
+|---|---|
+| `account.rs` | 账号模型、离线 UUID（`MD5("OfflinePlayer:name")`）、激活账号 |
+| `yggdrasil.rs` | 外置登录，端点逐个探测（不同皮肤站路径不同） |
+| `microsoft.rs` | 微软 OAuth 设备码 → XBL → XSTS → Minecraft |
+| `skins.rs` | 皮肤缓存与 Blessing Skin 皮肤库 |
+| `injector.rs` | `authlib-injector` 的下载、校验、拼进 `-javaagent` |
+
+### 外围
+
+| 模块 | 职责 |
+|---|---|
+| `modrinth.rs` | Modrinth 搜索 / 版本 / 安装，本地模组开关 |
+| `modpack.rs` | `.mrpack` 导入导出（zip 操作在这里，注意路径穿越） |
+| `importer.rs` | 从 HMCL / 官方 / Prism 导入 |
+| `terracotta.rs` | 陶瓦联机，下载官方包并只取裸二进制 |
+| `glass.rs` | 三端毛玻璃能力申请，失败交给前端降级 |
+
+## 启动链：一次点击发生了什么
+
+`launch_game` 之后：
+
+1. `manifest.rs` 读版本 JSON，沿 `inheritsFrom` 向上找到底，**深合并**成一份完整清单；
+2. `java.rs` 选 JDK（版本要求 → 已装候选 → 实例自带的）；
+3. `launch.rs` 展开 `arguments.jvm` / `arguments.game` 里的占位符与 `rules`；
+4. 拼 classpath，校验每个文件是否存在；
+5. `game.rs` 拉起进程，把 stdout 同时 emit 给界面、写进 `logs/game-latest.log`；
+6. 进程退出时 emit `game-exit`，前端把按钮状态改回来。
+
+### 四条不要随便改的规则
+
+这四条都是从「游戏能启动」这个结果反推出来的，简化任何一条都会炸：
+
+1. **`inheritsFrom` 必须深合并**，而且：
+   - `libraries` 按 `group:artifact`（不含版本）取并集，子版本覆盖父版本。
+     不同版本的同名库同时保留，NeoForge 会抛
+     `Module named org.objectweb.asm.commons was already on the JVM's module path`。
+   - `arguments` 父 + 子依次拼接，再用 `dedupe_options` / `dedupe_game_arguments` 去重
+     （`-p`/`-cp`/`--add-modules`/`-D*` 与 `--key value` 保留最后一个），否则会
+     `MultipleArgumentsForOptionException: Found multiple arguments for option launchTarget`。
+2. **客户端 jar 放在父版本目录**，文件名取版本 JSON 的 `jar` 字段（如 `1.21.1-NeoForge`），
+   并且必须排在 classpath 第一位，否则主类找不到。
+3. **`rules` 按「最后匹配的规则说了算」**展开，并检查 `os.arch`；带 `features` 的规则一律视为不匹配，
+   否则命令里会残留 `${quickPlay…}` 占位符。
+4. **macOS 需要 `-XstartOnFirstThread`**，旧版 JSON 没有时要补上，否则 GLFW 初始化失败。
+
+## 前端
+
+没有框架，没有打包器。三个约定：
+
+- `index.html` 里的每一页是 `<section class="page" data-page="xxx">`，导航是 `data-nav="xxx"`。
+- `app.js` 持有全局状态 `S` 与渲染函数，并把三个时机暴露成钩子：
+
+  ```js
+  (function () {
+    const HOOKS = (window.__GM_HOOKS = window.__GM_HOOKS || { ready: [], nav: [], render: [] });
+    HOOKS.render.push(() => { /* 重新渲染我这一块 */ });
+  })();
+  ```
+
+  顺序：`ready` 启动时一次；`nav` 切页时；`render` 每次状态刷新后。
+  **`features*.js` 必须用 `setTimeout(boot, 0)` 异步启动**，否则脚本还没解析完，
+  前面的模块就已经走完了启动流程，钩子全部丢失。
+- 所有 `invoke` 都走 `app.js` 里的同一个封装；参数用 camelCase，Rust 侧自动转 snake_case。
+
+### 浏览器 mock 模式
+
+没有 `window.__TAURI__` 时，`app.js` 自动切到 `mockInvoke`，返回一份假数据。
+所以你可以只开个静态服务就调界面：
+
+```bash
+python3 -m http.server 8080 --directory src
+```
+
+mock 数据在 `app.js` 顶部的 `MOCK_STATE`，改界面时顺手改它，能让新的空态也在浏览器里看得到。
+
+## 调试技巧
+
+```bash
+# 打印某个版本的完整启动命令（不启动游戏）
+glassmc --print-command 1.21.11
+
+# 直接命令行安装，绕过界面
+glassmc --install 1.21.11
+```
+
+排查「启动不了」时，先看 `--print-command` 的输出里还有没有 `${...}` 残留、
+classpath 里有没有缺失文件，再去看游戏日志。
+
+---
+
+# 三、开发说明（docs/development.md）
+
+# 开发说明
+
+面向想改代码或自己编译的人。只想用的话看 [README](../README.md) 就够了。
+
+---
+
+## 技术栈
+
+Tauri 2：**Rust 管系统层，Web 管界面**。
+
+启动器最脏最重的活（拼上千项 JVM 参数、解压 natives、fork 进程、扫几百个 jar、算 SHA1）
+本来就在系统层，Rust 干这些比任何前端框架都顺手；界面用 Web 是因为它是唯一能在
+macOS / Windows / Linux 上渲染出同一套像素的东西。
+
+玻璃的实现跟着换了思路：
+
+| | 上一代（SwiftUI） | 本代（Tauri） |
+|---|---|---|
+| 窗口玻璃 | `NSVisualEffectView` | macOS 同一个 API；Windows 用 Mica → Acrylic 回退；Linux 交给合成器 |
+| 卡片玻璃 | `NSVisualEffectView` 多层 | **半透明色块，不叠滤镜**（窗口已经糊过了，再糊一次只是白烧内存） |
+| 开关控件 | 原生 `Toggle` | 自研 Web Component，能力不足时自动降级但**圆角不变** |
+
+---
+
+## 目录
+
+```
+src/                      前端（无构建步骤，改完刷新就生效）
+  index.html
+  js/app.js               骨架：路由、首页、版本、设置基础字段
+  js/features.js          账号 / 皮肤 / 皮肤库 / 弹层与进度
+  js/features-install.js  安装（原版·加载器·Java）与模组（本地·Modrinth）
+  js/features-more.js     导入、陶瓦联机、设置补充项
+  styles/
+    baseline.css          跨内核渲染基线（必须先于业务样式引入）
+    app.css               设计系统 + 布局
+  vendor/
+    liquid-glass-toggle.js    液态玻璃开关（Web Component）
+
+src-tauri/                Rust 后端
+  src/
+    main.rs               入口；--print-command / --install / --test-terracotta
+    lib.rs                Builder、命令注册、玻璃初始化
+    paths.rs              三平台数据目录
+    config.rs             设置持久化（含认证服务器与皮肤库）
+    manifest.rs           版本清单、本地扫描、inheritsFrom 深合并
+    download.rs           通用下载：重试 / 状态码 / SHA1 / 原子落盘
+    install.rs            安装原版：jar + 依赖库 + 资源对象（带进度事件）
+    loader.rs             Fabric / Quilt / NeoForge / Forge
+    javadl.rs             Adoptium + 清华镜像装 JDK
+    java.rs               JDK 扫描与版本解析
+    launch.rs             启动命令构建（核心）+ authlib-injector 注入
+    game.rs               子进程、实时日志、退出通知
+    account.rs            账号、离线 UUID、账号文件读写
+    yggdrasil.rs          外置登录：多路径探测 + sessionserver 贴图
+    microsoft.rs          微软设备码登录全链路
+    skins.rs              皮肤缓存 + Blessing Skin 皮肤库
+    injector.rs           authlib-injector 下载与校验
+    modrinth.rs           Modrinth API + jar 元数据解析 + 本地模组
+    modpack.rs            .mrpack 导入导出
+    importer.rs           从其它启动器导入
+    terracotta.rs         陶瓦联机（下载组件 / 守护进程 / 房间 API）
+    glass.rs              三平台窗口毛玻璃
+    net.rs                HTTP 客户端（带 UA / 本地禁用代理）
+    commands.rs           基础命令
+    commands_ext.rs       第二阶段新增的 50+ 个命令
+
+build.sh                  编译 → lipo → 组 .app → 签名 → dmg
+Scripts/                  DMG 背景图与布局配置
+docs/rendering-parity.md  跨内核渲染差异的实测记录
+```
+
+---
+
+## 跑起来
+
+### macOS
+
+```bash
+cd src-tauri
+cargo run --release
+```
+
+打包 universal 应用与 dmg：
+
+```bash
+bash build.sh
+# 产物：build/GlassMC.app、build/GlassMC.dmg
+```
+
+`build.sh` 会分别编译 `aarch64-apple-darwin` 与 `x86_64-apple-darwin`，用 `lipo` 合并，
+再组 `.app`、ad-hoc 签名、调 dmgbuild 出安装包。
+
+### Windows
+
+需要 **WebView2 运行时**（Windows 11 自带；Windows 10 需装 Evergreen Runtime）。
+毛玻璃优先 Mica（Windows 11），失败退 Acrylic（Windows 10 1803+），都不行则前端降级为磨砂。
+
+#### 在 Linux 上交叉编译（发布包就是这么来的）
+
+不需要 Windows 机器，也不需要 Mac。`mingw-w64` 出链接器，`nasm` 给 `aws-lc-sys`
+汇编用，`nsis` 是 **Linux 原生版 makensis**（不用 wine 就能打安装包）：
+
+```bash
+sudo apt install -y mingw-w64 nsis nasm
+rustup target add x86_64-pc-windows-gnu
+
+cat >> ~/.cargo/config.toml << 'EOF'
+[target.x86_64-pc-windows-gnu]
+linker = "x86_64-w64-mingw32-gcc"
+ar = "x86_64-w64-mingw32-ar"
+EOF
+
+cd src-tauri
+cargo build --release --target x86_64-pc-windows-gnu
+# 产物：target/x86_64-pc-windows-gnu/release/glassmc.exe
+#      同目录还有 WebView2Loader.dll —— 必须和 exe 放一起
+```
+
+打 NSIS 安装包：
+
+```bash
+cd ..                          # 回到仓库根
+D="$PWD/build/windows"; mkdir -p "$D"
+cp src-tauri/target/x86_64-pc-windows-gnu/release/{glassmc.exe,WebView2Loader.dll} "$D"/
+
+makensis -DEXE_PATH="$D/glassmc.exe" \
+         -DICON_PATH="$PWD/src-tauri/icons/icon.ico" \
+         -DEXTRA_DIR="$D" \
+         -DOUTFILE="$D/GlassMC-Setup.exe" \
+         "$PWD/Scripts/windows-installer.nsi"
+```
+
+`-DEXTRA_DIR` 让脚本把目录里的 `*.dll` 一起装进去（WebView2Loader，以及将来可能出现的
+运行时 DLL）。卸载时会一并删除。
+
+> **运行时依赖**：exe 已经静态链接了 mingw 运行时，`objdump -p` 里只有
+> `KERNEL32/USER32/ole32/...` 这类系统 DLL 加 `WebView2Loader.dll`，
+> 目标机器不用装 mingw、不用装 VC++ 运行库。
+
+#### 在 Windows 上原生编译
+
+装了 Visual Studio Build Tools（C++ 工作负载）的话直接：
+
+```powershell
+cd src-tauri
+cargo build --release
+# 产物：src-tauri\target\release\glassmc.exe
+```
+
+### Linux
+
+需要 WebKitGTK 与相关开发库：
+
+```bash
+# Debian / Ubuntu
+sudo apt install libwebkit2gtk-4.1-dev libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev
+# Fedora
+sudo dnf install webkit2gtk4.1-devel gtk3-devel libappindicator-gtk3-devel librsvg2-devel
+
+cd src-tauri && cargo build --release
+# 产物：src-tauri/target/release/glassmc
+```
+
+打 deb 和绿色版：
+
+```bash
+bash Scripts/make-linux-package.sh
+# 产物：build/linux/GlassMC_<版本>_amd64.deb
+#      build/linux/GlassMC_<版本>_linux-amd64.tar.gz
+```
+
+脚本会写好 `.desktop`、hicolor 图标、`control`（依赖声明 `libwebkit2gtk-4.1-0` 等），
+并规范权限（目录 755 / 文件 644），最后 `dpkg-deb --root-owner-group -Zxz --build`。
+
+> Linux 没有统一的窗口模糊 API：KWin 开了 blur 才有真玻璃，GNOME 默认没有。
+> 所以本版在 Linux 上一律先按「磨砂」出，能不能真糊取决于桌面环境——这也正是
+> 「不适配就自动关掉玻璃、保留圆角」这条规则存在的意义。
+
+---
+
+## 数据目录
+
+三平台按系统习惯放，和上一代原生版**完全一致**，所以能直接沿用已装的版本和账号：
+
+| 平台 | 路径 |
+|---|---|
+| macOS | `~/Library/Application Support/GlassMC` |
+| Windows | `%APPDATA%\GlassMC` |
+| Linux | `~/.local/share/GlassMC` |
+
+里面是 `minecraft/`（游戏本体）、`accounts.json`、`tauri-config.json`
+（刻意与原生版的 `UserDefaults` 分开存，两边同时装着不会互相踩）、`logs/`、`terracotta/`。
+
+---
+
+## 几个容易踩的点
+
+### 1. 整合包实例的客户端 jar 在父版本目录里
+
+`新蒸程1.7` 的 json 里既没有 `jar` 字段也没有 `downloads.client`——真正的 jar 是
+`versions/1.21.1-NeoForge/1.21.1-NeoForge.jar`。只看本版本会误判成「缺客户端 jar」。
+`manifest::local_client_jar_id()` 会沿 `inheritsFrom` 一路找下去。
+
+同理，`--gameDir` 要指向 `versions/<id>/`（HMCL 的版本隔离），否则会读到根目录的 mod 和存档。
+
+### 2. 父子版本的 `--add-opens` 各写一份
+
+不去重不会崩（JVM 允许重复），但参数会变长；而 `-p` / `-cp` / `--add-modules`
+如果重复就会直接报 `MultipleArgumentsForOptionException`。所以两类去重是分开的：
+单值选项保留最后一个，`--add-opens` 这类只删完全重复的。
+
+### 3. `-cp` 已经在版本 JSON 里了
+
+现代版本的 jvm 参数自带 `-cp ${classpath}`。要替换占位符，但**不要**再追加一个 `-cp`。
+
+### 4. macOS 需要 `-XstartOnFirstThread`
+
+新版 JSON 自带；旧版缺失时要补上，否则 GLFW 初始化失败。
+
+### 5. BMCLAPI 的资源路径没有 `objects/` 段
+
+`/assets/{hash 前两位}/{hash}` 才是对的，`/assets/objects/...` 是 404。
+另外要校验 HTTP 状态码（否则 404 页面会被当文件写盘），并带 `User-Agent`。
+
+### 6. 前端钩子的时序
+
+`app.js` 的 `boot()` 如果用 `else boot()` 同步执行，会在后续脚本解析前就跑完，
+那时 `features*.js` 还没注册渲染钩子——表现是版本页少了按钮、设置页列表空白。
+现在的写法是 `setTimeout(boot, 0)` + 首次渲染后 60ms 再兜底渲染一次。
+
+### 7. `#[serde(default)]` 用的是字段类型的默认值
+
+不是 struct 的 `Default::default()`。给 `Config` 新增字段时，旧配置文件里会是空值，
+需要在 `config::load()` 里显式补预设（`authServers` 就是这么补的）。
+
+---
+
+## 跨内核渲染一致性
+
+同一份 HTML 在 WKWebView（macOS）、WebView2（Windows）、WebKitGTK（Linux）和 Chrome 里
+默认会排出不同高度，根因是 `line-height: normal` 的解释不同、以及系统字体回退链不一致。
+实测数据与修复方式见 [rendering-parity.md](rendering-parity.md)。
+
+结论就三条：所有文本显式写 `line-height`；字体栈写全
+`-apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif`；等宽场景写死 `Menlo`。
+
+---
+
+## 调试用命令行
+
+不打开界面也能验证启动链路：
+
+```bash
+# 打印某个版本的完整启动命令（含 classpath 项数、缺失文件数、未替换占位符检查）
+./target/release/glassmc --print-command "新蒸程1.7"
+
+# 只用命令行装一个版本，打印下载 / 跳过 / 失败的文件数
+./target/release/glassmc --install "1.21.4"
+
+# 自测陶瓦联机：下载组件、拉起守护进程、查一次房间状态后退出
+./target/release/glassmc --test-terracotta
+```
+
+---
+
+# 四、渲染一致性（docs/rendering-parity.md）
+
+# 跨内核渲染一致性：实测记录
+
+> 起因：在 macOS 上跑 Tauri，页面"看起来变形"，和 Chrome 里预览的不一样。
+> 结论：**这不是玄学，是两个可定位、可修复的具体差异。** 本文是实测数据与修复方案。
+
+测试环境：macOS 27.0.1 · Retina（DPR = 2）· WKWebView（WebKit 605.1.15）· Chrome 156 headless · Tauri 2（debug build）
+
+测试方法：同一份 HTML，分别用裸 WKWebView、Chrome、真实 Tauri 窗口加载，
+页面内跑同一段 JS 探针读取 `getBoundingClientRect` / `getComputedStyle` / `CSS.supports`，
+三方逐项 diff。Tauri 的探针结果通过 `fetch` POST 回本地端口取出（避免依赖截图）。
+
+---
+
+## 一、根因 1：`line-height: normal` 两个内核算得不一样
+
+这是"页面变形"最主要的原因。
+
+| 元素 | 字号 | WKWebView 行高 | Chrome 行高 |
+|---|---|---|---|
+| `h1` | 22px | **26px**（×1.18） | **31px**（×1.41） |
+| 卡片（含 11/24/10px 三层文字）| — | 91px | 93px |
+
+WebKit 与 Blink 对"normal 行高"的取值来自各自对字体 `ascent + descent + lineGap` 的解释，
+WebKit 偏紧（约 1.18×），Blink 偏松（约 1.41×）。单看一个元素只差 5px，
+但一屏几十个文字块累积下来，整页高度、折行位置、卡片对齐全都会变——这就是"变形"的观感来源。
+
+**修复：所有文本显式声明 `line-height`，一个都不留给 `normal`。**
+
+修复后：
+
+| 指标 | WKWebView | Chrome | 差异 |
+|---|---|---|---|
+| `h1` 高度 | 27.5px | 27.5px | **0** |
+| 卡片高度 | 95.98px | 95.99px | 0.01px |
+
+见 `src/styles/baseline.css`。
+
+---
+
+## 二、根因 2：窗口尺寸 ≠ 内容区尺寸
+
+Tauri 的 `tauri.conf.json` 里 `width` / `height` 指的是**窗口尺寸**，不是 webview 内容区。
+`decorations: true` 时，标题栏吃掉 32px：
+
+```
+配置 height: 800  →  实际 innerHeight: 768
+```
+
+如果前端按 800 设计（`100vh` 布局、`height: 800px` 的分栏），底部会被裁掉，
+或者冒出不该出现的滚动条。这也会被误认为"页面被压扁了"。
+
+**修复：用 `decorations: false`，自绘标题栏。**
+
+实测：
+
+| 配置 | 窗口 | 内容区 |
+|---|---|---|
+| `decorations: true`, height 800 | 1200×800 | 1200×**768** |
+| `decorations: false`, height 800 | 1200×800 | 1200×**800** ✅ |
+
+GlassMC 这种"整窗液态玻璃"的界面本来就应该无边框——玻璃可以一直延伸到顶，
+不需要系统标题栏那条灰带。顺便还消掉了这个尺寸损耗。
+
+---
+
+## 三、实测排除的"疑似问题"
+
+以下这些都逐个测过，**没有问题**，不用浪费时间调：
+
+| 项目 | 结果 |
+|---|---|
+| flex / grid 布局 | 完全一致（色块行 972×42 两边相同） |
+| 圆角、渐变 | 完全一致 |
+| `backdrop-filter` | 两边都支持；WK 还额外支持 `-webkit-` 前缀 |
+| `border-radius` 取整 | 一致 |
+| DPR | 都是 2 |
+| 完整字体链的西文字宽 | **176.33 = 176.33**，完全一致（见下） |
+| Tauri vs 裸 WKWebView | **29 项一致**，仅 6 项差异且全部来自上面那个 32px |
+
+### 关于字体，有个坑要说清楚
+
+字体**不是**问题，但字体链写不全就会变成问题：
+
+| 写法 | WKWebView | Chrome | 差异 |
+|---|---|---|---|
+| `20px -apple-system` | 176.33 | 190.53 | **7.5%** ❌ |
+| `20px "SF Pro Text"` | 168.3 | 190.53 | **11.7%** ❌ |
+| `20px -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif` | 176.33 | 176.33 | **0** ✅ |
+| `20px Arial` | 178.98 | 178.98 | 0 ✅ |
+
+`-apple-system` 是 WebKit 私有关键字，Blink 不认；`"SF Pro Text"` 在 Chrome 里也不是合法族名。
+**只写 `-apple-system` 会在 Chrome 侧静默回退到默认字体**，字宽差 7.5%——这才是网上很多
+"Tauri 页面字变大/字变宽"的真正原因。字体链写全就没事。
+
+### 唯一残留：等宽字体
+
+| 写法 | WKWebView | Chrome | 差异 |
+|---|---|---|---|
+| `ui-monospace, SFMono-Regular, Menlo, monospace` | 108.8（SF Mono） | 105.97（Menlo） | 2.7% |
+
+`ui-monospace` 在 WebKit 解析成 SF Mono，在 Blink 解析成 Menlo。11px 下每字符差 0.3px，
+如果拿等宽字体做对齐（版本号、日志、邀请码），会有肉眼可见的错位。
+
+**修复：等宽场景显式写死一个字体**（本项目统一用 `Menlo`，三端都有或可回退）。
+
+---
+
+## 四、可直接抄的配置
+
+### `tauri.conf.json` 窗口部分
+
+```json
+{
+  "app": {
+    "windows": [{
+      "width": 1200,
+      "height": 800,
+      "decorations": false,
+      "transparent": true,
+      "titleBarStyle": "Overlay",
+      "dragDropEnabled": true
+    }]
+  }
+}
+```
+
+- `decorations: false` —— 消掉 32px 损耗，玻璃延伸到顶
+- `transparent: true` —— 配合 `window-vibrancy` 做窗口级毛玻璃
+- 无边框后需要自己实现窗口拖动：给标题区域加 `data-tauri-drag-region`
+
+### CSS 基线
+
+见 `src/styles/baseline.css`，必须在所有业务样式之前引入。
+
+---
+
+## 五、验证脚本
+
+想自己复现这套测量：
+
+```bash
+# 1. WKWebView 侧
+swiftc -O probe.swift -o probe -framework Cocoa -framework WebKit
+./probe test.html wk.json wk.png
+
+# 2. Chrome 侧
+"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
+  --headless=new --no-sandbox --hide-scrollbars \
+  --window-size=1200,800 --force-device-scale-factor=2 \
+  --virtual-time-budget=4000 --dump-dom file:///path/test.html
+
+# 3. diff 两份 JSON 即可
+```
+
+注意：Chrome headless 的 `--window-size` 不等于 `innerHeight`（实测 800 → 657），
+所以**只比元素内部尺寸，不要比 viewport 高度**，否则会得出假差异。

@@ -1,0 +1,54 @@
+# GlassMC
+
+> GlassMC 是 Rust + Tauri 2 写的跨平台 Minecraft 启动器：系统级毛玻璃界面，393 个正式版与快照、Fabric / Quilt / Forge / NeoForge、JDK 自动配置、Modrinth 模组、整合包导入导出与陶瓦联机，macOS / Windows / Linux 同一套代码，GPLv3 开源。
+
+GlassMC 是一个直接面向最终用户的桌面应用（不是模组加载器、也不是服务端），装好之后选版本、点安装、点启动即可进游戏；启动参数、Java 运行时、依赖库、资源对象、皮肤注入都由启动器处理。界面使用操作系统原生的毛玻璃材质（macOS 的 NSVisualEffectView、Windows 的 Mica / Acrylic、Linux 的 WebKitGTK），不是网页里叠滤镜模拟出来的效果。
+
+## 核心事实
+
+- 当前版本：1.3.2
+- 平台：macOS 15+（Apple Silicon 与 Intel 共用一个 Universal 包）、Windows 10 1809+ / 11（x64，需要 WebView2）、Linux（需要 WebKitGTK 4.1）
+- 技术栈：Rust 后端 + Tauri 2 + 无构建的静态前端（HTML / CSS / 原生 JS）
+- 许可：GPLv3
+- 安装包体积：macOS dmg 约 9 MB，Windows exe 约 3 MB，Linux deb 约 3.4 MB
+- 源码与 issue：https://github.com/shaun-chen2/GlassMC
+- 下载：https://github.com/shaun-chen2/GlassMC/releases/latest
+- 在线体验（浏览器里跑同一套前端，示例数据，不装游戏、不连账号）：https://glassmc.shuan.uk/web/
+- 关联声明：本项目与 Mojang / Microsoft 无关联；Minecraft 是 Mojang Studios 的商标；连正版服务器需要自备正版账号。
+
+## 能力
+
+- 393 个正式版与快照，一键安装并逐项校验 SHA1
+- Fabric / Quilt / Forge / NeoForge 四种加载器
+- JDK 8 / 11 / 17 / 21 按游戏版本自动配置，清华镜像下载
+- 离线登录 / 微软正版 / 外置登录（Yggdrasil，LittleSkin、Ely.by、MiniSkins）
+- Modrinth 模组搜索安装、缺失依赖提示、本地模组开关
+- 整合包导入与导出（.mrpack）
+- 从 HMCL / 官方启动器 / Prism、MultiMC 一键搬家
+- 陶瓦联机：邀请码进服，不用公网 IP 和端口映射
+- 系统级毛玻璃：NSVisualEffectView / Mica / Acrylic / WebKitGTK
+
+## 页面
+
+- [介绍页](https://glassmc.shuan.uk/)：功能、平台状态、三平台安装与放行步骤、常见问题
+- [在线体验](https://glassmc.shuan.uk/web/)：八个页面的可交互界面，数据是示例数据
+
+## 技术文档（Markdown 原文）
+
+- [架构说明](https://glassmc.shuan.uk/docs/architecture.md)：进程模型、模块划分、数据目录
+- [开发说明](https://glassmc.shuan.uk/docs/development.md)：环境搭建、构建、调试
+- [渲染一致性](https://glassmc.shuan.uk/docs/rendering-parity.md)：三个平台 WebView 的差异与对齐方式
+
+## 常见问题
+
+- **提示「GlassMC 已损坏，无法打开」怎么办？** 去「系统设置 → 隐私与安全性 → 安全性」里点「仍要打开」。先双击一次 GlassMC，弹提示时点「取消」；打开系统设置 → 隐私与安全性，向下滚到「安全性」，会看到一行 “GlassMC” 已被阻止使用…，点右边的 仍要打开，输入密码；
+- **启动游戏时报 Java 相关的错误？** 去「安装 → Java 环境」看有没有可用运行时。没有就点安装，选 17 或 21（1.17 及更新用 17/21，1.16 及更早用 8）。导入来的实例也可以选「使用实例自带的 Java」。
+- **内存该给多少？** 8 GB 内存给 4 GB，16 GB 给 6~8 GB，大型整合包可以到 8~12 GB。别全给游戏，否则系统本身会卡。判断标准：游戏里按 F3 看右上角内存占用，长期贴着上限就该加。
+- **皮肤站登录了，游戏里还是默认皮肤？** 确认启动的实例用的是那个皮肤站账号。外置登录会在启动时注入 authlib-injector，日志里应该出现 Authentication server: 你的皮肤站地址 和 Httpd is running。
+- **以前 HMCL 的整合包和存档能直接用吗？** 能。左侧「导入」会自动扫描 HMCL、官方启动器、Prism / MultiMC 的目录，选一个点导入，账号、版本、模组、存档都复制过来，原目录不受影响。
+- **Windows / Linux 真的能用吗？** Windows：交叉编译出的是 PE32+ 可执行文件，只依赖系统 DLL 和 WebView2Loader.dll。装进 wine 走完了「静默安装 → 从 Program Files 启动 → 卸载无残留」。真实 Windows 上的窗口长什么样还没看到。
+- **能不安装先看看界面吗？** 可以，glassmc.shuan.uk/web 是同一套前端跑在浏览器里，八个页面都能点，安装、启动、联机走的是示例数据。 它只是让人先看一眼界面：真的下版本、开游戏还是得装桌面版。
+
+## 可选
+
+- [llms-full.txt](https://glassmc.shuan.uk/llms-full.txt)：本页正文与三份技术文档的纯文本全文，适合一次性摄取
