@@ -118,7 +118,7 @@ jobs:
 
       # 别人报平台相关的问题时，直接丢一个可运行的调试版给他复现，比来回猜快
       - name: 上传调试产物
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: glassmc-debug-${{ matrix.name }}
           path: |
