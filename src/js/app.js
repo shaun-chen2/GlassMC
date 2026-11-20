@@ -678,7 +678,9 @@
         const raw = localStorage.getItem(UPDATE_CACHE);
         if (raw) {
           const c = JSON.parse(raw);
-          if (c && c.info && Date.now() - (c.at || 0) < UPDATE_TTL) {
+          // 版本号变了（刚升级）就不能再用旧缓存，否则会把「已经装上」的版本又提示一遍
+          const sameVersion = c && c.info && c.info.current === (S.boot && S.boot.version);
+          if (sameVersion && Date.now() - (c.at || 0) < UPDATE_TTL) {
             apply(c.info);
             return;
           }

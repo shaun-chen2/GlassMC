@@ -470,18 +470,20 @@ pub struct PackProbe {
 
 #[tauri::command]
 pub fn modpack_probe(path: String) -> Result<PackProbe, String> {
-    if let Ok(p) = curseforge::probe(&path) {
-        return Ok(PackProbe {
+    let cf = curseforge::probe(&path);
+    match cf {
+        Ok(p) => Ok(PackProbe {
             kind: "curseforge".into(),
             index: p.index,
-        });
-    }
-    match modpack::inspect(&path) {
-        Ok(index) => Ok(PackProbe {
-            kind: "mrpack".into(),
-            index,
         }),
-        Err(e) => Err(format!("无法识别这个整合包：{e}")),
+        Err(cf_err) => match modpack::inspect(&path) {
+            Ok(index) => Ok(PackProbe {
+                kind: "mrpack".into(),
+                index,
+            }),
+            // 两种都认不出时，把 CurseForge 那条错误抛出来——用户选的多半是 .zip
+            Err(_) => Err(format!("无法识别这个整合包：{cf_err}")),
+        },
     }
 }
 
