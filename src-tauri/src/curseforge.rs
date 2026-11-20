@@ -134,7 +134,6 @@ pub fn probe(path: &str) -> Result<CfProbe, String> {
             })
             .collect(),
         dependencies: deps,
-        ..Default::default()
     };
     Ok(CfProbe {
         index,
@@ -300,13 +299,16 @@ pub async fn import(
         let _ = std::fs::write(instance_dir.join(modpack::MANIFEST), s);
     }
     prog.note("整合包导入完成");
-    Ok(CfOutcome { record, failed: failures })
+    Ok(CfOutcome {
+        record,
+        failed: failures,
+    })
 }
 
 fn read_manifest(path: &str) -> Result<CfManifest, String> {
     let file = std::fs::File::open(path).map_err(|e| format!("打开整合包失败：{e}"))?;
-    let mut zip = zip::ZipArchive::new(file)
-        .map_err(|_| "这不是有效的整合包（无法解压）".to_string())?;
+    let mut zip =
+        zip::ZipArchive::new(file).map_err(|_| "这不是有效的整合包（无法解压）".to_string())?;
     // 少数包把 manifest 放在一层目录里，按「路径最短的 manifest.json」取
     let mut best: Option<String> = None;
     for i in 0..zip.len() {
@@ -315,14 +317,16 @@ fn read_manifest(path: &str) -> Result<CfManifest, String> {
         };
         let name = entry.name().to_string();
         let lower = name.to_lowercase();
-        if lower == "manifest.json" || lower.ends_with("/manifest.json") {
-            if best.as_ref().map(|b| name.len() < b.len()).unwrap_or(true) {
-                best = Some(name);
-            }
+        if (lower == "manifest.json" || lower.ends_with("/manifest.json"))
+            && best.as_ref().map(|b| name.len() < b.len()).unwrap_or(true)
+        {
+            best = Some(name);
         }
     }
     let name = best.ok_or("整合包里没有 manifest.json")?;
-    let mut entry = zip.by_name(&name).map_err(|e| format!("读取 manifest 失败：{e}"))?;
+    let mut entry = zip
+        .by_name(&name)
+        .map_err(|e| format!("读取 manifest 失败：{e}"))?;
     let mut text = String::new();
     entry
         .read_to_string(&mut text)
@@ -335,7 +339,11 @@ fn read_manifest(path: &str) -> Result<CfManifest, String> {
 ///
 /// 返回值与 `loader::forge_versions` 等接口给的版本串保持一致（不含游戏版本）。
 fn parse_loader(loaders: &[CfLoader], game: &str) -> (String, String) {
-    let Some(l) = loaders.iter().find(|l| l.primary).or_else(|| loaders.first()) else {
+    let Some(l) = loaders
+        .iter()
+        .find(|l| l.primary)
+        .or_else(|| loaders.first())
+    else {
         return (String::new(), String::new());
     };
     let id = l.id.trim();
@@ -490,7 +498,11 @@ mod tests {
         );
         // primary 优先
         assert_eq!(
-            parse_loader(&[l("fabric-0.15.0", false), l("quilt-0.20.0", true)], "1.20.1").0,
+            parse_loader(
+                &[l("fabric-0.15.0", false), l("quilt-0.20.0", true)],
+                "1.20.1"
+            )
+            .0,
             "quilt"
         );
         assert_eq!(parse_loader(&[], "1.20.1"), (String::new(), String::new()));
@@ -542,7 +554,9 @@ mod tests {
         zw.write_all(b"pwned").unwrap();
         zw.finish().unwrap();
 
-        let out = import(None, zip_path.to_str().unwrap(), None).await.unwrap();
+        let out = import(None, zip_path.to_str().unwrap(), None)
+            .await
+            .unwrap();
         let p = super::probe(zip_path.to_str().unwrap()).unwrap();
         assert_eq!(p.loader, "forge");
         assert_eq!(p.loader_version, "40.2.0");
@@ -554,7 +568,9 @@ mod tests {
         assert_eq!(out.record.mod_count, 1);
         assert_eq!(out.failed, 0);
 
-        let inst = root.join("minecraft/versions").join(&out.record.instance_id);
+        let inst = root
+            .join("minecraft/versions")
+            .join(&out.record.instance_id);
         assert!(inst.join("mods/jei-1.18.2-forge-10.2.1.1005.jar").is_file());
         assert!(inst.join("options.txt").is_file());
         assert!(!inst.join("evil.txt").exists());

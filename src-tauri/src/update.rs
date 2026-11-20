@@ -148,15 +148,19 @@ pub async fn download(app: Option<tauri::AppHandle>) -> Result<String, String> {
             return Err(format!("写入下载文件失败：{e}"));
         }
         got += chunk.len() as u64;
-        if total > 0 {
-            let pct = (got.saturating_mul(100) / total).min(100);
-            if pct > last_pct {
-                last_pct = pct;
-                prog.tick(true);
-            }
+        let pct = got
+            .saturating_mul(100)
+            .checked_div(total)
+            .unwrap_or(0)
+            .min(100);
+        if pct > last_pct {
+            last_pct = pct;
+            prog.tick(true);
         }
     }
-    out.flush().await.map_err(|e| format!("写入下载文件失败：{e}"))?;
+    out.flush()
+        .await
+        .map_err(|e| format!("写入下载文件失败：{e}"))?;
     drop(out);
 
     if total > 0 && got < total {
@@ -322,8 +326,15 @@ mod tests {
         let path = super::download(None).await.unwrap();
         let p = std::path::PathBuf::from(&path);
         assert!(p.is_file(), "{path} 不存在");
-        assert!(std::fs::metadata(&p).unwrap().len() > 1_000_000, "文件太小：{path}");
-        assert!(p.file_name().unwrap().to_string_lossy().starts_with("GlassMC-"));
+        assert!(
+            std::fs::metadata(&p).unwrap().len() > 1_000_000,
+            "文件太小：{path}"
+        );
+        assert!(p
+            .file_name()
+            .unwrap()
+            .to_string_lossy()
+            .starts_with("GlassMC-"));
         let _ = std::fs::remove_dir_all(&root);
     }
 }

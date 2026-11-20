@@ -359,7 +359,11 @@ fn parse_version(d: &serde_json::Value) -> Option<MrVersion> {
         name: d
             .get("name")
             .and_then(|x| x.as_str())
-            .unwrap_or_else(|| d.get("version_number").and_then(|x| x.as_str()).unwrap_or(""))
+            .unwrap_or_else(|| {
+                d.get("version_number")
+                    .and_then(|x| x.as_str())
+                    .unwrap_or("")
+            })
             .to_string(),
         game_versions: str_list(d.get("game_versions")),
         loaders: str_list(d.get("loaders")),
@@ -900,7 +904,11 @@ mod tests {
         let again = install_mod(None, "1.20.1", "iris", "1.20.1", "fabric", None, false)
             .await
             .unwrap();
-        assert!(again.installed.is_empty(), "重复下载了：{:?}", again.installed);
+        assert!(
+            again.installed.is_empty(),
+            "重复下载了：{:?}",
+            again.installed
+        );
         assert!(again.skipped.len() >= 2, "没有跳过：{:?}", again.skipped);
 
         let idx = root.join("minecraft/.glassmc-modrinth.json");
