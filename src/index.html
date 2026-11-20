@@ -77,6 +77,7 @@ if (/Windows/i.test(navigator.userAgent)) document.documentElement.dataset.os = 
       <button class="nav-item" data-nav="settings">
         <svg class="ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><circle cx="8" cy="8" r="2.2"/><path d="M8 1.9l1.1 1.6 1.9-.5.5 1.9 1.6 1.1-1 1.7 1 1.7-1.6 1.1-.5 1.9-1.9-.5L8 14.1l-1.1-1.6-1.9.5-.5-1.9-1.6-1.1 1-1.7-1-1.7 1.6-1.1.5-1.9 1.9.5z"/></svg>
         <span class="tx">设置</span>
+        <span class="badge" id="nav-badge-update" style="display:none;color:var(--accent-hi)">新</span>
       </button>
 
       <div class="grow"></div>
@@ -160,7 +161,7 @@ if (/Windows/i.test(navigator.userAgent)) document.documentElement.dataset.os = 
       <section class="page" data-page="install">
         <div class="page-head">
           <h1>安装</h1>
-          <div class="sub">镜像优先，失败自动回退官方源</div>
+          <div class="sub" id="remote-sub">镜像优先，失败自动回退官方源</div>
           <div class="spacer"></div>
           <button class="btn sm" id="btn-load-remote">刷新版本列表</button>
         </div>
@@ -247,6 +248,9 @@ if (/Windows/i.test(navigator.userAgent)) document.documentElement.dataset.os = 
               <button class="btn sm" id="btn-mr-search" style="flex:none">搜索</button>
             </div>
             <div class="mini-note" style="margin-top:8px" id="mr-context">—</div>
+            <label class="hstack" style="margin-top:6px;font-size:12px;color:var(--text-dim);gap:6px">
+              <input type="checkbox" id="mr-optional"> 同时安装可选依赖（默认只补必需前置）
+            </label>
           </div>
           <div class="row-list" id="mr-list">
             <div class="empty"><span class="big-ico">◌</span><span>输入关键词搜索模组</span></div>
@@ -311,12 +315,12 @@ if (/Windows/i.test(navigator.userAgent)) document.documentElement.dataset.os = 
         </div>
 
         <div class="card section-gap">
-          <div class="card-title">整合包<span class="k">.mrpack</span></div>
+          <div class="card-title">整合包<span class="k">.mrpack / CurseForge .zip</span></div>
           <div class="wrap-gap">
-            <button class="btn" id="btn-import-mrpack">选择 .mrpack 文件</button>
+            <button class="btn" id="btn-import-mrpack">选择整合包文件</button>
             <button class="btn" id="btn-export-mrpack">把当前版本导出为整合包</button>
           </div>
-          <div class="mini-note section-gap">导入只会铺好文件；缺游戏本体或加载器时会提示你继续安装。</div>
+          <div class="mini-note section-gap">导入只会铺好文件；缺游戏本体或加载器时会提示你继续安装。CurseForge 包需要联网查询文件名。</div>
           <div class="row-list section-gap" id="import-packs"></div>
         </div>
       </section>
@@ -469,10 +473,21 @@ if (/Windows/i.test(navigator.userAgent)) document.documentElement.dataset.os = 
           <div class="hstack" style="gap:14px;align-items:flex-start">
             <div class="avatar" style="width:44px;height:44px;border-radius:12px;font-size:16px">G</div>
             <div style="font-size:12px;color:var(--text-dim);line-height:1.7">
-              <div style="color:var(--text);font-weight:650;font-size:13px">GlassMC <span class="mono-dim" id="about-ver"></span></div>
+              <div style="color:var(--text);font-weight:650;font-size:13px">GlassMC <span class="mono-dim" id="about-ver"></span>
+                <span class="badge-pill accent" id="update-pill" style="display:none;margin-left:6px">有新版本</span></div>
               液态玻璃 Minecraft 启动器 · Tauri 跨平台版<br>
               GPLv3 开源 · <a href="#" id="link-repo" style="color:var(--accent-hi)">github.com/shaun-chen2/GlassMC</a>
             </div>
+          </div>
+          <div class="hstack" id="update-row" style="display:none;margin-top:12px;gap:10px;align-items:center">
+            <span class="mini-note" id="update-text"></span>
+            <div style="flex:1"></div>
+            <button class="btn sm" id="btn-skip-update">忽略此版本</button>
+            <button class="btn sm primary" id="btn-update">下载并打开</button>
+          </div>
+          <div class="hstack" style="margin-top:10px;gap:10px;align-items:center">
+            <button class="btn sm" id="btn-check-update">检查更新</button>
+            <span class="mini-note" id="update-hint"></span>
           </div>
         </div>
       </section>

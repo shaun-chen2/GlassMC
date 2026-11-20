@@ -8,6 +8,7 @@ use tauri_plugin_dialog::DialogExt;
 
 use crate::account::{self, Account};
 use crate::config::{self, AuthServer, ConfigState};
+use crate::curseforge;
 use crate::importer;
 use crate::injector;
 use crate::install::{self, InstallOutcome, VersionDetail};
@@ -405,18 +406,22 @@ pub async fn modrinth_versions(
 
 #[tauri::command]
 pub async fn modrinth_install(
+    app: AppHandle,
     version_id: String,
     project_id: String,
     game: String,
     loader: String,
     mr_version: Option<String>,
-) -> Result<String, String> {
+    include_optional: Option<bool>,
+) -> Result<modrinth::InstallReport, String> {
     modrinth::install_mod(
+        Some(app),
         &version_id,
         &project_id,
         &game,
         &loader,
         mr_version.as_deref(),
+        include_optional.unwrap_or(false),
     )
     .await
 }
@@ -452,6 +457,41 @@ pub async fn modpack_import(
     name: Option<String>,
 ) -> Result<modpack::PackRecord, String> {
     modpack::import(Some(app), &path, name).await
+}
+
+/// 整合包预览：先按 CurseForge 认，认不出再按 .mrpack 认。
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct PackProbe {
+    /// "mrpack" | "curseforge"
+    pub kind: String,
+    pub index: modpack::PackIndex,
+}
+
+#[tauri::command]
+pub fn modpack_probe(path: String) -> Result<PackProbe, String> {
+    if let Ok(p) = curseforge::probe(&path) {
+        return Ok(PackProbe {
+            kind: "curseforge".into(),
+            index: p.index,
+        });
+    }
+    match modpack::inspect(&path) {
+        Ok(index) => Ok(PackProbe {
+            kind: "mrpack".into(),
+            index,
+        }),
+        Err(e) => Err(format!("无法识别这个整合包：{e}")),
+    }
+}
+
+#[tauri::command]
+pub async fn curseforge_import(
+    app: AppHandle,
+    path: String,
+    name: Option<String>,
+) -> Result<curseforge::CfOutcome, String> {
+    curseforge::import(Some(app), &path, name).await
 }
 
 #[tauri::command]
@@ -508,6 +548,7 @@ pub fn tc_shutdown() {
 pub async fn pick_file(app: AppHandle, kind: String) -> Option<String> {
     let (name, exts): (String, Vec<String>) = match kind.as_str() {
         "mrpack" => ("Modrinth 整合包".into(), vec!["mrpack".into()]),
+        "pack" => ("整合包".into(), vec!["mrpack".into(), "zip".into()]),
         "png" => ("皮肤图片".into(), vec!["png".into()]),
         "jar" => ("Jar 文件".into(), vec!["jar".into()]),
         "java" => ("Java 可执行文件".into(), vec![]),
@@ -584,4 +625,17 @@ pub fn version_dir(version_id: String) -> String {
 #[tauri::command]
 pub fn app_version() -> String {
     env!("CARGO_PKG_VERSION").to_string()
+}
+
+// ---------------------------------------------------------------- 更新
+
+#[tauri::command]
+pub async fn update_check() -> Result<crate::update::UpdateInfo, String> {
+    crate::update::check().await
+}
+
+/// 下载当前平台的安装包到「下载」目录，返回落盘路径。
+#[tauri::command]
+pub async fn update_download(app: AppHandle) -> Result<String, String> {
+    crate::update::download(Some(app)).await
 }

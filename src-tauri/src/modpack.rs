@@ -11,7 +11,7 @@ use crate::download;
 use crate::install::Progress;
 use crate::paths;
 
-const MANIFEST: &str = ".glassmc-modpack.json";
+pub(crate) const MANIFEST: &str = ".glassmc-modpack.json";
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 #[serde(rename_all = "camelCase", default)]
@@ -173,7 +173,7 @@ pub async fn import(
     Ok(record)
 }
 
-fn extract_prefix(pack: &str, prefix: &str, dest: &Path) -> Result<(), String> {
+pub(crate) fn extract_prefix(pack: &str, prefix: &str, dest: &Path) -> Result<(), String> {
     let file = std::fs::File::open(pack).map_err(|e| format!("打开整合包失败：{e}"))?;
     let mut zip = zip::ZipArchive::new(file).map_err(|_| "无法解压整合包".to_string())?;
     for i in 0..zip.len() {
@@ -187,7 +187,16 @@ fn extract_prefix(pack: &str, prefix: &str, dest: &Path) -> Result<(), String> {
         if rel.is_empty() || rel.ends_with('/') {
             continue;
         }
-        if rel.contains("..") {
+        // Zip Slip：绝对路径、反斜杠、`..`、盘符、符号链接一律不落盘
+        if rel.starts_with('/')
+            || rel.contains("..")
+            || rel.contains('\\')
+            || rel.contains(':')
+            || entry
+                .unix_mode()
+                .map(|m| m & 0o170000 == 0o120000)
+                .unwrap_or(false)
+        {
             continue;
         }
         let target = dest.join(rel);
@@ -410,7 +419,7 @@ fn detect_loader(deps: &std::collections::HashMap<String, String>) -> (String, S
     (String::new(), String::new())
 }
 
-fn unique_instance_id(base: &str) -> String {
+pub(crate) fn unique_instance_id(base: &str) -> String {
     let cleaned: String = base
         .trim()
         .chars()

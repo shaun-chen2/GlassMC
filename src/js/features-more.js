@@ -78,10 +78,12 @@
   // ---------------------------------------------------------------- 整合包
 
   async function pickModpack() {
-    const path = await invoke('pick_file', { kind: 'mrpack' });
+    const path = await invoke('pick_file', { kind: 'pack' });
     if (!path) return;
     try {
-      const idx = await invoke('modpack_inspect', { path });
+      const probe = await invoke('modpack_probe', { path });
+      const idx = probe.index || {};
+      const isCf = probe.kind === 'curseforge';
       const mods = (idx.files || []).filter(
         (f) => f.path.toLowerCase().startsWith('mods/') && f.path.toLowerCase().endsWith('.jar'),
       ).length;
@@ -92,11 +94,14 @@
           ui.escAttr(idx.name || '整合包'),
           ui.escAttr(idx.summary || ''),
           `<div class="stack" style="gap:8px">
+             <div class="kv"><span class="k">来源</span><span class="v">${isCf ? 'CurseForge .zip' : 'Modrinth .mrpack'}</span></div>
              <div class="kv"><span class="k">Minecraft</span><span class="v">${ui.escAttr(deps.minecraft || '未声明')}</span></div>
              <div class="kv"><span class="k">加载器</span><span class="v">${ui.escAttr(loaderKey ? `${loaderKey} ${deps[loaderKey]}` : '原版')}</span></div>
              <div class="kv"><span class="k">模组文件</span><span class="v">${mods} 个</span></div>
              <div class="kv"><span class="k">总文件</span><span class="v">${(idx.files || []).length} 项</span></div>
-             <div class="mini-note">导入会铺到 versions/ 下的独立实例，不影响其它版本。</div>
+             <div class="mini-note">导入会铺到 versions/ 下的独立实例，不影响其它版本。${
+               isCf ? 'CurseForge 包需要联网查询每个文件的名字。' : ''
+             }</div>
            </div>`,
           `<button class="btn" data-sheet-close>取消</button>
            <button class="btn primary" id="mrpack-ok">导入</button>`,
@@ -107,10 +112,20 @@
         ui.busy(btn, true, '导入中');
         ui.showProgress('导入整合包');
         try {
-          const rec = await invoke('modpack_import', { path, name: null });
-          ui.updateProgress({ frac: 1, label: '文件就绪' });
-          ui.closeSheet();
-          await afterModpackImport(rec);
+          if (isCf) {
+            const out = await invoke('curseforge_import', { path, name: null });
+            ui.updateProgress({ frac: 1, label: '文件就绪' });
+            ui.closeSheet();
+            if (out && out.failed) {
+              toast(`整合包已导入，${out.failed} 个文件没能下载`, 'err');
+            }
+            await afterModpackImport(out.record);
+          } else {
+            const rec = await invoke('modpack_import', { path, name: null });
+            ui.updateProgress({ frac: 1, label: '文件就绪' });
+            ui.closeSheet();
+            await afterModpackImport(rec);
+          }
         } catch (e) {
           ui.hideProgress();
           ui.busy(btn, false);

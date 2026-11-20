@@ -228,6 +228,8 @@
     selected: localStorage.getItem('glassmc.selected') || '',
     running: false,
     remoteLoading: false,
+    remoteShown: 200,
+    update: null,
     logOpen: false
   };
 
@@ -423,24 +425,21 @@
   }
 
   // ---------------------------------------------------------------- 渲染：安装
-  function renderRemote() {
-    const box = $('#remote-list');
-    const kw = ($('#remote-filter').value || '').trim().toLowerCase();
-    const installed = new Set(S.installed.map((v) => v.id));
-    const list = S.remote.filter((v) => !kw || v.id.toLowerCase().includes(kw));
+  const REMOTE_PAGE = 200;
 
-    if (!list.length) {
-      box.innerHTML = '<div class="empty"><span class="big-ico">◌</span><span>没有匹配的版本</span></div>';
-      return;
-    }
-    box.innerHTML = list
-      .slice(0, 200)
-      .map((v) => {
-        const has = installed.has(v.id);
-        // 后端新版序列化成 kind，旧版误 rename 成了 type，两种都认；
-        // 都取不到就整块不渲染，免得留一个空胶囊光剩圆点。
-        const kind = v.kind || v.type || '';
-        return `
+  function remoteFiltered() {
+    const kw = ($('#remote-filter').value || '').trim().toLowerCase();
+    // 过滤永远作用在全量数组上，分页只决定“渲染多少行”，
+    // 这样搜 1.7.10 不会因为它排在 700 多位就搜不到。
+    return S.remote.filter((v) => !kw || v.id.toLowerCase().includes(kw));
+  }
+
+  function remoteRow(v, installed) {
+    const has = installed.has(v.id);
+    // 后端新版序列化成 kind，旧版误 rename 成了 type，两种都认；
+    // 都取不到就整块不渲染，免得留一个空胶囊光剩圆点。
+    const kind = v.kind || v.type || '';
+    return `
       <div class="vrow">
         <div class="v-main">
           <div class="v-id">${esc(v.id)}</div>
@@ -453,8 +452,59 @@
           <button class="btn sm" ${has ? 'disabled' : ''} data-download="${esc(v.id)}">${has ? '已装' : '下载'}</button>
         </div>
       </div>`;
-      })
-      .join('');
+  }
+
+  function renderRemote(reset = true) {
+    const box = $('#remote-list');
+    const sub = $('#remote-sub');
+    const installed = new Set(S.installed.map((v) => v.id));
+
+    if (!S.remote.length) {
+      box.innerHTML = '<div class="empty"><span class="big-ico">◌</span><span>点右上角刷新，拉取可安装的版本</span></div>';
+      if (sub) sub.textContent = '镜像优先，失败自动回退官方源';
+      return;
+    }
+
+    const list = remoteFiltered();
+    if (reset) {
+      S.remoteShown = REMOTE_PAGE;
+      box.innerHTML = '';
+    }
+
+    if (!list.length) {
+      box.innerHTML = '<div class="empty"><span class="big-ico">◌</span><span>没有匹配的版本</span></div>';
+      if (sub) sub.textContent = `匹配 0 个 · 共 ${S.remote.length} 个`;
+      return;
+    }
+
+    // 只追加新的一段，不重建已有行 —— 否则滚到页底点“显示更多”会跳回顶部
+    const shown = box.querySelectorAll('.vrow').length;
+    const to = Math.min(S.remoteShown, list.length);
+    if (to > shown) {
+      const html = list.slice(shown, to).map((v) => remoteRow(v, installed)).join('');
+      const wrap = box.querySelector('[data-more-wrap]');
+      if (wrap) wrap.insertAdjacentHTML('beforebegin', html);
+      else box.insertAdjacentHTML('beforeend', html);
+    }
+
+    let wrap = box.querySelector('[data-more-wrap]');
+    const remaining = list.length - to;
+    if (remaining > 0) {
+      if (!wrap) {
+        box.insertAdjacentHTML('beforeend', '<div class="remote-more" data-more-wrap></div>');
+        wrap = box.querySelector('[data-more-wrap]');
+      }
+      wrap.innerHTML = `<button class="btn sm" data-remote-more>显示更多（剩余 ${remaining}）</button>`;
+    } else if (wrap) {
+      wrap.remove();
+    }
+
+    if (sub) {
+      const kw = ($('#remote-filter').value || '').trim();
+      sub.textContent = kw
+        ? `匹配 ${list.length} 个 · 已显示 ${to} · 共 ${S.remote.length} 个`
+        : `共 ${S.remote.length} 个版本 · 已显示 ${to}`;
+    }
   }
 
   // ---------------------------------------------------------------- 渲染：模组
@@ -594,6 +644,83 @@
     }, 200);
   }
 
+  // ---------------------------------------------------------------- 更新
+  const UPDATE_CACHE = 'glassmc.update';
+  const UPDATE_TTL = 24 * 3600 * 1000;
+
+  /** 把「有没有新版本」画到关于卡片和侧栏上。忽略过的版本不算。 */
+  function paintUpdate() {
+    const skipped = (S.config && S.config.skippedVersion) || '';
+    const has = !!S.update && S.update.latest !== skipped;
+    const pill = $('#update-pill');
+    const badge = $('#nav-badge-update');
+    const row = $('#update-row');
+    if (pill) pill.style.display = has ? '' : 'none';
+    if (badge) badge.style.display = has ? '' : 'none';
+    if (row) row.style.display = has ? '' : 'none';
+    const txt = $('#update-text');
+    if (txt) {
+      txt.textContent = has
+        ? `v${S.update.current} → v${S.update.latest}${S.update.size ? ' · ' + fmtSize(S.update.size) : ''}`
+        : '';
+    }
+  }
+
+  async function checkUpdate(force) {
+    if (!IS_TAURI) return;
+    const apply = (info) => {
+      S.update = info && info.hasUpdate ? info : null;
+      paintUpdate();
+    };
+    try {
+      if (!force) {
+        // 24 小时内不重复打 GitHub API（未登录限额只有 60 次/小时）
+        const raw = localStorage.getItem(UPDATE_CACHE);
+        if (raw) {
+          const c = JSON.parse(raw);
+          if (c && c.info && Date.now() - (c.at || 0) < UPDATE_TTL) {
+            apply(c.info);
+            return;
+          }
+        }
+      }
+      const info = await invoke('update_check');
+      localStorage.setItem(UPDATE_CACHE, JSON.stringify({ at: Date.now(), info }));
+      apply(info);
+      if (force) {
+        const hint = $('#update-hint');
+        if (hint) hint.textContent = info.hasUpdate ? `发现 v${info.latest}` : `已是最新（v${info.current}）`;
+        toast(info.hasUpdate ? `发现新版本 v${info.latest}` : '已经是最新版本', 'ok');
+      }
+    } catch (e) {
+      // 启动时的静默检查失败不该打扰用户（断网、GitHub 抽风都很常见）
+      if (force) toast('检查更新失败：' + String(e).split('\n')[0], 'err');
+      else console.debug('[update]', e);
+    }
+  }
+
+  async function downloadUpdate(btn) {
+    if (!S.update) return;
+    const ui = window.GM && window.GM.ui;
+    if (btn) btn.disabled = true;
+    if (ui) ui.showProgress('下载 GlassMC v' + S.update.latest);
+    try {
+      const path = await invoke('update_download');
+      if (ui) {
+        ui.updateProgress({ frac: 1, label: '下载完成' });
+        setTimeout(() => ui.hideProgress(), 500);
+      }
+      toast('已保存到 ' + path, 'ok');
+      // dmg 会直接被挂载；Windows 上是打开 exe
+      invoke('open_path', { path }).catch(() => {});
+    } catch (e) {
+      if (ui) ui.hideProgress();
+      toast(String(e).split('\n')[0], 'err');
+    } finally {
+      if (btn) btn.disabled = false;
+    }
+  }
+
   async function loadMods() {
     const v = selectedVersion();
     if (!v) return;
@@ -623,8 +750,9 @@
     btn.innerHTML = '<span class="spinner"></span> 拉取中';
     try {
       S.remote = await invoke('list_remote', { includeSnapshots: $('#chk-snapshots').checked });
-      renderRemote();
-      toast('已获取 ' + S.remote.length + ' 个版本', 'ok');
+      renderRemote(true);
+      const releases = S.remote.filter((v) => (v.kind || v.type) === 'release').length;
+      toast(`已获取 ${S.remote.length} 个版本（正式 ${releases} · 其它 ${S.remote.length - releases}）`, 'ok');
     } catch (e) {
       toast('拉取失败：' + e, 'err');
     } finally {
@@ -751,6 +879,13 @@
             toast('已切换账号', 'ok');
           })
           .catch((err) => toast(String(err), 'err'));
+        return;
+      }
+      const more = e.target.closest('[data-remote-more]');
+      if (more) {
+        S.remoteShown += 200;
+        renderRemote(false);
+        return;
       }
     });
 
@@ -780,7 +915,13 @@
     $('#chk-snapshots').onchange = () => {
       if (S.remote.length) loadRemote();
     };
-    $('#remote-filter').oninput = renderRemote;
+    $('#remote-filter').oninput = (() => {
+      let timer = 0;
+      return () => {
+        clearTimeout(timer);
+        timer = setTimeout(() => renderRemote(true), 120);
+      };
+    })();
 
     // 模组页
     $('#mods-filter').oninput = renderMods;
@@ -847,6 +988,21 @@
       invoke('open_url', { url: 'https://github.com/shaun-chen2/GlassMC' }).catch(() => {});
     };
 
+    // 更新
+    const checkBtn = $('#btn-check-update');
+    if (checkBtn) checkBtn.onclick = () => checkUpdate(true);
+    const updateBtn = $('#btn-update');
+    if (updateBtn) updateBtn.onclick = () => downloadUpdate(updateBtn);
+    const skipBtn = $('#btn-skip-update');
+    if (skipBtn) {
+      skipBtn.onclick = () => {
+        if (!S.update) return;
+        saveConfig({ skippedVersion: S.update.latest });
+        paintUpdate();
+        toast('已忽略 v' + S.update.latest, 'ok');
+      };
+    }
+
     // 内容滚动 → 标题栏加分隔线
     $('#content').addEventListener('scroll', () => {
       $('#shell').classList.toggle('scrolled', $('#content').scrollTop > 4);
@@ -895,6 +1051,9 @@
 
     // 液态玻璃开关的档位是异步算出来的
     setTimeout(syncToggleScheme, 320);
+
+    // 静默查一次更新（不 await，断网也不影响启动）
+    if (S.config.checkUpdates !== false) checkUpdate(false);
 
     if (!IS_TAURI) {
       document.documentElement.classList.add('preview');

@@ -467,6 +467,11 @@ body {
 /* ---------------------------------- 列表行 */
 .row-list { display: flex; flex-direction: column; gap: 6px; }
 
+/* 版本清单一次可能渲染上千行，让浏览器跳过视口外的布局与绘制 */
+.row-list .vrow { content-visibility: auto; contain-intrinsic-size: 44px; }
+
+.remote-more { display: flex; justify-content: center; padding: 10px 0 4px; }
+
 .vrow {
   display: flex;
   align-items: center;

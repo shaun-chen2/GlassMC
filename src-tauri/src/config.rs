@@ -93,6 +93,20 @@ pub struct Config {
     pub ms_client_id: String,
     /// 陶瓦联机组件版本（空 = 用内置默认）
     pub terracotta_version: String,
+    /// 启动时静默检查更新
+    ///
+    /// 注意：容器上的 `#[serde(default)]` 对缺失字段取的是「字段类型的默认值」，
+    /// bool 会变成 false；这里必须显式写字段级默认值，否则老用户的配置文件
+    /// 一升级就等于关掉了检查。
+    #[serde(default = "default_true")]
+    pub check_updates: bool,
+    /// 「忽略此版本」记下的版本号（空 = 不忽略）
+    #[serde(default)]
+    pub skipped_version: String,
+}
+
+fn default_true() -> bool {
+    true
 }
 
 impl Default for Config {
@@ -116,6 +130,8 @@ impl Default for Config {
             skin_library_base: "https://www.mcpeau.com".into(),
             ms_client_id: String::new(),
             terracotta_version: String::new(),
+            check_updates: true,
+            skipped_version: String::new(),
         }
     }
 }

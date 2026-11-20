@@ -131,7 +131,10 @@ pub async fn list_remote(
 ) -> Result<Vec<VersionEntry>, String> {
     let cfg = state.0.lock().unwrap().clone();
     let m = manifest::fetch_manifest(&cfg).await?;
-    let mut v: Vec<VersionEntry> = if include_snapshots {
+    // 不截断：清单 900 多条、JSON 约 150 KB，一次性给前端反而最简单；
+    // 1.7.10 这类老版本排在 700 多位，截断会让它们在「含快照」时彻底消失。
+    // 渲染由前端分批做（每次 200 行 + 显示更多）。
+    let v: Vec<VersionEntry> = if include_snapshots {
         m.versions
     } else {
         m.versions
@@ -139,7 +142,6 @@ pub async fn list_remote(
             .filter(|x| x.kind == "release")
             .collect()
     };
-    v.truncate(600);
     Ok(v)
 }
 

@@ -4,6 +4,7 @@ mod account;
 mod commands;
 mod commands_ext;
 mod config;
+mod curseforge;
 mod download;
 mod game;
 mod glass;
@@ -22,6 +23,7 @@ mod net;
 mod paths;
 mod skins;
 mod terracotta;
+mod update;
 mod yggdrasil;
 
 use tauri::Manager;
@@ -195,6 +197,8 @@ pub fn run() {
             commands_ext::modpack_inspect,
             commands_ext::modpack_import,
             commands_ext::modpack_export,
+            commands_ext::modpack_probe,
+            commands_ext::curseforge_import,
             // ---- 联机 ----
             commands_ext::tc_snapshot,
             commands_ext::tc_bootstrap,
@@ -211,6 +215,9 @@ pub fn run() {
             commands_ext::data_root,
             commands_ext::version_dir,
             commands_ext::app_version,
+            // ---- 更新 ----
+            commands_ext::update_check,
+            commands_ext::update_download,
         ])
         .build(tauri::generate_context!())
         .expect("构建 GlassMC 失败")

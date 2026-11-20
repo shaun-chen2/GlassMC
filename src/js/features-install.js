@@ -418,20 +418,49 @@
       toast('先选一个版本', 'err');
       return;
     }
+    const optEl = document.getElementById('mr-optional');
     ui.busy(btn, true, '安装');
+    ui.showProgress('安装 ' + title);
     try {
-      await invoke('modrinth_install', {
+      const rep = await invoke('modrinth_install', {
         versionId: cur.id,
         projectId,
         game: mrState.game,
         loader: mrState.loader,
         mrVersion: null,
+        includeOptional: !!(optEl && optEl.checked),
       });
-      toast(`已安装 ${title}`, 'ok');
+      const inst = (rep && rep.installed) || [];
+      const skip = (rep && rep.skipped) || [];
+      const fail = (rep && rep.failed) || [];
+      if (inst.length) {
+        toast(`已安装 ${inst.length} 个：${inst.join('、')}`, 'ok');
+      } else if (skip.length) {
+        toast('已经装过了：' + skip.join('、'), 'ok');
+      } else {
+        toast('没有需要下载的文件', 'err');
+      }
+      if (fail.length) {
+        // 前置装不上不算致命错误（比如作者只发了 Forge 版），列出来让用户自己判断
+        ui.openSheet(
+          ui.shell(
+            '部分依赖未安装',
+            `${fail.length} 项需要手动处理`,
+            `<div class="stack" style="gap:8px">${fail
+              .map(
+                (f) =>
+                  `<div class="kv"><span class="k">${ui.escAttr(f.title || f.projectId || '依赖')}</span><span class="v">${ui.escAttr(f.reason)}</span></div>`,
+              )
+              .join('')}</div>`,
+            '<button class="btn" data-sheet-close>知道了</button>',
+          ),
+        );
+      }
       await loadMods(true);
     } catch (e) {
       toast(String(e).split('\n')[0], 'err');
     } finally {
+      ui.hideProgress();
       ui.busy(btn, false);
     }
   }
