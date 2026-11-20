@@ -157,13 +157,18 @@ serde 的 rename 是双向的，序列化时字段名被改回 type，前端读 
 1. 改版本号：`src-tauri/tauri.conf.json`、`src-tauri/Cargo.toml`、
    `Scripts/windows-installer.nsi`（`PRODUCT_VERSION` 与 `PRODUCT_VERSION4`）、
    `src/js/app.js` 的 mock 版本。CI 会校验这四处是否一致。
-2. 更新 `CHANGELOG.md`。
-3. 打 tag 并推送：
+2. 更新 `CHANGELOG.md`，并给 `.github/release-notes/<tag>.md` 写一份中文发布说明
+   （Release 工作流优先用它，没有才回退自动生成）。
+3. 改官网版本号：`docs/index.html` 里 hero 徽章的 `vX.Y.Z` 与下载区的 `GlassMC X.Y.Z`，
+   然后跑 `python3 Scripts/gen-geo.py` 同步 JSON-LD / llms.txt（漏了这步站点会停在旧版本）。
+4. 本地过一遍 `cargo fmt --all --check`、`cargo clippy --all-targets -- -D warnings`、
+   `cargo build --locked`。
+5. 打 tag 并推送：
 
    ```bash
-   git tag v1.3.2 && git push origin v1.3.2
+   git tag -a vX.Y.Z -m "GlassMC X.Y.Z" && git push origin vX.Y.Z
    ```
 
-4. GitHub Actions 的 `Release` 工作流会自动构建三端、统一文件名、生成 SHA-256、
+6. GitHub Actions 的 `Release` 工作流会自动构建三端、统一文件名、生成 SHA-256、
    建 Release 并上传。tag 与 `tauri.conf.json` 版本号不一致会直接失败。
-5. 想先看构建结果不发版：在 Actions 页面手动跑 `Release`，只产出 artifact。
+7. 想先看构建结果不发版：在 Actions 页面手动跑 `Release`，只产出 artifact。

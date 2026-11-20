@@ -13,7 +13,7 @@
 
   // ---------------------------------------------------------------- mock
   const MOCK_STATE = {
-    version: '1.3.2',
+    version: '1.3.3',
     dataRoot: '/Users/demo/Library/Application Support/GlassMC',
     gameDir: '/Users/demo/Library/Application Support/GlassMC/minecraft',
     os: 'osx',

@@ -302,10 +302,12 @@ mod tests {
     #[tokio::test]
     #[ignore]
     async fn reads_latest_release() {
-        std::env::set_var("GLASSMC_VERSION_OVERRIDE", "1.3.1");
+        // 不写死 latest：每发一版，这个测试都应该继续成立
+        std::env::set_var("GLASSMC_VERSION_OVERRIDE", "1.0.0");
         let info = super::check().await.unwrap();
-        assert_eq!(info.latest, "1.3.2");
-        assert_eq!(info.current, "1.3.1");
+        assert_eq!(info.current, "1.0.0");
+        assert!(!info.latest.is_empty(), "没有读到最新版本号");
+        assert!(super::semver_gt(&info.latest, "1.0.0"));
         assert!(info.has_update);
         assert!(!info.asset_url.is_empty(), "没有挑到安装包");
         if cfg!(target_os = "macos") {
