@@ -18,6 +18,21 @@ fn main() {
         }
         return;
     }
+    if let Some(i) = args.iter().position(|a| a == "--launch") {
+        let version = args.get(i + 1).cloned().unwrap_or_default();
+        if version.is_empty() {
+            eprintln!("用法：glassmc --launch <版本 id>");
+            std::process::exit(2);
+        }
+        match glassmc_lib::cli_launch(&version) {
+            Ok(text) => println!("{text}"),
+            Err(e) => {
+                eprintln!("失败：{e}");
+                std::process::exit(1);
+            }
+        }
+        return;
+    }
     if let Some(i) = args.iter().position(|a| a == "--install") {
         let version = args.get(i + 1).cloned().unwrap_or_default();
         if version.is_empty() {

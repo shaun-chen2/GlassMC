@@ -1,7 +1,7 @@
 //! 前端可调用的命令。所有耗时操作都在这里异步执行，避免卡界面。
 
 use serde::Serialize;
-use tauri::{AppHandle, Manager, State};
+use tauri::{AppHandle, Emitter, Manager, State};
 
 use crate::account::{self, Account};
 use crate::config::{self, Config, ConfigState};
@@ -186,7 +186,10 @@ pub async fn launch_game(
     let java = java::best_for(required, &cfg.java_path)
         .ok_or_else(|| "没有找到可用的 Java，请先在设置里指定一个".to_string())?;
     let built = launch::build_command(&version_id, &acc, &java, &cfg).await?;
-    game::spawn(app, &built)
+    let pid = game::spawn(app.clone(), &built)?;
+    // 启动音效 / 外部联动用：失败不影响启动
+    let _ = app.emit("game-launch", &version_id);
+    Ok(pid)
 }
 
 #[tauri::command]

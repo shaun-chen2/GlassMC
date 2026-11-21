@@ -11,6 +11,9 @@
   const TAURI = window.__TAURI__;
   const IS_TAURI = !!TAURI;
 
+  // 动态文案统一走 i18n 表（key 见 locales/app.js）
+  const t = (k, vars) => window.GM.t(k, vars);
+
   // ---------------------------------------------------------------- mock
   const MOCK_STATE = {
     version: '1.3.3',
@@ -96,7 +99,7 @@
       case 'preview_command':
         return {
           program: '/Library/Java/JavaVirtualMachines/temurin-21.jdk/Contents/Home/bin/java',
-          args: ['-Xmx12288M', '-XstartOnFirstThread', '-Djava.library.path=/natives', '-cp', '…（共 214 项）', 'net.minecraft.client.main.Main', '--username', 'Steve'],
+          args: ['-Xmx12288M', '-XstartOnFirstThread', '-Djava.library.path=/natives', '-cp', t('app.mock.cp_omitted', { n: 214 }), 'net.minecraft.client.main.Main', '--username', 'Steve'],
           cwd: MOCK_STATE.gameDir,
           versionId: args.versionId,
           javaVersion: 21,
@@ -164,11 +167,11 @@
         return MOCK_STATE.gameDir + '/mods';
       case 'modrinth_search': {
         const all = [
-          ['sodium', '现代渲染优化，大幅提升帧率', 'jellysquid3', 41200000],
-          ['iris', '光影加载器，支持 OptiFine 光影包', 'coderbot', 18700000],
-          ['jei', '查看物品配方与用途', 'mezz', 33100000],
-          ['create', '机械与自动化', 'simibubi', 15200000],
-          ['jade', '方块信息 HUD', 'snownee', 9800000]
+          ['sodium', t('app.mock.mod_sodium'), 'jellysquid3', 41200000],
+          ['iris', t('app.mock.mod_iris'), 'coderbot', 18700000],
+          ['jei', t('app.mock.mod_jei'), 'mezz', 33100000],
+          ['create', t('app.mock.mod_create'), 'simibubi', 15200000],
+          ['jade', t('app.mock.mod_jade'), 'snownee', 9800000]
         ];
         const start = args.offset || 0;
         const hits = all.slice(start, start + 3).map((x) => ({
@@ -180,7 +183,7 @@
         return [];
       case 'skinlib_page':
         return {
-          items: Array.from({ length: 12 }, (_, i) => ({ tid: i + 1, name: '皮肤 ' + (i + 1), kind: i % 3 === 0 ? 'alex' : 'steve', likes: 100 - i, author: 'user' + i })),
+          items: Array.from({ length: 12 }, (_, i) => ({ tid: i + 1, name: t('app.mock.skin_name', { n: i + 1 }), kind: i % 3 === 0 ? 'alex' : 'steve', likes: 100 - i, author: 'user' + i })),
           page: args.page || 1, lastPage: 3, total: 36
         };
       case 'skinlib_thumb':
@@ -201,7 +204,7 @@
       case 'import_detect':
         return [
           { id: 'hmcl|/Applications/HMCL.app/Contents/Resources/.minecraft', launcher: 'hmcl', name: 'HMCL', rootPath: '/Applications/HMCL.app/Contents/Resources/.minecraft', gameDir: '/Applications/HMCL.app/Contents/Resources/.minecraft', accountCount: 1, versionCount: 4 },
-          { id: 'official|~/Library/Application Support/minecraft', launcher: 'official', name: '官方启动器', rootPath: '~/Library/Application Support/minecraft', gameDir: '~/Library/Application Support/minecraft', accountCount: 0, versionCount: 2 }
+          { id: 'official|~/Library/Application Support/minecraft', launcher: 'official', name: t('app.mock.official_launcher'), rootPath: '~/Library/Application Support/minecraft', gameDir: '~/Library/Application Support/minecraft', accountCount: 0, versionCount: 2 }
         ];
       case 'modpack_list':
         return [];
@@ -291,7 +294,7 @@
     $$('liquid-glass-toggle').forEach((el) => el.setAttribute('scheme', scheme));
     const tierEl = $('#toggle-tier');
     const demo = $('#demo-toggle');
-    if (tierEl) tierEl.textContent = (demo && demo.dataset.glass) || '检测中…';
+    if (tierEl) tierEl.textContent = (demo && demo.dataset.glass) || t('app.chrome.detecting');
   }
 
   function applyAlpha() {
@@ -311,9 +314,9 @@
     $('#env-datadir').title = b.dataRoot;
     $('#env-source').textContent = S.config.downloadBase;
     $('#env-source').title = S.config.downloadBase;
-    $('#env-glass').textContent = b.glassHint === 'liquid' ? '液态玻璃' : '磨砂';
+    $('#env-glass').textContent = b.glassHint === 'liquid' ? t('app.chrome.glass_liquid') : t('app.chrome.glass_frosted');
     const j = b.java && b.java[0];
-    $('#env-java').textContent = j ? 'Java ' + j.version + ' · ' + j.vendor : '未检测到';
+    $('#env-java').textContent = j ? 'Java ' + j.version + ' · ' + j.vendor : t('app.chrome.java_none');
     $('#nav-badge-versions').textContent = String(b.installed.length);
     $('#stat-versions').textContent = String(b.installed.length);
     $('#stat-java').textContent = String((b.java || []).length);
@@ -329,8 +332,8 @@
     } else {
       av.textContent = accountInitial(a.username);
     }
-    $('#account-name').textContent = a.username || '未登录';
-    const map = { offline: '离线账号', msa: '微软正版', microsoft: '微软正版', yggdrasil: '外置登录', mojang: 'Mojang' };
+    $('#account-name').textContent = a.username || t('app.account.not_logged_in');
+    const map = { offline: t('app.account.type_offline'), msa: t('app.account.type_msa'), microsoft: t('app.account.type_msa'), yggdrasil: t('app.account.type_yggdrasil'), mojang: 'Mojang' };
     $('#account-type').textContent = map[a.type] || a.type || '—';
   }
 
@@ -348,11 +351,11 @@
   function versionBadges(v) {
     const out = [];
     if (v.loader) out.push('<span class="badge-pill accent">' + esc(loaderName[v.loader] || v.loader) + '</span>');
-    if (v.isolated) out.push('<span class="badge-pill">版本隔离</span>');
-    if (v.mods > 0) out.push('<span class="badge-pill">' + v.mods + ' 模组</span>');
-    if (!v.jarOk) out.push('<span class="badge-pill danger"><span class="d"></span>缺客户端 jar</span>');
-    if (v.missingLibs > 0) out.push('<span class="badge-pill warn"><span class="d"></span>缺 ' + v.missingLibs + ' 个库</span>');
-    if (v.jarOk && v.missingLibs === 0) out.push('<span class="badge-pill ok"><span class="d"></span>就绪</span>');
+    if (v.isolated) out.push('<span class="badge-pill">' + t('app.badge.isolated') + '</span>');
+    if (v.mods > 0) out.push('<span class="badge-pill">' + t('app.badge.mods', { n: v.mods }) + '</span>');
+    if (!v.jarOk) out.push('<span class="badge-pill danger"><span class="d"></span>' + t('app.badge.no_jar') + '</span>');
+    if (v.missingLibs > 0) out.push('<span class="badge-pill warn"><span class="d"></span>' + t('app.badge.missing_libs', { n: v.missingLibs }) + '</span>');
+    if (v.jarOk && v.missingLibs === 0) out.push('<span class="badge-pill ok"><span class="d"></span>' + t('app.badge.ready') + '</span>');
     return out.join('');
   }
 
@@ -363,14 +366,14 @@
     const heroMeta = $('#hero-meta');
 
     if (!v) {
-      heroTitle.textContent = '还没有装好的版本';
-      heroVer.textContent = '先去「安装」页装一个，或者把已有启动器的数据导入';
+      heroTitle.textContent = t('app.home.empty_title');
+      heroVer.textContent = t('app.home.empty_hint');
       heroMeta.innerHTML = '';
       $('#btn-play').disabled = true;
     } else {
       S.selected = v.id;
-      heroTitle.textContent = v.loader ? (loaderName[v.loader] || v.loader) + ' 整合实例' : '原版游戏';
-      heroVer.textContent = v.id + (v.inherits ? '  ·  继承 ' + v.inherits : '');
+      heroTitle.textContent = v.loader ? t('app.home.instance_title', { loader: loaderName[v.loader] || v.loader }) : t('app.home.vanilla');
+      heroVer.textContent = v.inherits ? t('app.home.with_inherits', { id: v.id, parent: v.inherits }) : v.id;
       heroMeta.innerHTML = versionBadges(v);
       $('#btn-play').disabled = false;
     }
@@ -390,21 +393,21 @@
             <div class="v-meta">${versionBadges(x)}</div>
           </div>
           <div class="v-actions">
-            <button class="btn sm ${x.id === S.selected ? 'primary' : ''}" data-play="${esc(x.id)}">启动</button>
+            <button class="btn sm ${x.id === S.selected ? 'primary' : ''}" data-play="${esc(x.id)}">${t('app.home.play')}</button>
           </div>
         </div>`
           )
           .join('')
-      : '<div class="empty"><span class="big-ico">◌</span><span>暂无已安装版本</span></div>';
-    $('#home-count').textContent = S.installed.length + ' 个';
+      : '<div class="empty"><span class="big-ico">◌</span><span>' + t('app.home.empty_recent') + '</span></div>';
+    $('#home-count').textContent = t('app.home.count', { n: S.installed.length });
   }
 
   // ---------------------------------------------------------------- 渲染：版本
   function renderVersions() {
     const box = $('#versions-list');
-    $('#versions-sub').textContent = S.installed.length + ' 个版本 · ' + (S.boot.dataRoot || '');
+    $('#versions-sub').textContent = t('app.versions.sub', { n: S.installed.length, path: S.boot.dataRoot || '' });
     if (!S.installed.length) {
-      box.innerHTML = '<div class="empty"><span class="big-ico">◌</span><span>versions 目录里没有可用版本</span></div>';
+      box.innerHTML = '<div class="empty"><span class="big-ico">◌</span><span>' + t('app.versions.empty') + '</span></div>';
       return;
     }
     box.innerHTML = S.installed
@@ -416,8 +419,8 @@
           <div class="v-meta">${versionBadges(v)}</div>
         </div>
         <div class="v-actions">
-          <button class="btn sm" data-cmd="${esc(v.id)}">启动参数</button>
-          <button class="btn sm primary" data-play="${esc(v.id)}">启动</button>
+          <button class="btn sm" data-cmd="${esc(v.id)}">${t('app.versions.command')}</button>
+          <button class="btn sm primary" data-play="${esc(v.id)}">${t('app.versions.play')}</button>
         </div>
       </div>`
       )
@@ -445,11 +448,11 @@
           <div class="v-id">${esc(v.id)}</div>
           <div class="v-meta">
             ${kind ? `<span class="badge-pill">${esc(kind)}</span>` : ''}
-            ${has ? '<span class="badge-pill ok"><span class="d"></span>已安装</span>' : ''}
+            ${has ? '<span class="badge-pill ok"><span class="d"></span>' + t('app.install.installed') + '</span>' : ''}
           </div>
         </div>
         <div class="v-actions">
-          <button class="btn sm" ${has ? 'disabled' : ''} data-download="${esc(v.id)}">${has ? '已装' : '下载'}</button>
+          <button class="btn sm" ${has ? 'disabled' : ''} data-download="${esc(v.id)}">${has ? t('app.install.installed_short') : t('app.install.download')}</button>
         </div>
       </div>`;
   }
@@ -460,8 +463,8 @@
     const installed = new Set(S.installed.map((v) => v.id));
 
     if (!S.remote.length) {
-      box.innerHTML = '<div class="empty"><span class="big-ico">◌</span><span>点右上角刷新，拉取可安装的版本</span></div>';
-      if (sub) sub.textContent = '镜像优先，失败自动回退官方源';
+      box.innerHTML = '<div class="empty"><span class="big-ico">◌</span><span>' + t('app.install.empty') + '</span></div>';
+      if (sub) sub.textContent = t('app.install.sub_idle');
       return;
     }
 
@@ -472,8 +475,8 @@
     }
 
     if (!list.length) {
-      box.innerHTML = '<div class="empty"><span class="big-ico">◌</span><span>没有匹配的版本</span></div>';
-      if (sub) sub.textContent = `匹配 0 个 · 共 ${S.remote.length} 个`;
+      box.innerHTML = '<div class="empty"><span class="big-ico">◌</span><span>' + t('app.install.no_match') + '</span></div>';
+      if (sub) sub.textContent = t('app.install.sub_no_match', { total: S.remote.length });
       return;
     }
 
@@ -494,7 +497,7 @@
         box.insertAdjacentHTML('beforeend', '<div class="remote-more" data-more-wrap></div>');
         wrap = box.querySelector('[data-more-wrap]');
       }
-      wrap.innerHTML = `<button class="btn sm" data-remote-more>显示更多（剩余 ${remaining}）</button>`;
+      wrap.innerHTML = `<button class="btn sm" data-remote-more>${t('app.install.more', { n: remaining })}</button>`;
     } else if (wrap) {
       wrap.remove();
     }
@@ -502,8 +505,8 @@
     if (sub) {
       const kw = ($('#remote-filter').value || '').trim();
       sub.textContent = kw
-        ? `匹配 ${list.length} 个 · 已显示 ${to} · 共 ${S.remote.length} 个`
-        : `共 ${S.remote.length} 个版本 · 已显示 ${to}`;
+        ? t('app.install.sub_filtered', { matched: list.length, shown: to, total: S.remote.length })
+        : t('app.install.sub_all', { total: S.remote.length, shown: to });
     }
   }
 
@@ -513,16 +516,20 @@
     const box = $('#mods-list');
     if (!v) {
       $('#mods-sub').textContent = '—';
-      box.innerHTML = '<div class="empty"><span class="big-ico">◌</span><span>先选一个版本</span></div>';
+      box.innerHTML = '<div class="empty"><span class="big-ico">◌</span><span>' + t('app.mods.empty_no_version') + '</span></div>';
       return;
     }
-    $('#mods-sub').textContent = v.id + ' · ' + S.mods.length + ' 个文件' + (v.isolated ? ' · 实例目录' : ' · 全局 mods');
+    $('#mods-sub').textContent = t('app.mods.sub', {
+      id: v.id,
+      n: S.mods.length,
+      scope: v.isolated ? t('app.mods.scope_instance') : t('app.mods.scope_global')
+    });
     $('#nav-badge-mods').textContent = String(S.mods.length);
 
     const kw = ($('#mods-filter').value || '').trim().toLowerCase();
     const list = S.mods.filter((m) => !kw || m.name.toLowerCase().includes(kw));
     if (!list.length) {
-      box.innerHTML = '<div class="empty"><span class="big-ico">◌</span><span>mods 目录是空的</span></div>';
+      box.innerHTML = '<div class="empty"><span class="big-ico">◌</span><span>' + t('app.mods.empty') + '</span></div>';
       return;
     }
     box.innerHTML = list
@@ -542,11 +549,11 @@
     const box = $('#accounts-list');
     const list = S.boot.accounts || [];
     if (!list.length) {
-      box.innerHTML = '<div class="empty"><span class="big-ico">◌</span><span>还没有账号，新建一个离线账号就能进游戏</span></div>';
+      box.innerHTML = '<div class="empty"><span class="big-ico">◌</span><span>' + t('app.account.empty') + '</span></div>';
       return;
     }
     const activeId = S.config.activeAccount;
-    const map = { offline: '离线账号', msa: '微软正版', microsoft: '微软正版', yggdrasil: '外置登录', mojang: 'Mojang' };
+    const map = { offline: t('app.account.type_offline'), msa: t('app.account.type_msa'), microsoft: t('app.account.type_msa'), yggdrasil: t('app.account.type_yggdrasil'), mojang: 'Mojang' };
     box.innerHTML = list
       .map(
         (a) => `
@@ -556,12 +563,12 @@
           <div class="v-id" style="font-size:13px">${esc(a.username)}</div>
           <div class="v-meta">
             <span class="badge-pill ${a.type === 'offline' ? '' : 'accent'}">${esc(map[a.type] || a.type)}</span>
-            ${a.needsReauth ? '<span class="badge-pill warn"><span class="d"></span>需要重新登录</span>' : ''}
-            ${a.id === activeId ? '<span class="badge-pill ok"><span class="d"></span>使用中</span>' : ''}
+            ${a.needsReauth ? '<span class="badge-pill warn"><span class="d"></span>' + t('app.account.reauth') + '</span>' : ''}
+            ${a.id === activeId ? '<span class="badge-pill ok"><span class="d"></span>' + t('app.account.in_use') + '</span>' : ''}
           </div>
         </div>
         <div class="v-actions">
-          ${a.id === activeId ? '' : '<button class="btn sm" data-use-account="' + esc(a.id) + '">使用</button>'}
+          ${a.id === activeId ? '' : '<button class="btn sm" data-use-account="' + esc(a.id) + '">' + t('app.account.use') + '</button>'}
         </div>
       </div>`
       )
@@ -587,7 +594,7 @@
     if (quit) quit.checked = !!c.quitOnClose;
 
     const list = S.boot.java || [];
-    $('#java-count').textContent = list.length + ' 个';
+    $('#java-count').textContent = t('app.settings.java_count', { n: list.length });
     $('#java-list').innerHTML = list.length
       ? list
           .map(
@@ -600,12 +607,12 @@
             </div>
           </div>
           <div class="v-actions">
-            ${i === 0 ? '<span class="badge-pill ok"><span class="d"></span>默认</span>' : ''}
+            ${i === 0 ? '<span class="badge-pill ok"><span class="d"></span>' + t('app.settings.java_default') + '</span>' : ''}
           </div>
         </div>`
           )
           .join('')
-      : '<div class="empty"><span class="big-ico">◌</span><span>没有检测到 Java，可指定路径或安装一个 JDK</span></div>';
+      : '<div class="empty"><span class="big-ico">◌</span><span>' + t('app.settings.java_empty') + '</span></div>';
   }
 
   // ---------------------------------------------------------------- 渲染：全部
@@ -639,7 +646,7 @@
       try {
         S.config = await invoke('save_config', { patch });
       } catch (e) {
-        toast('保存失败：' + e, 'err');
+        toast(t('app.toast.save_failed', { msg: e }), 'err');
       }
     }, 200);
   }
@@ -691,12 +698,15 @@
       apply(info);
       if (force) {
         const hint = $('#update-hint');
-        if (hint) hint.textContent = info.hasUpdate ? `发现 v${info.latest}` : `已是最新（v${info.current}）`;
-        toast(info.hasUpdate ? `发现新版本 v${info.latest}` : '已经是最新版本', 'ok');
+        if (hint)
+          hint.textContent = info.hasUpdate
+            ? t('app.update.hint_found', { version: info.latest })
+            : t('app.update.hint_latest', { version: info.current });
+        toast(info.hasUpdate ? t('app.toast.update_found', { version: info.latest }) : t('app.toast.update_latest'), 'ok');
       }
     } catch (e) {
       // 启动时的静默检查失败不该打扰用户（断网、GitHub 抽风都很常见）
-      if (force) toast('检查更新失败：' + String(e).split('\n')[0], 'err');
+      if (force) toast(t('app.toast.update_failed', { msg: String(e).split('\n')[0] }), 'err');
       else console.debug('[update]', e);
     }
   }
@@ -705,14 +715,14 @@
     if (!S.update) return;
     const ui = window.GM && window.GM.ui;
     if (btn) btn.disabled = true;
-    if (ui) ui.showProgress('下载 GlassMC v' + S.update.latest);
+    if (ui) ui.showProgress(t('app.update.downloading', { version: S.update.latest }));
     try {
       const path = await invoke('update_download');
       if (ui) {
-        ui.updateProgress({ frac: 1, label: '下载完成' });
+        ui.updateProgress({ frac: 1, label: t('app.update.download_done') });
         setTimeout(() => ui.hideProgress(), 500);
       }
-      toast('已保存到 ' + path, 'ok');
+      toast(t('app.toast.saved_to', { path }), 'ok');
       // dmg 会直接被挂载；Windows 上是打开 exe
       invoke('open_path', { path }).catch(() => {});
     } catch (e) {
@@ -738,9 +748,9 @@
     try {
       S.installed = await invoke('scan_versions');
       renderAll();
-      toast('已重新扫描', 'ok');
+      toast(t('app.toast.rescanned'), 'ok');
     } catch (e) {
-      toast('扫描失败：' + e, 'err');
+      toast(t('app.toast.scan_failed', { msg: e }), 'err');
     }
   }
 
@@ -749,18 +759,21 @@
     S.remoteLoading = true;
     const btn = $('#btn-load-remote');
     btn.disabled = true;
-    btn.innerHTML = '<span class="spinner"></span> 拉取中';
+    btn.innerHTML = '<span class="spinner"></span> ' + t('app.install.fetching');
     try {
       S.remote = await invoke('list_remote', { includeSnapshots: $('#chk-snapshots').checked });
       renderRemote(true);
       const releases = S.remote.filter((v) => (v.kind || v.type) === 'release').length;
-      toast(`已获取 ${S.remote.length} 个版本（正式 ${releases} · 其它 ${S.remote.length - releases}）`, 'ok');
+      toast(
+        t('app.toast.remote_loaded', { total: S.remote.length, release: releases, other: S.remote.length - releases }),
+        'ok'
+      );
     } catch (e) {
-      toast('拉取失败：' + e, 'err');
+      toast(t('app.toast.remote_failed', { msg: e }), 'err');
     } finally {
       S.remoteLoading = false;
       btn.disabled = false;
-      btn.textContent = '刷新列表';
+      btn.textContent = t('app.install.refresh');
     }
   }
 
@@ -770,14 +783,14 @@
     S.selected = id;
     localStorage.setItem('glassmc.selected', id);
     openLog(true);
-    setRunning(true, '启动中…');
+    setRunning(true, t('app.log.starting'));
     try {
       const pid = await invoke('launch_game', { versionId: id });
       setRunning(true, 'PID ' + pid);
-      toast('已启动 ' + id, 'ok');
+      toast(t('app.toast.launched', { id }), 'ok');
     } catch (e) {
       setRunning(false);
-      appendLog('err', '启动失败：' + String(e));
+      appendLog('err', t('app.log.launch_failed', { msg: String(e) }));
       toast(String(e).split('\n')[0], 'err');
     }
   }
@@ -792,7 +805,7 @@
       c.args.forEach((a, i) => {
         appendLog('out', '  ' + a + (i === c.args.length - 1 ? '' : ' \\'));
       });
-      $('#log-state').textContent = 'classpath ' + c.classpathCount + ' 项 · 缺失 ' + c.missingFiles + ' · Java ' + c.javaVersion;
+      $('#log-state').textContent = t('app.log.command_state', { count: c.classpathCount, missing: c.missingFiles, java: c.javaVersion });
     } catch (e) {
       toast(String(e).split('\n')[0], 'err');
     }
@@ -818,15 +831,15 @@
     S.running = on;
     const chip = $('#tb-status');
     chip.classList.toggle('live', on);
-    $('#tb-status-text').textContent = on ? text || '运行中' : '空闲';
-    $('#log-state').textContent = on ? '运行中' : '未启动';
+    $('#tb-status-text').textContent = on ? text || t('app.log.running') : t('app.log.idle');
+    $('#log-state').textContent = on ? t('app.log.running') : t('app.log.stopped');
     const btn = $('#btn-play');
     if (btn) {
       btn.disabled = on;
       btn.classList.toggle('primary', !on);
       btn.innerHTML = on
-        ? '<span class="spinner"></span> 游戏运行中'
-        : '<svg viewBox="0 0 16 16" fill="currentColor"><path d="M4.4 2.6l8.2 5.4-8.2 5.4z"/></svg> 启动游戏';
+        ? '<span class="spinner"></span> ' + t('app.log.running_btn')
+        : '<svg viewBox="0 0 16 16" fill="currentColor"><path d="M4.4 2.6l8.2 5.4-8.2 5.4z"/></svg> ' + t('app.home.play_btn');
     }
   }
 
@@ -867,7 +880,7 @@
       const dl = e.target.closest('[data-download]');
       if (dl && !dl.disabled) {
         if (window.__GM_INSTALL) window.__GM_INSTALL(dl.dataset.download, dl);
-        else toast('安装模块未加载', 'err');
+        else toast(t('app.toast.install_not_loaded'), 'err');
         return;
       }
       const useAcc = e.target.closest('[data-use-account]');
@@ -878,7 +891,7 @@
             S.boot.activeAccount = (S.boot.accounts || []).find((a) => a.id === cfg.activeAccount) || S.boot.activeAccount;
             renderChrome();
             renderAccounts();
-            toast('已切换账号', 'ok');
+            toast(t('app.toast.account_switched'), 'ok');
           })
           .catch((err) => toast(String(err), 'err'));
         return;
@@ -905,7 +918,7 @@
       invoke('kill_game')
         .then(() => {
           setRunning(false);
-          toast('已结束进程', 'ok');
+          toast(t('app.toast.killed'), 'ok');
         })
         .catch((e) => toast(String(e), 'err'));
 
@@ -935,14 +948,14 @@
 
     // 账号页
     $('#btn-add-offline').onclick = () => {
-      const name = prompt('离线账号名字（3-16 位）');
+      const name = prompt(t('app.account.prompt_offline_name'));
       if (!name) return;
       invoke('create_offline_account', { name })
         .then((list) => {
           S.boot.accounts = list;
           renderAccounts();
           renderChrome();
-          toast('已创建离线账号 ' + name, 'ok');
+          toast(t('app.toast.account_created', { name }), 'ok');
         })
         .catch((e) => toast(String(e), 'err'));
     };
@@ -1001,7 +1014,7 @@
         if (!S.update) return;
         saveConfig({ skippedVersion: S.update.latest });
         paintUpdate();
-        toast('已忽略 v' + S.update.latest, 'ok');
+        toast(t('app.toast.update_skipped', { version: S.update.latest }), 'ok');
       };
     }
 
@@ -1021,13 +1034,19 @@
     try {
       S.boot = await invoke('bootstrap');
     } catch (e) {
-      toast('初始化失败：' + e, 'err');
+      toast(t('app.toast.boot_failed', { msg: e }), 'err');
       console.error(e);
       return;
     }
     S.config = S.boot.config;
     S.installed = S.boot.installed || [];
     S.running = !!S.boot.running;
+
+    // 语言要在第一帧渲染前定下来，否则会先闪一遍中文
+    if (window.GM && window.GM.i18n) {
+      window.GM.i18n.setLocale(window.GM.i18n.resolve(S.config.language));
+      window.GM.i18n.apply(document);
+    }
 
     // 平台的观感差异（圆角半径等）让 CSS 自己判断，别在样式里猜 userAgent
     document.documentElement.dataset.os = String(S.boot.os || '').toLowerCase();
@@ -1040,15 +1059,17 @@
     bind();
 
     if (S.running) {
-      setRunning(true, '运行中');
+      setRunning(true, t('app.log.running'));
       openLog(true);
     }
+
+    if (!S.running) setRunning(false);
 
     await listen('game-log', (ev) => appendLog(ev.payload.stream, ev.payload.line));
     await listen('game-exit', (ev) => {
       setRunning(false);
-      appendLog('out', '—— 游戏已退出（code ' + ev.payload + '）——');
-      toast('游戏已退出', '');
+      appendLog('out', t('app.log.game_exit', { code: ev.payload }));
+      toast(t('app.toast.game_exit'), '');
     });
 
     // 液态玻璃开关的档位是异步算出来的
@@ -1059,7 +1080,7 @@
 
     if (!IS_TAURI) {
       document.documentElement.classList.add('preview');
-      document.title = 'GlassMC（浏览器预览）';
+      document.title = t('app.chrome.preview_title');
       console.info('[GlassMC] 当前是浏览器 mock 模式');
     }
 

@@ -11,6 +11,7 @@ mod glass;
 mod importer;
 mod injector;
 mod install;
+mod instance;
 mod java;
 mod javadl;
 mod launch;
@@ -88,6 +89,41 @@ pub fn cli_install(version_id: &str) -> Result<String, String> {
         }
         Ok(out)
     })
+}
+
+/// 命令行直接启动某个实例（桌面快捷方式用）：`glassmc --launch 新蒸程1.7`
+pub fn cli_launch(version_id: &str) -> Result<String, String> {
+    let cfg = config::load();
+    let acc = commands::resolve_account(&cfg);
+    let rt = tokio::runtime::Runtime::new().map_err(|e| e.to_string())?;
+    let built = rt.block_on(async {
+        let required = launch::required_java(version_id, &cfg).await;
+        let java = java::best_for(required, &cfg.java_path)
+            .ok_or_else(|| "没有找到可用的 Java，请先在设置里指定一个".to_string())?;
+        launch::build_command(version_id, &acc, &java, &cfg).await
+    })?;
+
+    // 快捷方式启动没有窗口，输出直接追加到同一个日志文件，出问题还能查
+    let log_path = paths::paths().log_dir.join("game-latest.log");
+    if let Some(parent) = log_path.parent() {
+        let _ = std::fs::create_dir_all(parent);
+    }
+    let out = std::fs::OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open(&log_path)
+        .map_err(|e| format!("打开日志文件失败：{e}"))?;
+    let err = out
+        .try_clone()
+        .map_err(|e| format!("复制日志句柄失败：{e}"))?;
+    let mut cmd = std::process::Command::new(&built.program);
+    cmd.args(&built.args)
+        .current_dir(&built.cwd)
+        .stdin(std::process::Stdio::null())
+        .stdout(out)
+        .stderr(err);
+    let child = cmd.spawn().map_err(|e| format!("启动游戏失败：{e}"))?;
+    Ok(format!("已启动 {}（PID {}）", version_id, child.id()))
 }
 
 /// 命令行自测联机组件：下载 → 拉起守护进程 → 读 /state → 关闭。
@@ -218,6 +254,13 @@ pub fn run() {
             // ---- 更新 ----
             commands_ext::update_check,
             commands_ext::update_download,
+            // ---- 实例运维 ----
+            commands_ext::copy_instance,
+            commands_ext::set_instance_category,
+            commands_ext::set_instance_archived,
+            commands_ext::create_instance_shortcut,
+            // ---- 界面资源 ----
+            commands_ext::media_data_url,
         ])
         .build(tauri::generate_context!())
         .expect("构建 GlassMC 失败")

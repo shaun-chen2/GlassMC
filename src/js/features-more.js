@@ -7,6 +7,7 @@
   const ui = GM.ui;
   let invoke = null;
   let S = null;
+  const t = (k, v) => window.GM.t(k, v);
   const toast = (m, k) => GM.ui.toast(m, k);
 
   // ================================================================ 导入
@@ -16,11 +17,16 @@
   async function scanLaunchers(btn) {
     if (impState.loading) return;
     impState.loading = true;
-    ui.busy(btn, true, '扫描中');
+    ui.busy(btn, true, t('more.busy.scanning'));
     try {
       impState.list = await invoke('import_detect');
       renderImportList();
-      toast(impState.list.length ? `找到 ${impState.list.length} 个可导入来源` : '没有找到其它启动器的游戏目录', impState.list.length ? 'ok' : '');
+      toast(
+        impState.list.length
+          ? t('more.import.found', { n: impState.list.length })
+          : t('more.import.not_found'),
+        impState.list.length ? 'ok' : '',
+      );
     } catch (e) {
       toast(String(e), 'err');
     } finally {
@@ -33,39 +39,40 @@
     const box = document.getElementById('import-list');
     if (!box) return;
     const count = document.getElementById('import-count');
-    if (count) count.textContent = impState.list.length ? impState.list.length + ' 个' : '—';
+    if (count) count.textContent = impState.list.length ? t('more.count', { n: impState.list.length }) : '—';
     if (!impState.list.length) {
-      box.innerHTML = '<div class="empty"><span class="big-ico">◌</span><span>点右上角「扫描本机启动器」</span></div>';
+      box.innerHTML = `<div class="empty"><span class="big-ico">◌</span><span>${t('more.import.empty')}</span></div>`;
       return;
     }
-    const LAUNCHER = { official: '官方启动器', hmcl: 'HMCL', prism: 'Prism / MultiMC' };
+    // 启动器名称：HMCL 与 Prism / MultiMC 是产品名，不翻译
+    const LAUNCHER = { official: 'more.launcher.official', hmcl: 'HMCL', prism: 'Prism / MultiMC' };
     box.innerHTML = impState.list
       .map(
         (c) => `<div class="vrow">
         <div class="v-main">
-          <div class="v-id" style="font-size:12.5px">${ui.escAttr(LAUNCHER[c.launcher] || c.launcher)}</div>
+          <div class="v-id" style="font-size:12.5px">${ui.escAttr(t(LAUNCHER[c.launcher] || c.launcher))}</div>
           <div class="v-meta"><span class="mono-dim" style="max-width:520px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${ui.escAttr(c.gameDir)}</span></div>
-          <div class="v-meta"><span class="tag">${c.versionCount} 个版本</span>
-            ${c.accountCount ? `<span class="tag">${c.accountCount} 个账号</span>` : ''}</div>
+          <div class="v-meta"><span class="tag">${t('more.import.versions', { n: c.versionCount })}</span>
+            ${c.accountCount ? `<span class="tag">${t('more.import.accounts', { n: c.accountCount })}</span>` : ''}</div>
         </div>
-        <div class="v-actions"><button class="btn sm" data-import="${ui.escAttr(c.launcher)}" data-dir="${ui.escAttr(c.gameDir)}">导入</button></div>
+        <div class="v-actions"><button class="btn sm" data-import="${ui.escAttr(c.launcher)}" data-dir="${ui.escAttr(c.gameDir)}">${t('more.btn.import')}</button></div>
       </div>`,
       )
       .join('');
   }
 
   async function runImport(launcher, gameDir, btn) {
-    ui.showProgress('正在导入游戏数据');
-    ui.busy(btn, true, '导入中');
+    ui.showProgress(t('more.import.progress_title'));
+    ui.busy(btn, true, t('more.busy.importing'));
     try {
-      ui.updateProgress({ frac: 0.3, label: '复制版本 / 模组 / 存档…' });
+      ui.updateProgress({ frac: 0.3, label: t('more.import.progress_copy') });
       const n = await invoke('import_run', { launcher, gameDir });
-      ui.updateProgress({ frac: 1, label: '完成' });
+      ui.updateProgress({ frac: 1, label: t('common.done') });
       setTimeout(() => ui.hideProgress(), 600);
       S.installed = await invoke('scan_versions');
       S.boot.accounts = await invoke('accounts_all');
       GM.app.renderAll();
-      toast(`导入完成，本地共 ${n} 个版本`, 'ok');
+      toast(t('more.toast.import_done', { n }), 'ok');
       GM.app.go('versions');
     } catch (e) {
       ui.hideProgress();
@@ -91,38 +98,38 @@
       const loaderKey = ['neoforge', 'forge', 'fabric-loader', 'quilt-loader'].find((k) => deps[k]);
       ui.openSheet(
         ui.shell(
-          ui.escAttr(idx.name || '整合包'),
+          ui.escAttr(idx.name || t('more.pack.fallback_name')),
           ui.escAttr(idx.summary || ''),
           `<div class="stack" style="gap:8px">
-             <div class="kv"><span class="k">来源</span><span class="v">${isCf ? 'CurseForge .zip' : 'Modrinth .mrpack'}</span></div>
-             <div class="kv"><span class="k">Minecraft</span><span class="v">${ui.escAttr(deps.minecraft || '未声明')}</span></div>
-             <div class="kv"><span class="k">加载器</span><span class="v">${ui.escAttr(loaderKey ? `${loaderKey} ${deps[loaderKey]}` : '原版')}</span></div>
-             <div class="kv"><span class="k">模组文件</span><span class="v">${mods} 个</span></div>
-             <div class="kv"><span class="k">总文件</span><span class="v">${(idx.files || []).length} 项</span></div>
-             <div class="mini-note">导入会铺到 versions/ 下的独立实例，不影响其它版本。${
-               isCf ? 'CurseForge 包需要联网查询每个文件的名字。' : ''
+             <div class="kv"><span class="k">${t('more.pack.field.source')}</span><span class="v">${isCf ? 'CurseForge .zip' : 'Modrinth .mrpack'}</span></div>
+             <div class="kv"><span class="k">Minecraft</span><span class="v">${ui.escAttr(deps.minecraft || t('more.pack.undeclared'))}</span></div>
+             <div class="kv"><span class="k">${t('more.pack.field.loader')}</span><span class="v">${ui.escAttr(loaderKey ? `${loaderKey} ${deps[loaderKey]}` : t('more.pack.vanilla'))}</span></div>
+             <div class="kv"><span class="k">${t('more.pack.field.mods')}</span><span class="v">${t('more.pack.count', { n: mods })}</span></div>
+             <div class="kv"><span class="k">${t('more.pack.field.total')}</span><span class="v">${t('more.pack.items', { n: (idx.files || []).length })}</span></div>
+             <div class="mini-note">${t('more.pack.note')}${
+               isCf ? t('more.pack.note_cf') : ''
              }</div>
            </div>`,
-          `<button class="btn" data-sheet-close>取消</button>
-           <button class="btn primary" id="mrpack-ok">导入</button>`,
+          `<button class="btn" data-sheet-close>${t('common.cancel')}</button>
+           <button class="btn primary" id="mrpack-ok">${t('more.btn.import')}</button>`,
         ),
       );
       document.getElementById('mrpack-ok').onclick = async () => {
         const btn = document.getElementById('mrpack-ok');
-        ui.busy(btn, true, '导入中');
-        ui.showProgress('导入整合包');
+        ui.busy(btn, true, t('more.busy.importing'));
+        ui.showProgress(t('more.pack.progress_title'));
         try {
           if (isCf) {
             const out = await invoke('curseforge_import', { path, name: null });
-            ui.updateProgress({ frac: 1, label: '文件就绪' });
+            ui.updateProgress({ frac: 1, label: t('more.pack.progress_files') });
             ui.closeSheet();
             if (out && out.failed) {
-              toast(`整合包已导入，${out.failed} 个文件没能下载`, 'err');
+              toast(t('more.toast.pack_partial', { n: out.failed }), 'err');
             }
             await afterModpackImport(out.record);
           } else {
             const rec = await invoke('modpack_import', { path, name: null });
-            ui.updateProgress({ frac: 1, label: '文件就绪' });
+            ui.updateProgress({ frac: 1, label: t('more.pack.progress_files') });
             ui.closeSheet();
             await afterModpackImport(rec);
           }
@@ -154,31 +161,36 @@
     const missingJar = detail && !detail.jarOk;
 
     if (!missingGame && !missingLibs && !missingJar) {
-      toast(`整合包「${rec.name}」已就绪`, 'ok');
+      toast(t('more.toast.pack_ready', { name: rec.name }), 'ok');
       return;
     }
 
     ui.openSheet(
       ui.shell(
-        '整合包文件已铺好',
-        '还差游戏本体或加载器',
-        `<div class="mini-note">「${ui.escAttr(rec.name)}」需要 Minecraft ${ui.escAttr(rec.gameVersion)}${
-          rec.loader ? ` + ${ui.escAttr(rec.loader)} ${ui.escAttr(rec.loaderVersion)}` : ''
-        }。可以现在补齐，也可以稍后自己装。</div>
+        t('more.pack.ready_title'),
+        t('more.pack.ready_sub'),
+        `<div class="mini-note">${t('more.pack.need_note', {
+          name: ui.escAttr(rec.name),
+          game: ui.escAttr(rec.gameVersion),
+          loader: rec.loader ? ` + ${ui.escAttr(rec.loader)} ${ui.escAttr(rec.loaderVersion)}` : '',
+        })}</div>
          <div class="section-gap stack" style="gap:8px">
            ${
              missingGame
-               ? `<button class="btn primary" id="mp-install-game">安装 Minecraft ${ui.escAttr(rec.gameVersion)}</button>`
+               ? `<button class="btn primary" id="mp-install-game">${t('more.pack.btn_install_game', { game: ui.escAttr(rec.gameVersion) })}</button>`
                : ''
            }
            ${
              rec.loader && (missingGame || missingJar || missingLibs)
-               ? `<button class="btn" id="mp-install-loader">安装 ${ui.escAttr(rec.loader)} ${ui.escAttr(rec.loaderVersion)}</button>`
+               ? `<button class="btn" id="mp-install-loader">${t('more.pack.btn_install_loader', {
+                   loader: ui.escAttr(rec.loader),
+                   version: ui.escAttr(rec.loaderVersion),
+                 })}</button>`
                : ''
            }
-           <button class="btn" id="mp-install-deps">只补齐依赖库与资源</button>
+           <button class="btn" id="mp-install-deps">${t('more.pack.btn_deps')}</button>
          </div>`,
-        `<button class="btn" data-sheet-close>稍后</button>`,
+        `<button class="btn" data-sheet-close>${t('more.btn.later')}</button>`,
       ),
     );
 
@@ -193,18 +205,18 @@
     if (l) {
       l.onclick = async () => {
         ui.closeSheet();
-        ui.showProgress(`安装 ${rec.loader} ${rec.loaderVersion}`);
+        ui.showProgress(t('more.pack.progress_install_loader', { loader: rec.loader, version: rec.loaderVersion }));
         try {
           await invoke('install_loader', {
             kind: rec.loader,
             game: rec.gameVersion,
             loaderVersion: rec.loaderVersion,
           });
-          ui.updateProgress({ frac: 1, label: '完成' });
+          ui.updateProgress({ frac: 1, label: t('common.done') });
           setTimeout(() => ui.hideProgress(), 600);
           S.installed = await invoke('scan_versions');
           GM.app.renderAll();
-          toast('加载器已装好', 'ok');
+          toast(t('more.toast.loader_ready'), 'ok');
         } catch (e) {
           ui.hideProgress();
           toast(String(e).split('\n')[0], 'err');
@@ -221,15 +233,15 @@
   }
 
   async function installVersionFlow(versionId) {
-    ui.showProgress('安装 ' + versionId);
+    ui.showProgress(t('more.pack.progress_install_ver', { id: versionId }));
     try {
       const res = await invoke('install_version', { versionId });
-      ui.updateProgress({ frac: 1, label: '完成' });
+      ui.updateProgress({ frac: 1, label: t('common.done') });
       setTimeout(() => ui.hideProgress(), 600);
       S.installed = await invoke('scan_versions');
       GM.app.renderAll();
-      if (res.failed && res.failed.length) toast(`有 ${res.failed.length} 个文件失败`, '');
-      else toast('安装完成', 'ok');
+      if (res.failed && res.failed.length) toast(t('more.toast.files_failed', { n: res.failed.length }), '');
+      else toast(t('more.toast.installed'), 'ok');
     } catch (e) {
       ui.hideProgress();
       toast(String(e).split('\n')[0], 'err');
@@ -239,23 +251,23 @@
   async function exportModpack() {
     const cur = GM.app.selectedVersion();
     if (!cur) {
-      toast('先选一个版本', 'err');
+      toast(t('more.toast.pick_version'), 'err');
       return;
     }
     const dest = await invoke('pick_save_path', { defaultName: `${cur.id}.mrpack` });
     if (!dest) return;
-    ui.showProgress('导出整合包');
+    ui.showProgress(t('more.pack.export_title'));
     try {
-      ui.updateProgress({ frac: 0.4, label: '收集模组与配置…' });
+      ui.updateProgress({ frac: 0.4, label: t('more.pack.export_collect') });
       const msg = await invoke('modpack_export', {
         versionId: cur.id,
         destination: dest,
         name: cur.id,
-        summary: '由 GlassMC 导出',
+        summary: t('more.pack.export_summary'),
       });
-      ui.updateProgress({ frac: 1, label: '完成' });
+      ui.updateProgress({ frac: 1, label: t('common.done') });
       setTimeout(() => ui.hideProgress(), 600);
-      toast('已导出：' + msg, 'ok');
+      toast(t('more.toast.exported', { msg }), 'ok');
       loadPacks();
     } catch (e) {
       ui.hideProgress();
@@ -278,11 +290,11 @@
           <div class="v-main">
             <div class="v-id" style="font-size:12.5px">${ui.escAttr(p.name)}</div>
             <div class="v-meta"><span class="tag">MC ${ui.escAttr(p.gameVersion)}</span>
-              <span class="tag">${ui.escAttr(p.loader || '原版')} ${ui.escAttr(p.loaderVersion || '')}</span>
-              <span class="tag">${p.modCount} 个模组</span>
+              <span class="tag">${ui.escAttr(p.loader || t('more.pack.vanilla'))} ${ui.escAttr(p.loaderVersion || '')}</span>
+              <span class="tag">${t('more.pack.mods', { n: p.modCount })}</span>
               <span class="mono-dim">${ui.escAttr(p.instanceId)}</span></div>
           </div>
-          <div class="v-actions"><button class="btn sm" data-play="${ui.escAttr(p.instanceId)}">启动</button></div>
+          <div class="v-actions"><button class="btn sm" data-play="${ui.escAttr(p.instanceId)}">${t('more.btn.launch')}</button></div>
         </div>`,
         )
         .join('');
@@ -296,31 +308,32 @@
   let tcSnap = null;
   let tcTimer = null;
 
+  // 下面三张表存的是文案 key，渲染时再翻译；未知状态回退到原始值
   const STATE_TEXT = {
-    waiting: '待机中',
-    'host-scanning': '正在扫描本机局域网房间…',
-    'host-starting': '正在创建隧道…',
-    'host-ok': '房间已开启',
-    'guest-connecting': '正在连接房主…',
-    'guest-ok': '已加入房间',
-    exception: '出现异常',
+    waiting: 'more.tc.state.waiting',
+    'host-scanning': 'more.tc.state.host_scanning',
+    'host-starting': 'more.tc.state.host_starting',
+    'host-ok': 'more.tc.state.host_ok',
+    'guest-connecting': 'more.tc.state.guest_connecting',
+    'guest-ok': 'more.tc.state.guest_ok',
+    exception: 'more.tc.state.exception',
   };
 
   const DIFF_TEXT = {
-    EASIEST: '网络很好，几乎秒连',
-    SIMPLE: '网络良好，通常几秒内连上',
-    MEDIUM: '网络一般，可能要等十几秒',
-    TOUGH: '网络较严格，可能需要多试几次',
-    UNKNOWN: '正在评估网络环境',
+    EASIEST: 'more.tc.diff.easiest',
+    SIMPLE: 'more.tc.diff.simple',
+    MEDIUM: 'more.tc.diff.medium',
+    TOUGH: 'more.tc.diff.tough',
+    UNKNOWN: 'more.tc.diff.unknown',
   };
 
   const EXC_TEXT = {
-    0: '无法连接到房主：房间可能已关闭，或对方网络不稳定。',
-    1: '与房主的连接中断了。',
-    2: '本机的隧道组件崩溃了，请重试一次。',
-    3: '房主那边的隧道组件崩溃了，请让房主重新创建房间。',
-    4: '房主的游戏服务器已关闭（可能退出了存档），房间自动解散。',
-    5: '房间协调协议出错，请稍后重试。',
+    0: 'more.tc.exc.0',
+    1: 'more.tc.exc.1',
+    2: 'more.tc.exc.2',
+    3: 'more.tc.exc.3',
+    4: 'more.tc.exc.4',
+    5: 'more.tc.exc.5',
   };
 
   function renderTc() {
@@ -331,59 +344,59 @@
     if (ver) ver.textContent = s && s.ready ? `${s.version}${s.easytier ? ' · ' + s.easytier : ''}` : '—';
 
     if (!s) {
-      box.innerHTML = '<div class="empty"><span class="big-ico">◌</span><span>还没有连接组件</span></div>';
+      box.innerHTML = `<div class="empty"><span class="big-ico">◌</span><span>${t('more.tc.empty')}</span></div>`;
       renderMembers([]);
       return;
     }
     if (s.preparing) {
-      box.innerHTML = `<div class="empty"><span class="spinner"></span><span>${ui.escAttr(s.prepareText || '正在准备…')}</span></div>`;
+      box.innerHTML = `<div class="empty"><span class="spinner"></span><span>${ui.escAttr(s.prepareText || t('more.tc.preparing'))}</span></div>`;
       renderMembers([]);
       return;
     }
     if (!s.ready) {
       box.innerHTML = `<div class="empty"><span class="big-ico">◌</span><span>${
-        s.error ? ui.escAttr(s.error) : '点右上角「启动联机组件」'
+        s.error ? ui.escAttr(s.error) : t('more.tc.hint_boot')
       }</span></div>`;
       renderMembers([]);
       return;
     }
     const st = s.state || {};
     const state = st.state || 'waiting';
-    const label = STATE_TEXT[state] || state;
+    const label = STATE_TEXT[state] ? t(STATE_TEXT[state]) : state;
     const isOk = state === 'host-ok' || state === 'guest-ok';
     const isExc = state === 'exception';
     const parts = [];
     parts.push(
       `<div class="hstack">
         <span class="badge-pill ${isExc ? 'danger' : isOk ? 'ok' : 'accent'}"><span class="d"></span>${ui.escAttr(label)}</span>
-        ${st.difficulty ? `<span class="tag">${ui.escAttr(DIFF_TEXT[st.difficulty] || st.difficulty)}</span>` : ''}
+        ${st.difficulty ? `<span class="tag">${ui.escAttr(t(DIFF_TEXT[st.difficulty] || st.difficulty))}</span>` : ''}
       </div>`,
     );
     if (st.room) {
       parts.push(
         `<div class="code-box" style="padding:11px 13px">
            <div>
-             <div class="mini-note">邀请码</div>
+             <div class="mini-note">${t('more.tc.room_code')}</div>
              <div class="code" style="font-size:15px">${ui.escAttr(st.room)}</div>
            </div>
-           <button class="btn sm" id="tc-copy" style="margin-left:auto">复制</button>
+           <button class="btn sm" id="tc-copy" style="margin-left:auto">${t('common.copy')}</button>
          </div>`,
       );
     }
     if (isExc && st.type != null) {
-      parts.push(`<div class="mini-note" style="color:var(--danger)">${ui.escAttr(EXC_TEXT[st.type] || '出现了未知错误。')}</div>`);
+      parts.push(`<div class="mini-note" style="color:var(--danger)">${ui.escAttr(t(EXC_TEXT[st.type] || 'more.tc.unknown_error'))}</div>`);
     }
     if (st.url) {
-      parts.push(`<div class="kv"><span class="k">隧道地址</span><span class="v mono-dim">${ui.escAttr(st.url)}</span></div>`);
+      parts.push(`<div class="kv"><span class="k">${t('more.tc.tunnel_url')}</span><span class="v mono-dim">${ui.escAttr(st.url)}</span></div>`);
     }
-    parts.push('<div class="mini-note">房主需要先在游戏里「对局域网开放」，再点创建房间。</div>');
+    parts.push(`<div class="mini-note">${t('more.tc.note')}</div>`);
     box.innerHTML = parts.join('');
     const copy = document.getElementById('tc-copy');
     if (copy) {
       copy.onclick = () => {
         navigator.clipboard.writeText(st.room || '').then(
-          () => toast('邀请码已复制', 'ok'),
-          () => toast('复制失败，请手动选中', 'err'),
+          () => toast(t('more.tc.copied'), 'ok'),
+          () => toast(t('more.tc.copy_failed'), 'err'),
         );
       };
     }
@@ -393,12 +406,12 @@
   function renderMembers(list) {
     const box = document.getElementById('tc-members');
     const count = document.getElementById('tc-count');
-    if (count) count.textContent = list.length ? list.length + ' 人' : '—';
+    if (count) count.textContent = list.length ? t('more.tc.members', { n: list.length }) : '—';
     if (!box) return;
     box.innerHTML = list.length
       ? list
           .map((p) => {
-            const role = p.kind === 'HOST' ? '房主' : p.kind === 'GUEST' ? '成员' : '本机';
+            const role = p.kind === 'HOST' ? t('more.tc.role.host') : p.kind === 'GUEST' ? t('more.tc.role.guest') : t('more.tc.role.local');
             return `<div class="vrow">
               <div class="acc-avatar">${ui.escAttr((p.name || '?').slice(0, 1).toUpperCase())}</div>
               <div class="v-main">
@@ -409,18 +422,18 @@
             </div>`;
           })
           .join('')
-      : '<div class="empty"><span class="big-ico">◌</span><span>房间里还没有人</span></div>';
+      : `<div class="empty"><span class="big-ico">◌</span><span>${t('more.tc.empty_members')}</span></div>`;
   }
 
   async function tcBootstrap(btn) {
-    ui.busy(btn, true, '启动中');
-    tcSnap = Object.assign({}, tcSnap, { preparing: true, prepareText: '正在准备联机组件…' });
+    ui.busy(btn, true, t('more.busy.starting'));
+    tcSnap = Object.assign({}, tcSnap, { preparing: true, prepareText: t('more.tc.preparing') });
     renderTc();
     try {
       tcSnap = await invoke('tc_bootstrap');
       renderTc();
       startTcPolling();
-      toast('联机组件已就绪', 'ok');
+      toast(t('more.toast.tc_ready'), 'ok');
     } catch (e) {
       tcSnap = await invoke('tc_snapshot').catch(() => tcSnap);
       renderTc();
@@ -472,17 +485,17 @@
     if (!box) return;
     const list = S.config.authServers || [];
     const count = document.getElementById('srv-count');
-    if (count) count.textContent = list.length + ' 个';
+    if (count) count.textContent = t('more.count', { n: list.length });
     box.innerHTML = list
       .map(
         (s) => `<div class="vrow">
         <div class="v-main">
           <div class="v-id" style="font-size:12px">${ui.escAttr(s.name)}</div>
           <div class="v-meta"><span class="mono-dim">${ui.escAttr(s.baseUrl)}</span>
-            ${s.isPreset ? '<span class="tag">内置</span>' : ''}</div>
+            ${s.isPreset ? `<span class="tag">${t('more.srv.builtin')}</span>` : ''}</div>
         </div>
         <div class="v-actions">${
-          s.isPreset ? '' : `<button class="btn sm danger" data-del-srv="${ui.escAttr(s.id)}">删除</button>`
+          s.isPreset ? '' : `<button class="btn sm danger" data-del-srv="${ui.escAttr(s.id)}">${t('common.delete')}</button>`
         }</div>
       </div>`,
       )
@@ -494,8 +507,8 @@
     const state = document.getElementById('injector-state');
     try {
       const s = await invoke('injector_status');
-      if (el) el.textContent = s.installed ? `已就绪${s.version ? ' · ' + s.version : ''}` : '未安装';
-      if (state) state.textContent = s.installed ? '注入器已就绪' : '注入器未安装';
+      if (el) el.textContent = s.installed ? t('more.injector.ready', { ver: s.version ? ` · ${s.version}` : '' }) : t('more.injector.missing');
+      if (state) state.textContent = s.installed ? t('more.injector.ok') : t('more.injector.state_missing');
     } catch (e) {
       if (el) el.textContent = '—';
     }
@@ -518,7 +531,7 @@
           const btn = document.getElementById('btn-play');
           window.GM.app.go('home');
           invoke('launch_game', { versionId: p.dataset.play })
-            .then(() => toast('已启动', 'ok'))
+            .then(() => toast(t('more.toast.launched'), 'ok'))
             .catch((err) => toast(String(err).split('\n')[0], 'err'));
           return;
         }
@@ -542,20 +555,20 @@
         tcTimer = null;
         tcSnap = await invoke('tc_snapshot').catch(() => null);
         renderTc();
-        toast('组件已关闭', 'ok');
+        toast(t('more.toast.tc_closed'), 'ok');
       };
       document.getElementById('btn-tc-create').onclick = (e) =>
-        tcAction(() => invoke('tc_create', { player: tcPlayer() }), e.currentTarget, '创建');
+        tcAction(() => invoke('tc_create', { player: tcPlayer() }), e.currentTarget, t('more.tc.create'));
       document.getElementById('btn-tc-join').onclick = (e) => {
         const room = (document.getElementById('tc-room') || {}).value || '';
         if (!room.trim()) {
-          toast('先填邀请码', 'err');
+          toast(t('more.tc.need_room'), 'err');
           return;
         }
-        tcAction(() => invoke('tc_join', { room: room.trim(), player: tcPlayer() }), e.currentTarget, '加入');
+        tcAction(() => invoke('tc_join', { room: room.trim(), player: tcPlayer() }), e.currentTarget, t('more.tc.join'));
       };
       document.getElementById('btn-tc-leave').onclick = (e) =>
-        tcAction(() => invoke('tc_leave'), e.currentTarget, '返回');
+        tcAction(() => invoke('tc_leave'), e.currentTarget, t('more.tc.leave'));
     }
 
     const srvBox = document.getElementById('srv-list');
@@ -568,7 +581,7 @@
           const list = await invoke('remove_auth_server', { id: del.dataset.delSrv });
           S.config.authServers = list;
           renderServers();
-          toast('已删除', 'ok');
+          toast(t('more.toast.deleted'), 'ok');
         } catch (err) {
           toast(String(err), 'err');
         }
@@ -586,7 +599,7 @@
           document.getElementById('srv-name').value = '';
           document.getElementById('srv-base').value = '';
           renderServers();
-          toast('已添加', 'ok');
+          toast(t('more.toast.added'), 'ok');
         } catch (e) {
           toast(String(e), 'err');
         }
@@ -597,11 +610,11 @@
     if (inj && !inj.dataset.bound) {
       inj.dataset.bound = '1';
       inj.onclick = async (e) => {
-        ui.busy(e.currentTarget, true, '下载中');
+        ui.busy(e.currentTarget, true, t('more.busy.downloading'));
         try {
           await invoke('injector_install', { force: true });
           await renderInjector();
-          toast('注入器已就绪', 'ok');
+          toast(t('more.injector.ok'), 'ok');
         } catch (err) {
           toast(String(err), 'err');
         } finally {
@@ -621,7 +634,7 @@
         S.config.javaPath = path;
         S.boot.java = await invoke('list_java_all');
         renderSettingsExtra();
-        toast('已指定 java', 'ok');
+        toast(t('more.toast.java_set'), 'ok');
       };
     }
     const clearJava = document.getElementById('btn-clear-java');
@@ -632,7 +645,7 @@
         S.config.javaPath = '';
         S.boot.java = await invoke('list_java_all');
         renderSettingsExtra();
-        toast('已恢复自动挑选', 'ok');
+        toast(t('more.toast.java_auto'), 'ok');
       };
     }
 
@@ -690,13 +703,17 @@
     if (mc && document.activeElement !== mc) mc.value = S.config.msClientId || '';
     const jm = document.getElementById('java-manual');
     if (jm) {
-      jm.textContent = S.config.javaPath ? '已手动指定：' + S.config.javaPath : '当前自动挑选版本最接近的 Java';
+      jm.textContent = S.config.javaPath
+        ? t('more.java.manual', { path: S.config.javaPath })
+        : t('more.java.auto');
     }
   }
 
   HOOKS.render.push(() => {
     if (!S) return;
     renderSettingsExtra();
+    // 注入器状态文案是动态的，切语言后也要跟着重画
+    renderInjector();
   });
 
   GM.importer = { scan: scanLaunchers, pick: pickModpack, export: exportModpack };

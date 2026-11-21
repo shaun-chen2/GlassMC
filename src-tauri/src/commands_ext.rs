@@ -12,6 +12,7 @@ use crate::curseforge;
 use crate::importer;
 use crate::injector;
 use crate::install::{self, InstallOutcome, VersionDetail};
+use crate::instance;
 use crate::java::{self, JavaInstall};
 use crate::javadl;
 use crate::loader;
@@ -60,8 +61,27 @@ pub async fn version_detail(
 }
 
 #[tauri::command]
-pub fn delete_version(version_id: String) -> Result<(), String> {
-    install::delete_version(&version_id)
+pub fn delete_version(state: State<'_, ConfigState>, version_id: String) -> Result<(), String> {
+    install::delete_version(&version_id)?;
+    // 实例没了，分类与归档记录也一起清掉，免得配置文件越积越长
+    if let Ok(mut guard) = state.0.lock() {
+        let old = (
+            guard.instance_categories.len(),
+            guard.archived_instances.len(),
+        );
+        guard.instance_categories.remove(&version_id);
+        guard.archived_instances.retain(|x| x != &version_id);
+        if old
+            != (
+                guard.instance_categories.len(),
+                guard.archived_instances.len(),
+            )
+        {
+            let next = guard.clone();
+            let _ = config::save(&next);
+        }
+    }
+    Ok(())
 }
 
 #[tauri::command]
@@ -553,6 +573,26 @@ pub async fn pick_file(app: AppHandle, kind: String) -> Option<String> {
         "pack" => ("整合包".into(), vec!["mrpack".into(), "zip".into()]),
         "png" => ("皮肤图片".into(), vec!["png".into()]),
         "jar" => ("Jar 文件".into(), vec!["jar".into()]),
+        "image" => (
+            "图片".into(),
+            vec![
+                "png".into(),
+                "jpg".into(),
+                "jpeg".into(),
+                "webp".into(),
+                "gif".into(),
+            ],
+        ),
+        "audio" => (
+            "音频".into(),
+            vec![
+                "mp3".into(),
+                "m4a".into(),
+                "ogg".into(),
+                "wav".into(),
+                "flac".into(),
+            ],
+        ),
         "java" => ("Java 可执行文件".into(), vec![]),
         _ => ("所有文件".into(), vec![]),
     };
@@ -640,4 +680,96 @@ pub async fn update_check() -> Result<crate::update::UpdateInfo, String> {
 #[tauri::command]
 pub async fn update_download(app: AppHandle) -> Result<String, String> {
     crate::update::download(Some(app)).await
+}
+
+// ---------------------------------------------------------------- 实例运维
+
+/// 复制实例（大目录，放到阻塞线程里跑，进度仍走 progress 事件）。
+#[tauri::command]
+pub async fn copy_instance(
+    app: AppHandle,
+    version_id: String,
+    name: String,
+    with_mods: bool,
+    with_saves: bool,
+) -> Result<String, String> {
+    tokio::task::spawn_blocking(move || {
+        instance::copy_instance(Some(app), &version_id, &name, with_mods, with_saves)
+    })
+    .await
+    .map_err(|e| format!("复制任务失败：{e}"))?
+}
+
+#[tauri::command]
+pub fn set_instance_category(
+    state: State<'_, ConfigState>,
+    version_id: String,
+    category: String,
+) -> Result<crate::config::Config, String> {
+    instance::set_category(&state, &version_id, &category)
+}
+
+#[tauri::command]
+pub fn set_instance_archived(
+    state: State<'_, ConfigState>,
+    version_id: String,
+    archived: bool,
+) -> Result<crate::config::Config, String> {
+    instance::set_archived(&state, &version_id, archived)
+}
+
+#[tauri::command]
+pub async fn create_instance_shortcut(version_id: String) -> Result<String, String> {
+    tokio::task::spawn_blocking(move || instance::create_shortcut(&version_id))
+        .await
+        .map_err(|e| format!("创建快捷方式失败：{e}"))?
+}
+
+/// 把图片 / 音频读成 data URL，供自定义背景与启动音效使用。
+///
+/// 走命令而不是 asset 协议：不需要放开 `$HOME` 这类文件作用域，
+/// 也能顺手限制大小与类型。
+#[tauri::command]
+pub fn media_data_url(path: String, max_bytes: Option<u64>) -> Result<String, String> {
+    use base64::Engine as _;
+    let p = std::path::PathBuf::from(&path);
+    let meta = std::fs::metadata(&p).map_err(|e| format!("读取文件失败：{e}"))?;
+    if !meta.is_file() {
+        return Err("选择的不是一个文件".into());
+    }
+    let limit = max_bytes
+        .unwrap_or(12 * 1024 * 1024)
+        .clamp(64 * 1024, 64 * 1024 * 1024);
+    if meta.len() > limit {
+        return Err(format!(
+            "文件太大（{:.1} MB），上限 {:.0} MB",
+            meta.len() as f64 / 1048576.0,
+            limit as f64 / 1048576.0
+        ));
+    }
+    let ext = p
+        .extension()
+        .and_then(|x| x.to_str())
+        .unwrap_or("")
+        .to_lowercase();
+    let mime = match ext.as_str() {
+        "png" => "image/png",
+        "jpg" | "jpeg" => "image/jpeg",
+        "webp" => "image/webp",
+        "gif" => "image/gif",
+        "bmp" => "image/bmp",
+        "avif" => "image/avif",
+        "mp3" => "audio/mpeg",
+        "m4a" => "audio/mp4",
+        "aac" => "audio/aac",
+        "ogg" | "oga" => "audio/ogg",
+        "wav" => "audio/wav",
+        "flac" => "audio/flac",
+        _ => return Err("只支持 png / jpg / webp / gif 或 mp3 / m4a / ogg / wav".into()),
+    };
+    let bytes = std::fs::read(&p).map_err(|e| format!("读取文件失败：{e}"))?;
+    Ok(format!(
+        "data:{mime};base64,{}",
+        base64::engine::general_purpose::STANDARD.encode(bytes)
+    ))
 }

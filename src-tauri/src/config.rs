@@ -103,10 +103,43 @@ pub struct Config {
     /// 「忽略此版本」记下的版本号（空 = 不忽略）
     #[serde(default)]
     pub skipped_version: String,
+    /// 界面语言：zh-CN / en-US / system
+    #[serde(default = "default_language")]
+    pub language: String,
+    /// 界面缩放 0.85 ~ 1.25
+    #[serde(default = "default_scale")]
+    pub ui_scale: f64,
+    /// 自定义背景图（绝对路径，空 = 无）
+    #[serde(default)]
+    pub background_image: String,
+    /// 背景图不透明度 0.05 ~ 0.8
+    #[serde(default = "default_bg_opacity")]
+    pub background_opacity: f64,
+    /// 启动音效（绝对路径，空 = 关）
+    #[serde(default)]
+    pub launch_sound: String,
+    /// 实例分类：实例 id -> 分类名
+    #[serde(default)]
+    pub instance_categories: std::collections::HashMap<String, String>,
+    /// 已归档的实例 id（仍留在 versions/ 里，只是默认列表不显示）
+    #[serde(default)]
+    pub archived_instances: Vec<String>,
 }
 
 fn default_true() -> bool {
     true
+}
+
+fn default_language() -> String {
+    "zh-CN".to_string()
+}
+
+fn default_scale() -> f64 {
+    1.0
+}
+
+fn default_bg_opacity() -> f64 {
+    0.35
 }
 
 impl Default for Config {
@@ -132,6 +165,13 @@ impl Default for Config {
             terracotta_version: String::new(),
             check_updates: true,
             skipped_version: String::new(),
+            language: "zh-CN".into(),
+            ui_scale: 1.0,
+            background_image: String::new(),
+            background_opacity: 0.35,
+            launch_sound: String::new(),
+            instance_categories: std::collections::HashMap::new(),
+            archived_instances: Vec::new(),
         }
     }
 }

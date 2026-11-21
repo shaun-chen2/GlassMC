@@ -7,6 +7,7 @@
 (function () {
   const HOOKS = (window.__GM_HOOKS = window.__GM_HOOKS || { ready: [], nav: [], render: [] });
   const GM = (window.GM = window.GM || {});
+  const t = (k, v) => window.GM.t(k, v);
 
   // app.js 在三个时机回调这些函数
   window.__GM_ON_READY = () => HOOKS.ready.forEach((f) => f());
@@ -38,15 +39,15 @@
           <h3>${title}</h3>
           ${sub ? `<div class="sub">${sub}</div>` : ''}
         </div>
-        <button class="btn sm icon x" data-sheet-close>✕</button>
+        <button class="btn sm icon x" data-sheet-close aria-label="${GM.t('html.titlebar.close')}">✕</button>
       </div>
       ${body}
       ${foot ? `<div class="sheet-foot">${foot}</div>` : ''}`;
     },
     showProgress(title) {
       const card = document.getElementById('progress-card');
-      document.getElementById('pg-title').textContent = title || '正在处理';
-      document.getElementById('pg-label').textContent = '准备中…';
+      document.getElementById('pg-title').textContent = title || t('acc.progress.working');
+      document.getElementById('pg-label').textContent = t('acc.progress.preparing');
       document.getElementById('pg-pct').textContent = '0%';
       document.getElementById('pg-bar').style.width = '0%';
       card.classList.add('on');
@@ -69,7 +70,7 @@
       if (on) {
         if (!btn.dataset._html) btn.dataset._html = btn.innerHTML;
         btn.disabled = true;
-        btn.innerHTML = '<span class="spinner"></span> ' + (text || '处理中');
+        btn.innerHTML = '<span class="spinner"></span> ' + (text || t('acc.busy.working'));
       } else {
         btn.disabled = false;
         if (btn.dataset._html) {
@@ -178,35 +179,37 @@
 
   // ---------------------------------------------------------------- 账号页
 
+  // 账号类型的文案 key；Mojang 是产品名，不翻译
   const TYPE_LABEL = {
-    offline: '离线账号',
-    msa: '微软正版',
-    microsoft: '微软正版',
-    yggdrasil: '外置登录',
+    offline: 'acc.type.offline',
+    msa: 'acc.type.msa',
+    microsoft: 'acc.type.msa',
+    yggdrasil: 'acc.type.yggdrasil',
     mojang: 'Mojang',
   };
 
   function accountRow(a, activeId) {
     const kind = a.type || a.kind || 'offline';
     const isActive = a.id === activeId;
+    const kindLabel = TYPE_LABEL[kind] ? t(TYPE_LABEL[kind]) : kind;
     return `<div class="vrow">
       <div class="acc-avatar" data-avatar="${GM.ui.escAttr(a.id)}">${GM.ui.escAttr((a.username || '?').slice(0, 1).toUpperCase())}</div>
       <div class="v-main">
         <div class="v-id" style="font-size:13px">${GM.ui.escAttr(a.username)}
-          ${isActive ? '<span class="badge-pill ok" style="margin-left:6px"><span class="d"></span>使用中</span>' : ''}
+          ${isActive ? `<span class="badge-pill ok" style="margin-left:6px"><span class="d"></span>${t('acc.badge.active')}</span>` : ''}
         </div>
         <div class="v-meta">
-          <span class="badge-pill ${kind === 'offline' ? '' : 'accent'}">${TYPE_LABEL[kind] || kind}</span>
-          ${a.needsReauth ? '<span class="badge-pill warn"><span class="d"></span>需要重新登录</span>' : ''}
-          ${a.skinLocalPath ? '<span class="tag">本地皮肤</span>' : ''}
+          <span class="badge-pill ${kind === 'offline' ? '' : 'accent'}">${kindLabel}</span>
+          ${a.needsReauth ? `<span class="badge-pill warn"><span class="d"></span>${t('acc.badge.reauth')}</span>` : ''}
+          ${a.skinLocalPath ? `<span class="tag">${t('acc.badge.local_skin')}</span>` : ''}
           ${a.uuid ? `<span class="mono-dim">${GM.ui.escAttr(String(a.uuid).replace(/-/g, '').slice(0, 12))}</span>` : ''}
         </div>
       </div>
       <div class="v-actions">
-        ${isActive ? '' : `<button class="btn sm" data-use-acc="${GM.ui.escAttr(a.id)}">使用</button>`}
-        ${kind === 'offline' ? '' : `<button class="btn sm" data-refresh-acc="${GM.ui.escAttr(a.id)}">刷新</button>`}
-        ${kind === 'offline' ? '' : `<button class="btn sm" data-sync-skin="${GM.ui.escAttr(a.id)}">同步皮肤</button>`}
-        <button class="btn sm danger" data-del-acc="${GM.ui.escAttr(a.id)}">删除</button>
+        ${isActive ? '' : `<button class="btn sm" data-use-acc="${GM.ui.escAttr(a.id)}">${t('acc.btn.use')}</button>`}
+        ${kind === 'offline' ? '' : `<button class="btn sm" data-refresh-acc="${GM.ui.escAttr(a.id)}">${t('acc.btn.refresh')}</button>`}
+        ${kind === 'offline' ? '' : `<button class="btn sm" data-sync-skin="${GM.ui.escAttr(a.id)}">${t('acc.btn.sync_skin')}</button>`}
+        <button class="btn sm danger" data-del-acc="${GM.ui.escAttr(a.id)}">${t('common.delete')}</button>
       </div>
     </div>`;
   }
@@ -221,8 +224,7 @@
       return (a.username || '').localeCompare(b.username || '');
     });
     if (!list.length) {
-      box.innerHTML =
-        '<div class="empty"><span class="big-ico">◌</span><span>还没有账号。离线账号可以直接进游戏，正版与外置登录会同步皮肤。</span></div>';
+      box.innerHTML = `<div class="empty"><span class="big-ico">◌</span><span>${t('acc.empty.accounts')}</span></div>`;
       return;
     }
     const activeId = S.config.activeAccount;
@@ -249,15 +251,15 @@
   async function offlineSheet() {
     ui.openSheet(
       ui.shell(
-        '新建离线账号',
-        '离线账号的 UUID 由名字计算得出，换个名字就是另一个人',
+        t('acc.offline.title'),
+        t('acc.offline.sub'),
         `<div class="field">
-           <div class="lbl">游戏内名字</div>
-           <input type="text" id="offline-name" placeholder="3-16 位，建议用英文" value="">
+           <div class="lbl">${t('acc.field.game_name')}</div>
+           <input type="text" id="offline-name" placeholder="${t('acc.offline.name_ph')}" value="">
          </div>
          <div class="mini-note" id="offline-err"></div>`,
-        `<button class="btn" data-sheet-close>取消</button>
-         <button class="btn primary" id="offline-ok">创建并使用</button>`,
+        `<button class="btn" data-sheet-close>${t('common.cancel')}</button>
+         <button class="btn primary" id="offline-ok">${t('acc.offline.create')}</button>`,
       ),
     );
     const input = document.getElementById('offline-name');
@@ -265,18 +267,18 @@
     const submit = async () => {
       const name = input.value.trim();
       if (!name) {
-        document.getElementById('offline-err').textContent = '名字不能为空';
+        document.getElementById('offline-err').textContent = t('acc.offline.err_empty');
         return;
       }
       const btn = document.getElementById('offline-ok');
-      ui.busy(btn, true, '创建中');
+      ui.busy(btn, true, t('acc.offline.creating'));
       try {
         const list = await invoke('create_offline_account', { name });
         S.boot.accounts = list;
         S.config = await invoke('get_config');
         ui.closeSheet();
         GM.app.renderAll();
-        GM.ui.toast('已创建离线账号 ' + name, 'ok');
+        GM.ui.toast(t('acc.toast.created', { name }), 'ok');
       } catch (e) {
         document.getElementById('offline-err').textContent = String(e);
         ui.busy(btn, false);
@@ -294,24 +296,24 @@
     );
     ui.openSheet(
       ui.shell(
-        '外置登录',
-        'LittleSkin / MiniSkins / Ely.by 或自建 Yggdrasil 服务',
+        t('acc.ygg.title'),
+        t('acc.ygg.sub'),
         `<div class="field">
-           <div class="lbl">认证服务器</div>
+           <div class="lbl">${t('acc.field.auth_server')}</div>
            <select id="ygg-server">${servers.join('')}</select>
-           <div class="desc"><a href="#" id="ygg-add" style="color:var(--accent-hi)">添加自定义服务器</a></div>
+           <div class="desc"><a href="#" id="ygg-add" style="color:var(--accent-hi)">${t('acc.ygg.add_custom')}</a></div>
          </div>
          <div class="field">
-           <div class="lbl">邮箱 / 用户名</div>
+           <div class="lbl">${t('acc.field.email_user')}</div>
            <input type="text" id="ygg-user" autocomplete="username">
          </div>
          <div class="field">
-           <div class="lbl">密码</div>
+           <div class="lbl">${t('acc.field.password')}</div>
            <input type="password" id="ygg-pass" autocomplete="current-password">
          </div>
          <div class="mini-note" id="ygg-err"></div>`,
-        `<button class="btn" data-sheet-close>取消</button>
-         <button class="btn primary" id="ygg-ok">登录</button>`,
+        `<button class="btn" data-sheet-close>${t('common.cancel')}</button>
+         <button class="btn primary" id="ygg-ok">${t('acc.btn.login')}</button>`,
       ),
     );
     document.getElementById('ygg-add').onclick = (e) => {
@@ -325,11 +327,11 @@
       const password = document.getElementById('ygg-pass').value;
       const err = document.getElementById('ygg-err');
       if (!username || !password) {
-        err.textContent = '用户名和密码都要填';
+        err.textContent = t('acc.ygg.err_empty');
         return;
       }
       const btn = document.getElementById('ygg-ok');
-      ui.busy(btn, true, '登录中');
+      ui.busy(btn, true, t('acc.ygg.logging'));
       err.textContent = '';
       try {
         const res = await invoke('ygg_login', { serverId, username, password });
@@ -338,7 +340,7 @@
         S.config = await invoke('get_config');
         ui.closeSheet();
         GM.app.renderAll();
-        GM.ui.toast('已登录：' + res.account.username, 'ok');
+        GM.ui.toast(t('acc.toast.logged_in', { name: res.account.username }), 'ok');
       } catch (e) {
         err.textContent = String(e);
         ui.busy(btn, false);
@@ -353,13 +355,13 @@
   async function addServerSheet() {
     ui.openSheet(
       ui.shell(
-        '添加认证服务器',
-        '填写 Yggdrasil API 基址，例如 https://example.com/api/yggdrasil',
-        `<div class="field"><div class="lbl">名称</div><input type="text" id="srv-new-name" placeholder="我的皮肤站"></div>
-         <div class="field"><div class="lbl">API 基址</div><input type="text" id="srv-new-base" placeholder="https://example.com/api/yggdrasil"></div>
+        t('acc.srv.title'),
+        t('acc.srv.sub'),
+        `<div class="field"><div class="lbl">${t('acc.field.name')}</div><input type="text" id="srv-new-name" placeholder="${t('acc.srv.name_ph')}"></div>
+         <div class="field"><div class="lbl">${t('acc.field.api_base')}</div><input type="text" id="srv-new-base" placeholder="https://example.com/api/yggdrasil"></div>
          <div class="mini-note" id="srv-new-err"></div>`,
-        `<button class="btn" data-sheet-close>取消</button>
-         <button class="btn primary" id="srv-new-ok">添加</button>`,
+        `<button class="btn" data-sheet-close>${t('common.cancel')}</button>
+         <button class="btn primary" id="srv-new-ok">${t('acc.btn.add')}</button>`,
       ),
     );
     document.getElementById('srv-new-ok').onclick = async () => {
@@ -371,7 +373,7 @@
         S.config.authServers = list;
         ui.closeSheet();
         GM.app.renderSettings();
-        GM.ui.toast('已添加 ' + name, 'ok');
+        GM.ui.toast(t('acc.toast.server_added', { name }), 'ok');
         yggSheet();
       } catch (e) {
         err.textContent = String(e);
@@ -384,10 +386,10 @@
   async function msSheet() {
     ui.openSheet(
       ui.shell(
-        '微软正版登录',
-        '需要先在浏览器里完成一次授权',
-        `<div id="ms-body"><div class="empty"><span class="spinner"></span><span>正在申请登录代码…</span></div></div>`,
-        `<button class="btn" data-sheet-close id="ms-cancel">关闭</button>`,
+        t('acc.ms.title'),
+        t('acc.ms.sub'),
+        `<div id="ms-body"><div class="empty"><span class="spinner"></span><span>${t('acc.ms.requesting')}</span></div></div>`,
+        `<button class="btn" data-sheet-close id="ms-cancel">${t('common.close')}</button>`,
       ),
     );
     document.getElementById('ms-cancel').onclick = () => {
@@ -401,12 +403,12 @@
       body.innerHTML = `
         <div class="code-box">
           <div>
-            <div class="mini-note">在浏览器里输入这个代码</div>
+            <div class="mini-note">${t('acc.ms.enter_code')}</div>
             <div class="code">${GM.ui.escAttr(code.userCode)}</div>
           </div>
-          <button class="btn sm" id="ms-open" style="margin-left:auto">打开授权页面</button>
+          <button class="btn sm" id="ms-open" style="margin-left:auto">${t('acc.ms.open_page')}</button>
         </div>
-        <div class="mini-note section-gap" id="ms-status">等待授权…</div>`;
+        <div class="mini-note section-gap" id="ms-status">${t('acc.ms.waiting')}</div>`;
       document.getElementById('ms-open').onclick = () =>
         invoke('open_url', { url: code.verificationUri }).catch(() => {});
       invoke('open_url', { url: code.verificationUri }).catch(() => {});
@@ -427,7 +429,7 @@
             S.config = await invoke('get_config');
             ui.closeSheet();
             GM.app.renderAll();
-            GM.ui.toast('登录成功：' + (r.account ? r.account.username : ''), 'ok');
+            GM.ui.toast(t('acc.toast.login_ok', { name: r.account ? r.account.username : '' }), 'ok');
           } else if (r.status === 'slow_down') {
             interval += 5000;
             clearInterval(msTimer);
@@ -448,7 +450,7 @@
     } catch (e) {
       document.getElementById('ms-body').innerHTML =
         `<div class="mini-note" style="color:var(--danger)">${GM.ui.escAttr(String(e))}</div>
-         <div class="mini-note section-gap">登录没有真正发起，请检查网络连接。</div>`;
+         <div class="mini-note section-gap">${t('acc.ms.not_started')}</div>`;
     }
   }
 
@@ -459,28 +461,28 @@
   async function skinlibSheet(page = 1) {
     ui.openSheet(
       ui.shell(
-        '皮肤库',
-        GM.ui.escAttr(S.config.skinLibraryBase || '') + ' · 点击套用到当前账号',
-        `<div id="skin-grid-wrap"><div class="empty"><span class="spinner"></span><span>正在加载…</span></div></div>
+        t('acc.skinlib.title'),
+        GM.ui.escAttr(S.config.skinLibraryBase || '') + ' · ' + t('acc.skinlib.sub'),
+        `<div id="skin-grid-wrap"><div class="empty"><span class="spinner"></span><span>${t('acc.skinlib.loading')}</span></div></div>
          <div class="hstack section-gap" style="justify-content:center">
-           <button class="btn sm" id="skin-prev">上一页</button>
+           <button class="btn sm" id="skin-prev">${t('acc.skinlib.prev')}</button>
            <span class="mono-dim" id="skin-pageno">1 / 1</span>
-           <button class="btn sm" id="skin-next">下一页</button>
+           <button class="btn sm" id="skin-next">${t('acc.skinlib.next')}</button>
          </div>`,
-        `<button class="btn" data-sheet-close>关闭</button>`,
+        `<button class="btn" data-sheet-close>${t('common.close')}</button>`,
       ),
       { wide: true },
     );
     const render = async (p) => {
       const wrap = document.getElementById('skin-grid-wrap');
       if (!wrap) return;
-      wrap.innerHTML = '<div class="empty"><span class="spinner"></span><span>正在加载…</span></div>';
+      wrap.innerHTML = `<div class="empty"><span class="spinner"></span><span>${t('acc.skinlib.loading')}</span></div>`;
       try {
         const res = await invoke('skinlib_page', { page: p });
         skinPage = { page: res.page, last: res.lastPage };
         document.getElementById('skin-pageno').textContent = `${res.page} / ${res.lastPage}`;
         if (!res.items.length) {
-          wrap.innerHTML = '<div class="empty"><span class="big-ico">◌</span><span>这一页没有皮肤</span></div>';
+          wrap.innerHTML = `<div class="empty"><span class="big-ico">◌</span><span>${t('acc.skinlib.empty')}</span></div>`;
           return;
         }
         wrap.innerHTML = `<div class="skin-grid">${res.items
@@ -488,7 +490,7 @@
             (it) => `<div class="skin-cell" data-tid="${it.tid}">
               <canvas class="skin-face" data-face="${it.tid}" width="64" height="64"></canvas>
               <div class="nm" title="${GM.ui.escAttr(it.name)}">${GM.ui.escAttr(it.name)}</div>
-              <div class="au">${GM.ui.escAttr(it.author || '匿名')} · ${it.kind === 'alex' ? 'Alex' : 'Steve'}</div>
+              <div class="au">${GM.ui.escAttr(it.author || t('acc.skinlib.anon'))} · ${it.kind === 'alex' ? 'Alex' : 'Steve'}</div>
             </div>`,
           )
           .join('')}</div>`;
@@ -519,7 +521,7 @@
       if (!cell) return;
       const acc = activeAccount();
       if (!acc) {
-        GM.ui.toast('先创建一个账号', 'err');
+        GM.ui.toast(t('acc.toast.no_account'), 'err');
         return;
       }
       const tid = Number(cell.dataset.tid);
@@ -529,7 +531,7 @@
         skinCache.delete(acc.id);
         S.boot.accounts = await invoke('accounts_all');
         GM.app.renderAll();
-        GM.ui.toast('已套用皮肤', 'ok');
+        GM.ui.toast(t('acc.toast.skin_applied'), 'ok');
       } catch (err) {
         GM.ui.toast(String(err), 'err');
       } finally {
@@ -558,7 +560,7 @@
           S.boot.activeAccount = (S.boot.accounts || []).find((a) => a.id === S.config.activeAccount) || null;
           GM.app.renderChrome();
           GM.app.renderAll();
-          GM.ui.toast('已切换账号', 'ok');
+          GM.ui.toast(t('acc.toast.switched'), 'ok');
         } catch (err) {
           GM.ui.toast(String(err), 'err');
         }
@@ -567,12 +569,12 @@
       const del = e.target.closest('[data-del-acc]');
       if (del) {
         const acc = (S.boot.accounts || []).find((a) => a.id === del.dataset.delAcc);
-        confirmSheet(`删除账号「${acc ? acc.username : ''}」？`, '只删除本机记录，站点上的账号不受影响。', async () => {
+        confirmSheet(t('acc.confirm.del_title', { name: acc ? acc.username : '' }), t('acc.confirm.del_sub'), async () => {
           try {
             S.boot.accounts = await invoke('remove_account', { id: del.dataset.delAcc });
             S.config = await invoke('get_config');
             GM.app.renderAll();
-            GM.ui.toast('已删除', 'ok');
+            GM.ui.toast(t('acc.toast.deleted'), 'ok');
           } catch (err) {
             GM.ui.toast(String(err), 'err');
           }
@@ -581,13 +583,13 @@
       }
       const rf = e.target.closest('[data-refresh-acc]');
       if (rf) {
-        ui.busy(rf, true, '刷新');
+        ui.busy(rf, true, t('acc.busy.refresh'));
         try {
           const acc = await invoke('refresh_account', { id: rf.dataset.refreshAcc });
           S.boot.accounts = await invoke('accounts_all');
           skinCache.delete(acc.id);
           GM.app.renderAll();
-          GM.ui.toast('令牌已刷新', 'ok');
+          GM.ui.toast(t('acc.toast.refreshed'), 'ok');
         } catch (err) {
           GM.ui.toast(String(err), 'err');
         } finally {
@@ -597,7 +599,7 @@
       }
       const sy = e.target.closest('[data-sync-skin]');
       if (sy) {
-        ui.busy(sy, true, '同步');
+        ui.busy(sy, true, t('acc.busy.sync'));
         try {
           const acc = await invoke('sync_account_skin', { id: sy.dataset.syncSkin });
           S.boot.accounts = await invoke('accounts_all');
@@ -609,7 +611,7 @@
             /* 忽略：站点可能仍返回旧贴图 */
           }
           GM.app.renderAll();
-          GM.ui.toast('皮肤已同步', 'ok');
+          GM.ui.toast(t('acc.toast.skin_synced'), 'ok');
         } catch (err) {
           GM.ui.toast(String(err), 'err');
         } finally {
@@ -622,8 +624,8 @@
 
   function confirmSheet(title, desc, onOk) {
     ui.openSheet(
-      ui.shell(title, desc, `<div class="mini-note">这个操作不可撤销。</div>`, 
-        `<button class="btn" data-sheet-close>取消</button><button class="btn danger" id="confirm-ok">确认</button>`),
+      ui.shell(title, desc, `<div class="mini-note">${t('acc.confirm.irreversible')}</div>`,
+        `<button class="btn" data-sheet-close>${t('common.cancel')}</button><button class="btn danger" id="confirm-ok">${t('common.confirm')}</button>`),
     );
     document.getElementById('confirm-ok').onclick = () => {
       ui.closeSheet();

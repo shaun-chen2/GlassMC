@@ -7,6 +7,7 @@
   const ui = GM.ui;
   let invoke = null;
   let S = null;
+  const t = (k, v) => window.GM.t(k, v);
   const toast = (m, k) => GM.ui.toast(m, k);
 
   // ---------------------------------------------------------------- 原版安装
@@ -17,22 +18,22 @@
     if (installing.has(versionId)) return;
     installing.add(versionId);
     const label = btn ? btn.textContent : '';
-    ui.showProgress('安装 ' + versionId);
+    ui.showProgress(t('install.progress.installing', { id: versionId }));
     if (btn) {
       btn.disabled = true;
       btn.innerHTML = '<span class="spinner"></span>';
     }
     try {
       const res = await invoke('install_version', { versionId });
-      ui.updateProgress({ frac: 1, label: '安装完成' });
+      ui.updateProgress({ frac: 1, label: t('install.progress.done') });
       setTimeout(() => ui.hideProgress(), 700);
       S.installed = await invoke('scan_versions');
       GM.app.renderAll();
       if (res.failed && res.failed.length) {
-        toast(`装好了，但有 ${res.failed.length} 个文件没下成功（可再点一次补齐）`, '');
+        toast(t('install.toast.partial', { n: res.failed.length }), '');
         console.warn('[install] 失败明细', res.failed);
       } else {
-        toast(`已安装 ${versionId}`, 'ok');
+        toast(t('install.toast.installed', { id: versionId }), 'ok');
       }
     } catch (e) {
       ui.hideProgress();
@@ -42,7 +43,7 @@
       installing.delete(versionId);
       if (btn) {
         btn.disabled = false;
-        btn.textContent = label || '安装';
+        btn.textContent = label || t('install.btn.install');
       }
     }
   }
@@ -65,7 +66,7 @@
     const prev = sel.value;
     sel.innerHTML = list.length
       ? list.map((id) => `<option value="${ui.escAttr(id)}">${ui.escAttr(id)}</option>`).join('')
-      : '<option value="">（还没有原版版本，先去「游戏版本」装一个）</option>';
+      : `<option value="">${t('install.loader.no_game_opt')}</option>`;
     if (prev && list.includes(prev)) sel.value = prev;
     loaderState.game = sel.value || '';
   }
@@ -88,26 +89,26 @@
     const game = document.getElementById('loader-game').value;
     loaderState.game = game;
     if (!game) {
-      box.innerHTML = '<div class="empty"><span class="big-ico">◌</span><span>先选一个游戏版本</span></div>';
+      box.innerHTML = `<div class="empty"><span class="big-ico">◌</span><span>${t('install.loader.pick_game')}</span></div>`;
       if (count) count.textContent = '—';
       return;
     }
     if (loaderState.loading) return;
     loaderState.loading = true;
-    box.innerHTML = '<div class="empty"><span class="spinner"></span><span>正在查询可用版本…</span></div>';
+    box.innerHTML = `<div class="empty"><span class="spinner"></span><span>${t('install.loader.loading')}</span></div>`;
     try {
       const list = await invoke('loader_versions', { kind: loaderState.kind, game });
       loaderState.versions = list;
-      if (count) count.textContent = list.length + ' 个';
+      if (count) count.textContent = t('install.count', { n: list.length });
       box.innerHTML = list
         .map(
           (v, i) => `<div class="vrow">
             <div class="v-main">
               <div class="v-id" style="font-size:12.5px">${ui.escAttr(v)}</div>
-              <div class="v-meta">${i === 0 ? '<span class="badge-pill ok"><span class="d"></span>最新</span>' : ''}
+              <div class="v-meta">${i === 0 ? `<span class="badge-pill ok"><span class="d"></span>${t('install.loader.latest')}</span>` : ''}
                 <span class="mono-dim">${KIND_LABEL[loaderState.kind]} · MC ${ui.escAttr(game)}</span></div>
             </div>
-            <div class="v-actions"><button class="btn sm" data-loader-install="${ui.escAttr(v)}">安装</button></div>
+            <div class="v-actions"><button class="btn sm" data-loader-install="${ui.escAttr(v)}">${t('install.btn.install')}</button></div>
           </div>`,
         )
         .join('');
@@ -121,18 +122,18 @@
     if (hint) {
       hint.textContent =
         loaderState.kind === 'neoforge' || loaderState.kind === 'forge'
-          ? '这类加载器需要 Java 21 来跑官方安装器，可能要几分钟。'
-          : '直接写版本文件，装完会自动补齐依赖。';
+          ? t('install.loader.hint_java21')
+          : t('install.loader.hint_direct');
     }
   }
 
   async function installLoader(version, btn) {
     const game = loaderState.game;
     if (!game) {
-      toast('先选一个游戏版本', 'err');
+      toast(t('install.loader.pick_game'), 'err');
       return;
     }
-    ui.showProgress(`安装 ${KIND_LABEL[loaderState.kind]} ${version}`);
+    ui.showProgress(t('install.progress.installing_loader', { kind: KIND_LABEL[loaderState.kind], version }));
     if (btn) {
       btn.disabled = true;
       btn.innerHTML = '<span class="spinner"></span>';
@@ -143,11 +144,11 @@
         game,
         loaderVersion: version,
       });
-      ui.updateProgress({ frac: 1, label: '安装完成' });
+      ui.updateProgress({ frac: 1, label: t('install.progress.done') });
       setTimeout(() => ui.hideProgress(), 700);
       S.installed = await invoke('scan_versions');
       GM.app.renderAll();
-      toast(`已安装 ${res.versionId}`, 'ok');
+      toast(t('install.toast.installed', { id: res.versionId }), 'ok');
       GM.app.go('versions');
     } catch (e) {
       ui.hideProgress();
@@ -155,16 +156,16 @@
       toast(msg.split('\n')[0], 'err');
       ui.openSheet(
         ui.shell(
-          '加载器安装失败',
-          '通常是 Java 版本或网络问题',
+          t('install.loader.fail_title'),
+          t('install.loader.fail_sub'),
           `<div class="mini-note" style="white-space:pre-wrap;max-height:40vh;overflow:auto;font-family:var(--font-mono)">${ui.escAttr(msg)}</div>`,
-          `<button class="btn" data-sheet-close>知道了</button>`,
+          `<button class="btn" data-sheet-close>${t('install.btn.got_it')}</button>`,
         ),
       );
     } finally {
       if (btn) {
         btn.disabled = false;
-        btn.textContent = '安装';
+        btn.textContent = t('install.btn.install');
       }
     }
   }
@@ -174,7 +175,7 @@
   function renderJava() {
     const list = (S.boot.java || []).slice();
     const el = document.getElementById('java-count2');
-    if (el) el.textContent = list.length + ' 个';
+    if (el) el.textContent = t('install.count', { n: list.length });
     const box = document.getElementById('java-list2');
     if (box) {
       box.innerHTML = list.length
@@ -184,14 +185,14 @@
               <div class="v-main">
                 <div class="v-id" style="font-size:12.5px">Java ${j.version} · ${ui.escAttr(j.vendor)}</div>
                 <div class="v-meta"><span class="mono-dim">${ui.escAttr(j.path)}</span>
-                  ${j.source === 'managed' ? '<span class="tag">本启动器安装</span>' : ''}</div>
+                  ${j.source === 'managed' ? `<span class="tag">${t('install.java.managed')}</span>` : ''}</div>
               </div>
-              <div class="v-actions">${i === 0 ? '<span class="badge-pill ok"><span class="d"></span>默认</span>' : ''}
-                ${j.source === 'managed' ? `<button class="btn sm danger" data-del-java="${j.version}">删除</button>` : ''}</div>
+              <div class="v-actions">${i === 0 ? `<span class="badge-pill ok"><span class="d"></span>${t('install.java.default')}</span>` : ''}
+                ${j.source === 'managed' ? `<button class="btn sm danger" data-del-java="${j.version}">${t('common.delete')}</button>` : ''}</div>
             </div>`,
             )
             .join('')
-        : '<div class="empty"><span class="big-ico">◌</span><span>没有检测到 Java</span></div>';
+        : `<div class="empty"><span class="big-ico">◌</span><span>${t('install.java.empty')}</span></div>`;
     }
     renderJavaCandidates();
   }
@@ -212,24 +213,24 @@
       .map(
         (c) =>
           `<button class="btn sm ${c.installed ? '' : 'primary'}" data-java-install="${c.feature}" ${c.installed ? 'disabled' : ''}>
-             ${c.label}${c.installed ? ' · 已装' : ''}
+             ${c.label}${c.installed ? t('install.java.installed_suffix') : ''}
            </button>`,
       )
       .join('');
   }
 
   async function installJava(feature, btn) {
-    ui.showProgress(`安装 Adoptium JDK ${feature}`);
-    ui.busy(btn, true, '下载中');
+    ui.showProgress(t('install.progress.installing_java', { feature }));
+    ui.busy(btn, true, t('install.busy.downloading'));
     try {
       await invoke('install_java', { feature });
-      ui.updateProgress({ frac: 1, label: '完成' });
+      ui.updateProgress({ frac: 1, label: t('common.done') });
       setTimeout(() => ui.hideProgress(), 600);
       S.boot.java = await invoke('list_java_all');
       javaCands = [];
       renderJava();
       GM.app.renderSettings();
-      toast(`Java ${feature} 已就绪`, 'ok');
+      toast(t('install.toast.java_ready', { feature }), 'ok');
     } catch (e) {
       ui.hideProgress();
       toast(String(e).split('\n')[0], 'err');
@@ -293,15 +294,15 @@
     const sub = document.getElementById('mods-sub');
     if (sub) {
       sub.textContent = cur
-        ? `${cur.id} · ${modsState.items.length} 个文件`
-        : '先选一个版本';
+        ? `${cur.id} · ${t('install.mods.file_count', { n: modsState.items.length })}`
+        : t('install.mods.pick_version');
     }
     const kw = (document.getElementById('mods-filter') || {}).value || '';
     const list = modsState.items.filter(
       (m) => !kw || (m.name || '').toLowerCase().includes(kw.toLowerCase()) || (m.fileName || '').toLowerCase().includes(kw.toLowerCase()),
     );
     if (!list.length) {
-      box.innerHTML = '<div class="empty"><span class="big-ico">◌</span><span>这个版本没有装模组</span></div>';
+      box.innerHTML = `<div class="empty"><span class="big-ico">◌</span><span>${t('install.mods.empty')}</span></div>`;
       return;
     }
     box.innerHTML = list
@@ -315,12 +316,12 @@
             <span class="mono-dim">${fmtSize(m.size)}</span>
             <span class="dot-sep">·</span>
             <span class="mono-dim">${ui.escAttr(m.modId)}</span>
-            ${m.enabled ? '' : '<span class="badge-pill warn"><span class="d"></span>已禁用</span>'}
+            ${m.enabled ? '' : `<span class="badge-pill warn"><span class="d"></span>${t('install.mods.disabled')}</span>`}
           </div>
         </div>
         <div class="v-actions">
-          <button class="btn sm" data-mod-toggle="${ui.escAttr(m.path)}" data-enabled="${m.enabled ? '1' : '0'}">${m.enabled ? '禁用' : '启用'}</button>
-          <button class="btn sm danger" data-mod-del="${ui.escAttr(m.path)}">删除</button>
+          <button class="btn sm" data-mod-toggle="${ui.escAttr(m.path)}" data-enabled="${m.enabled ? '1' : '0'}">${m.enabled ? t('install.mods.disable') : t('install.mods.enable')}</button>
+          <button class="btn sm danger" data-mod-del="${ui.escAttr(m.path)}">${t('common.delete')}</button>
         </div>
       </div>`,
       )
@@ -337,8 +338,12 @@
     const el = document.getElementById('mr-context');
     if (el) {
       el.textContent = cur
-        ? `当前筛选：${mrState.game || '未知版本'} · ${mrState.loader || '原版'}（点安装会装到 ${cur.id}）`
-        : '先选一个版本';
+        ? t('install.mr.context', {
+            game: mrState.game || t('install.mr.unknown_ver'),
+            loader: mrState.loader || t('install.mr.vanilla'),
+            id: cur.id,
+          })
+        : t('install.mods.pick_version');
     }
   }
 
@@ -348,9 +353,9 @@
     if (!more) mrState.offset = 0;
     mrState.busy = true;
     const box = document.getElementById('mr-list');
-    if (box && !more) box.innerHTML = '<div class="empty"><span class="spinner"></span><span>搜索中…</span></div>';
+    if (box && !more) box.innerHTML = `<div class="empty"><span class="spinner"></span><span>${t('install.mr.searching')}</span></div>`;
     const btn = document.getElementById('btn-mr-search');
-    ui.busy(btn, true, '搜索');
+    ui.busy(btn, true, t('install.mr.search'));
     try {
       const [items, total] = await invoke('modrinth_search', {
         query: q,
@@ -380,7 +385,7 @@
     const box = document.getElementById('mr-list');
     if (!box) return;
     if (!mrState.items.length) {
-      box.innerHTML = '<div class="empty"><span class="big-ico">◌</span><span>没有匹配的模组</span></div>';
+      box.innerHTML = `<div class="empty"><span class="big-ico">◌</span><span>${t('install.mr.empty')}</span></div>`;
       return;
     }
     box.innerHTML =
@@ -391,17 +396,17 @@
           <div class="v-main">
             <div class="v-id" style="font-size:12.5px">${ui.escAttr(it.title)}</div>
             <div class="v-meta"><span class="mono-dim" style="max-width:420px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${ui.escAttr(it.description)}</span></div>
-            <div class="v-meta"><span class="tag">${fmtDownloads(it.downloads)} 次下载</span>
+            <div class="v-meta"><span class="tag">${t('install.mr.downloads', { n: fmtDownloads(it.downloads) })}</span>
               <span class="mono-dim">${ui.escAttr(it.author)}</span></div>
           </div>
           <div class="v-actions">
-            <button class="btn sm" data-mr-install="${ui.escAttr(it.projectId)}" data-mr-title="${ui.escAttr(it.title)}">安装</button>
+            <button class="btn sm" data-mr-install="${ui.escAttr(it.projectId)}" data-mr-title="${ui.escAttr(it.title)}">${t('install.btn.install')}</button>
           </div>
         </div>`,
         )
         .join('') +
       (mrState.items.length < mrState.total
-        ? '<div class="hstack" style="justify-content:center;margin-top:8px"><button class="btn sm" id="mr-more">加载更多</button></div>'
+        ? `<div class="hstack" style="justify-content:center;margin-top:8px"><button class="btn sm" id="mr-more">${t('install.mr.more')}</button></div>`
         : '');
     const more = document.getElementById('mr-more');
     if (more) {
@@ -415,12 +420,12 @@
   async function installMod(projectId, title, btn) {
     const cur = GM.app.selectedVersion ? GM.app.selectedVersion() : null;
     if (!cur) {
-      toast('先选一个版本', 'err');
+      toast(t('install.mods.pick_version'), 'err');
       return;
     }
     const optEl = document.getElementById('mr-optional');
-    ui.busy(btn, true, '安装');
-    ui.showProgress('安装 ' + title);
+    ui.busy(btn, true, t('install.btn.install'));
+    ui.showProgress(t('install.progress.installing', { id: title }));
     try {
       const rep = await invoke('modrinth_install', {
         versionId: cur.id,
@@ -434,25 +439,25 @@
       const skip = (rep && rep.skipped) || [];
       const fail = (rep && rep.failed) || [];
       if (inst.length) {
-        toast(`已安装 ${inst.length} 个：${inst.join('、')}`, 'ok');
+        toast(t('install.toast.installed_many', { n: inst.length, list: inst.join('、') }), 'ok');
       } else if (skip.length) {
-        toast('已经装过了：' + skip.join('、'), 'ok');
+        toast(t('install.toast.already', { list: skip.join('、') }), 'ok');
       } else {
-        toast('没有需要下载的文件', 'err');
+        toast(t('install.toast.nothing'), 'err');
       }
       if (fail.length) {
         // 前置装不上不算致命错误（比如作者只发了 Forge 版），列出来让用户自己判断
         ui.openSheet(
           ui.shell(
-            '部分依赖未安装',
-            `${fail.length} 项需要手动处理`,
+            t('install.deps.title'),
+            t('install.deps.sub', { n: fail.length }),
             `<div class="stack" style="gap:8px">${fail
               .map(
                 (f) =>
-                  `<div class="kv"><span class="k">${ui.escAttr(f.title || f.projectId || '依赖')}</span><span class="v">${ui.escAttr(f.reason)}</span></div>`,
+                  `<div class="kv"><span class="k">${ui.escAttr(f.title || f.projectId || t('install.deps.fallback'))}</span><span class="v">${ui.escAttr(f.reason)}</span></div>`,
               )
               .join('')}</div>`,
-            '<button class="btn" data-sheet-close>知道了</button>',
+            `<button class="btn" data-sheet-close>${t('install.btn.got_it')}</button>`,
           ),
         );
       }
@@ -479,8 +484,8 @@
       if (!acts || acts.querySelector('[data-open-dir]')) return;
       acts.insertAdjacentHTML(
         'beforeend',
-        `<button class="btn sm" data-open-dir="${ui.escAttr(id)}">目录</button>
-         <button class="btn sm danger" data-del-ver="${ui.escAttr(id)}">删除</button>`,
+        `<button class="btn sm" data-open-dir="${ui.escAttr(id)}">${t('install.ver.dir')}</button>
+         <button class="btn sm danger" data-del-ver="${ui.escAttr(id)}">${t('common.delete')}</button>`,
       );
     });
   }
@@ -503,12 +508,12 @@
       const dv = e.target.closest('[data-del-ver]');
       if (dv) {
         const id = dv.dataset.delVer;
-        ui.confirm(`删除版本「${id}」？`, '版本目录会整个删掉，里面的存档与模组也随之消失。', async () => {
+        ui.confirm(t('install.confirm.del_title', { id }), t('install.confirm.del_sub'), async () => {
           try {
             await invoke('delete_version', { versionId: id });
             S.installed = await invoke('scan_versions');
             GM.app.renderAll();
-            toast('已删除 ' + id, 'ok');
+            toast(t('install.toast.version_deleted', { id }), 'ok');
           } catch (err) {
             toast(String(err), 'err');
           }
@@ -570,13 +575,13 @@
       }
       const dj = e.target.closest('[data-del-java]');
       if (dj) {
-        ui.confirm('删除这个 JDK？', '只会删本启动器安装的那一份。', async () => {
+        ui.confirm(t('install.confirm.del_java_title'), t('install.confirm.del_java_sub'), async () => {
           try {
             await invoke('remove_java', { feature: Number(dj.dataset.delJava) });
             S.boot.java = await invoke('list_java_all');
             javaCands = [];
             renderJava();
-            toast('已删除', 'ok');
+            toast(t('install.toast.deleted'), 'ok');
           } catch (err) {
             toast(String(err), 'err');
           }
@@ -623,11 +628,11 @@
       }
       const del = e.target.closest('[data-mod-del]');
       if (del) {
-        ui.confirm('删除这个模组？', '文件会被移动到 mods/.trash，可以手动找回。', async () => {
+        ui.confirm(t('install.confirm.del_mod_title'), t('install.confirm.del_mod_sub'), async () => {
           try {
             await invoke('mods_delete', { path: del.dataset.modDel });
             await loadMods(true);
-            toast('已移到 .trash', 'ok');
+            toast(t('install.toast.trashed'), 'ok');
           } catch (err) {
             toast(String(err), 'err');
           }
