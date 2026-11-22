@@ -318,12 +318,15 @@ fn make_shortcut(desktop: &Path, exe: &Path, version_id: &str) -> Result<PathBuf
     Ok(target)
 }
 
+// 只在 macOS 快捷方式 .app 与 Windows .lnk 的生成代码里使用
+#[cfg_attr(not(any(target_os = "macos", target_os = "windows")), allow(dead_code))]
 fn sanitize_id(s: &str) -> String {
     s.chars()
         .map(|c| if c.is_ascii_alphanumeric() { c } else { '_' })
         .collect()
 }
 
+#[cfg_attr(not(any(target_os = "macos", target_os = "windows")), allow(dead_code))]
 fn xml_escape(s: &str) -> String {
     s.replace('&', "&amp;")
         .replace('<', "&lt;")
