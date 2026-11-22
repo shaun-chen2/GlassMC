@@ -16,7 +16,7 @@
 
   // ---------------------------------------------------------------- mock
   const MOCK_STATE = {
-    version: '1.3.3',
+    version: '1.4.0',
     dataRoot: '/Users/demo/Library/Application Support/GlassMC',
     gameDir: '/Users/demo/Library/Application Support/GlassMC/minecraft',
     os: 'osx',
@@ -124,6 +124,17 @@
         return null;
       case 'game_running':
         return MOCK_STATE.running;
+      case 'mcp_status':
+        return {
+          executable: '/Applications/GlassMC.app/Contents/MacOS/glassmc',
+          args: ['--mcp'],
+          toolCount: 12,
+          configExample: JSON.stringify({
+            mcpServers: {
+              glassmc: { command: '/Applications/GlassMC.app/Contents/MacOS/glassmc', args: ['--mcp'] }
+            }
+          }, null, 2)
+        };
       case 'open_path':
       case 'open_url':
       case 'window_action':

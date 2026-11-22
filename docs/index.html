@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GlassMC · 液态玻璃 Minecraft 启动器下载 · macOS / Windows / Linux</title>
-<meta name="description" content="GlassMC 是一个跨平台的 Minecraft 启动器：液态玻璃界面，一键装版本、加载器与模组，支持离线 / 微软正版 / 皮肤站登录，内置 Modrinth、整合包导入与陶瓦联机。Rust + Tauri 2 实现，macOS（Apple Silicon / Intel）、Windows、Linux 同一套代码，并提供浏览器在线体验页。">
-<meta name="keywords" content="Minecraft 启动器, MC 启动器, 我的世界启动器, Minecraft 启动器下载, Tauri, Rust, 液态玻璃, 跨平台, Fabric, NeoForge, Modrinth, 在线体验">
+<meta name="description" content="GlassMC 是一个跨平台的 Minecraft 启动器：液态玻璃界面，一键装版本、加载器与模组，支持离线 / 微软正版 / 皮肤站登录，内置 Modrinth、整合包导入、陶瓦联机、存档备份、崩溃诊断与 MCP 服务端。Rust + Tauri 2 实现，macOS（Apple Silicon / Intel）、Windows、Linux 同一套代码，并提供浏览器在线体验页。">
+<meta name="keywords" content="Minecraft 启动器, MC 启动器, 我的世界启动器, Minecraft 启动器下载, Tauri, Rust, 液态玻璃, 跨平台, Fabric, NeoForge, Modrinth, 存档备份, 崩溃诊断, MCP, 在线体验">
 <meta name="theme-color" content="#060B14">
 <!-- GEO:BEGIN 由 Scripts/gen-geo.py 生成，请勿手改（重新运行脚本即可覆盖） -->
 <link rel="canonical" href="https://glassmc.shuan.uk/">
@@ -21,7 +21,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:url" content="https://glassmc.shuan.uk/">
 <meta property="og:title" content="GlassMC · 液态玻璃 Minecraft 启动器下载">
-<meta property="og:description" content="跨平台（macOS / Windows / Linux），一键装版本与模组，支持离线 / 微软正版 / 认证服务器登录，内置陶瓦联机。不想先安装，可以直接在浏览器里在线体验。">
+<meta property="og:description" content="跨平台（macOS / Windows / Linux），一键装版本与模组，支持离线 / 微软正版 / 认证服务器登录，内置陶瓦联机、存档备份、崩溃诊断与 MCP 服务端。不想先安装，可以直接在浏览器里在线体验。">
 <meta property="og:image" content="https://glassmc.shuan.uk/images/og-cover.png">
 <meta property="og:image:secure_url" content="https://glassmc.shuan.uk/images/og-cover.png">
 <meta property="og:image:type" content="image/png">
@@ -30,7 +30,7 @@
 <meta property="og:image:alt" content="GlassMC 界面：液态玻璃质感的启动器窗口浮在深色星云壁纸上">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="GlassMC · 液态玻璃 Minecraft 启动器下载">
-<meta name="twitter:description" content="跨平台（macOS / Windows / Linux），一键装版本与模组，支持离线 / 微软正版 / 认证服务器登录，内置陶瓦联机。不想先安装，可以直接在浏览器里在线体验。">
+<meta name="twitter:description" content="跨平台（macOS / Windows / Linux），一键装版本与模组，支持离线 / 微软正版 / 认证服务器登录，内置陶瓦联机、存档备份、崩溃诊断与 MCP 服务端。不想先安装，可以直接在浏览器里在线体验。">
 <meta name="twitter:image" content="https://glassmc.shuan.uk/images/og-cover.png">
 <meta name="twitter:image:alt" content="GlassMC 界面：液态玻璃质感的启动器窗口浮在深色星云壁纸上">
 <script type="application/ld+json">
@@ -57,7 +57,7 @@
         "GlassMC 官网",
         "GlassMC Minecraft Launcher"
       ],
-      "description": "GlassMC 是 Rust + Tauri 2 写的跨平台 Minecraft 启动器：系统级毛玻璃界面，393 个正式版与快照、Fabric / Quilt / Forge / NeoForge、JDK 自动配置、Modrinth 模组、整合包导入导出与陶瓦联机，macOS / Windows / Linux 同一套代码，GPLv3 开源。",
+      "description": "GlassMC 是 Rust + Tauri 2 写的跨平台 Minecraft 启动器：系统级毛玻璃界面，393 个正式版与快照、Fabric / Quilt / Forge / NeoForge、JDK 自动配置、Modrinth 模组、整合包导入导出、陶瓦联机、存档备份、崩溃诊断与 MCP 服务端，macOS / Windows / Linux 同一套代码，GPLv3 开源。",
       "inLanguage": "zh-CN",
       "publisher": {
         "@id": "https://glassmc.shuan.uk/#author"
@@ -68,7 +68,7 @@
       "@id": "https://glassmc.shuan.uk/#webpage",
       "url": "https://glassmc.shuan.uk/",
       "name": "GlassMC · 液态玻璃 Minecraft 启动器下载",
-      "description": "GlassMC 是一个跨平台的 Minecraft 启动器：液态玻璃界面，一键装版本、加载器与模组，支持离线 / 微软正版 / 皮肤站登录，内置 Modrinth、整合包导入与陶瓦联机。Rust + Tauri 2 实现，macOS（Apple Silicon / Intel）、Windows、Linux 同一套代码，并提供浏览器在线体验页。",
+      "description": "GlassMC 是一个跨平台的 Minecraft 启动器：液态玻璃界面，一键装版本、加载器与模组，支持离线 / 微软正版 / 皮肤站登录，内置 Modrinth、整合包导入、陶瓦联机、存档备份、崩溃诊断、服务器延迟与 MCP 服务端。Rust + Tauri 2 实现，macOS（Apple Silicon / Intel）、Windows、Linux 同一套代码，并提供浏览器在线体验页。",
       "isPartOf": {
         "@id": "https://glassmc.shuan.uk/#website"
       },
@@ -83,7 +83,7 @@
         "caption": "GlassMC 界面：液态玻璃质感的启动器窗口浮在深色星云壁纸上"
       },
       "datePublished": "2026-11-01",
-      "dateModified": "2026-11-20",
+      "dateModified": "2026-11-22",
       "inLanguage": "zh-CN",
       "keywords": "Minecraft 启动器, MC 启动器, 我的世界启动器, 液态玻璃, Tauri, Rust, NeoForge, Fabric, Modrinth"
     },
@@ -96,11 +96,11 @@
         "GlassMC Minecraft Launcher",
         "GlassMC 液态玻璃启动器"
       ],
-      "description": "GlassMC 是 Rust + Tauri 2 写的跨平台 Minecraft 启动器：系统级毛玻璃界面，393 个正式版与快照、Fabric / Quilt / Forge / NeoForge、JDK 自动配置、Modrinth 模组、整合包导入导出与陶瓦联机，macOS / Windows / Linux 同一套代码，GPLv3 开源。",
+      "description": "GlassMC 是 Rust + Tauri 2 写的跨平台 Minecraft 启动器：系统级毛玻璃界面，393 个正式版与快照、Fabric / Quilt / Forge / NeoForge、JDK 自动配置、Modrinth 模组、整合包导入导出、陶瓦联机、存档备份、崩溃诊断与 MCP 服务端，macOS / Windows / Linux 同一套代码，GPLv3 开源。",
       "applicationCategory": "GameApplication",
       "applicationSubCategory": "Minecraft 启动器",
       "operatingSystem": "macOS 15+, Windows 10 1809+ (x64), Linux (WebKitGTK 4.1)",
-      "softwareVersion": "1.3.3",
+      "softwareVersion": "1.4.0",
       "softwareRequirements": "macOS 15+（Universal）；Windows 10 1809+ / 11（x64，需 WebView2）；Linux（需 WebKitGTK 4.1）",
       "downloadUrl": "https://github.com/shaun-chen2/GlassMC/releases/latest",
       "installUrl": "https://glassmc.shuan.uk/#download",
@@ -235,7 +235,15 @@
           "name": "能不安装先看看界面吗？",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "可以，glassmc.shuan.uk/web 是同一套前端跑在浏览器里，八个页面都能点，安装、启动、联机走的是示例数据。 它只是让人先看一眼界面：真的下版本、开游戏还是得装桌面版。"
+            "text": "可以，glassmc.shuan.uk/web 是同一套前端跑在浏览器里，所有页面都能点，安装、启动、联机走的是示例数据。 它只是让人先看一眼界面：真的下版本、开游戏还是得装桌面版。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "MCP 服务端怎么接？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "用 glassmc --mcp 启动 stdio 服务端，在 Claude Desktop、CodeBuddy 等客户端里把可执行文件和 --mcp 写进 mcpServers 即可。设置页「MCP 服务端」卡片会生成当前机器的配置示例，可一键复制。 它提供 12 个工具：查实例、模组、存档、崩溃解释、服务器延迟、FRP 状态等；启动游戏和备份存档必须由客户端明确调用，清理类工具只扫描不删除。Windows 正式版没有控制台，stdio 连不上时用 debug 构建。"
           }
         }
       ]
@@ -1106,13 +1114,15 @@
 <header class="hero" id="top">
   <div class="hero-grid">
     <div class="hero-left">
-      <span class="hero-badge"><span class="dot"></span>macOS · Windows · Linux&nbsp;&nbsp;|&nbsp;&nbsp;v1.3.3&nbsp;&nbsp;|&nbsp;&nbsp;约 10 MB</span>
+      <span class="hero-badge"><span class="dot"></span>macOS · Windows · Linux&nbsp;&nbsp;|&nbsp;&nbsp;v1.4.0&nbsp;&nbsp;|&nbsp;&nbsp;约 10 MB</span>
       <h1 class="hero-title">GlassMC</h1>
       <p class="hero-cn">液态玻璃 · MINECRAFT 启动器</p>
       <p class="hero-slogan">装版本、装模组、开游戏，<br>三次点击的事。</p>
       <p class="hero-desc">
         玻璃是窗口本身向系统申请的毛玻璃，不是在网页里堆一层滤镜假装。
         选一个版本点安装，剩下的下载、补依赖、配 Java、拼启动参数，它自己来。
+        存档备份、崩溃解释、服务器延迟、模组冲突检测也在同一个窗口里；
+        需要给 AI 用，还有内置的 MCP 服务端。
       </p>
       <div class="hero-btns">
         <a class="btn btn-primary" href="#download">↓ 选一个平台下载</a>
@@ -1173,9 +1183,9 @@
   <div class="download-card reveal">
     <img src="images/icon-256.png" alt="">
     <h2>下载</h2>
-    <p class="meta">GlassMC 1.3.3 · macOS 15+ · Windows 10+ · Linux · <code>GPLv3</code> 开源</p>
+    <p class="meta">GlassMC 1.4.0 · macOS 15+ · Windows 10+ · Linux · <code>GPLv3</code> 开源</p>
     <div class="hero-btns">
-      <a class="btn btn-primary" href="https://github.com/shaun-chen2/GlassMC/releases/latest/download/GlassMC.dmg">↓ macOS · dmg <small>约 9 MB</small></a>
+      <a class="btn btn-primary" href="https://github.com/shaun-chen2/GlassMC/releases/latest/download/GlassMC.dmg">↓ macOS · dmg <small>约 10 MB</small></a>
       <a class="btn btn-ghost" href="https://github.com/shaun-chen2/GlassMC/releases/latest/download/GlassMC-Setup.exe">Windows · exe <small>约 3 MB</small></a>
       <a class="btn btn-ghost" href="https://github.com/shaun-chen2/GlassMC/releases/latest/download/GlassMC.deb">Linux · deb <small>约 3.4 MB</small></a>
     </div>
@@ -1189,7 +1199,7 @@
   <div class="demo-strip reveal">
     <div class="txt">
       <b>不想先下载？</b>
-      <span>在线体验版跑在浏览器里，八个页面都能点，示例数据，不装游戏、不连账号。</span>
+      <span>在线体验版跑在浏览器里，所有页面都能点，示例数据，不装游戏、不连账号。</span>
     </div>
     <a class="btn btn-ghost" href="https://glassmc.shuan.uk/web/" target="_blank" rel="noopener">打开体验页 <span class="arrow">↗</span></a>
   </div>
@@ -1202,7 +1212,7 @@
   <div class="sec-head reveal">
     <span class="sec-tag">FEATURES</span>
     <h2>从下载到进服，<em>中间都不用手动</em></h2>
-    <p>不用装 Java，不用手拼参数，不用配内网穿透。</p>
+    <p>不用装 Java，不用手拼参数，不用配内网穿透；存档、诊断、联机、AI 调用都在同一个窗口里。</p>
   </div>
 
   <div class="feature-grid">
@@ -1229,6 +1239,30 @@
     <div class="feature-card reveal">
       <span class="feat-icon">06</span><h3>陶瓦联机</h3>
       <p>不用公网 IP、不用端口映射。生成一串邀请码发给朋友，对方粘进去就能进你的世界。</p>
+    </div>
+    <div class="feature-card reveal">
+      <span class="feat-icon">07</span><h3>存档备份与数据包</h3>
+      <p>世界种子、估算时长、截图、单存档数据包与投影文件都能在启动器里管；备份先留旧世界，恢复不覆盖。</p>
+    </div>
+    <div class="feature-card reveal">
+      <span class="feat-icon">08</span><h3>模组进阶</h3>
+      <p>组合预设、重复 modid / 多版本冲突检测、拖拽 jar 导入、Modrinth 批量更新，旧 jar 先备份再替换。</p>
+    </div>
+    <div class="feature-card reveal">
+      <span class="feat-icon">09</span><h3>诊断与安全</h3>
+      <p>崩溃日志翻译成中文建议、日志打包导出、冗余扫描只删勾选项；模组启发式扫描，只提示不冒充杀毒。</p>
+    </div>
+    <div class="feature-card reveal">
+      <span class="feat-icon">10</span><h3>服务器列表与 FRP</h3>
+      <p>常用服务器测延迟、看人数与 MOTD，内置公共服务器浏览器；填好配置就能起 frpc，日志在界面里。</p>
+    </div>
+    <div class="feature-card reveal">
+      <span class="feat-icon">11</span><h3>快捷、性能与更新</h3>
+      <p>固定世界 / 服务器一步启动、Discord 状态、512MB 模式、智能 GC、启动前脚本；静默更新只暂存安装包。</p>
+    </div>
+    <div class="feature-card reveal">
+      <span class="feat-icon">12</span><h3>内置 MCP 服务端</h3>
+      <p><code>glassmc --mcp</code> 让 Claude 等客户端查询实例、模组、存档、崩溃与服务器延迟，也能明确调用启动和备份。</p>
     </div>
   </div>
 </section>
@@ -1474,7 +1508,7 @@
   <div class="sec-head reveal">
     <span class="sec-tag">FAQ</span>
     <h2>遇到问题<em>先看这里</em></h2>
-    <p>七条最常被问到的。</p>
+    <p>八条最常被问到的。</p>
   </div>
 
   <div class="faq-list">
@@ -1529,8 +1563,15 @@
     <details class="reveal">
       <summary><span class="q">Q7</span>能不安装先看看界面吗？</summary>
       <div class="faq-body"><div class="faq-inner">
-        <p>可以，<a href="https://glassmc.shuan.uk/web/" target="_blank" rel="noopener">glassmc.shuan.uk/web</a> 是同一套前端跑在浏览器里，八个页面都能点，安装、启动、联机走的是示例数据。</p>
+        <p>可以，<a href="https://glassmc.shuan.uk/web/" target="_blank" rel="noopener">glassmc.shuan.uk/web</a> 是同一套前端跑在浏览器里，所有页面都能点，安装、启动、联机走的是示例数据。</p>
         <p>它只是让人先看一眼界面：真的下版本、开游戏还是得装桌面版。</p>
+      </div></div>
+    </details>
+    <details class="reveal">
+      <summary><span class="q">Q8</span>MCP 服务端怎么接？</summary>
+      <div class="faq-body"><div class="faq-inner">
+        <p>用 <code>glassmc --mcp</code> 启动 stdio 服务端，在 Claude Desktop、CodeBuddy 等客户端里把可执行文件和 <code>--mcp</code> 写进 <code>mcpServers</code> 即可。设置页「MCP 服务端」卡片会生成当前机器的配置示例，可一键复制。</p>
+        <p>它提供 12 个工具：查实例、模组、存档、崩溃解释、服务器延迟、FRP 状态等；启动游戏和备份存档必须由客户端明确调用，清理类工具只扫描不删除。Windows 正式版没有控制台，stdio 连不上时用 debug 构建。</p>
       </div></div>
     </details>
   </div>

@@ -16,6 +16,9 @@
 [![介绍页](https://img.shields.io/badge/%E4%BB%8B%E7%BB%8D%E9%A1%B5-glassmc.shuan.uk-111?style=for-the-badge)](https://glassmc.shuan.uk/)
 [![在线体验](https://img.shields.io/badge/%E5%9C%A8%E7%BA%BF%E4%BD%93%E9%AA%8C-%E6%B5%8F%E8%A7%88%E5%99%A8%E9%87%8C%E8%AF%95%E8%AF%95-7fd3a0?style=for-the-badge)](https://glassmc.shuan.uk/web/)
 
+> **1.4.0**：新增内置 MCP 服务端、存档备份、模组进阶、诊断与安全、服务器列表 / FRP 等 40+ 项功能。
+> 完整变更见 [CHANGELOG](CHANGELOG.md)。
+
 ![GlassMC 主界面](docs/images/app-window.jpg)
 
 选一个版本点安装，剩下的它自己来：下载游戏文件、配 Java、装加载器、拉模组。
@@ -31,7 +34,7 @@
 
 | 平台 | 要求 | 文件 |
 |---|---|---|
-| **macOS** | 15 Sequoia 或更新，Apple Silicon / Intel 通用 | [`GlassMC.dmg`](https://github.com/shaun-chen2/GlassMC/releases/latest/download/GlassMC.dmg) · 约 9 MB |
+| **macOS** | 15 Sequoia 或更新，Apple Silicon / Intel 通用 | [`GlassMC.dmg`](https://github.com/shaun-chen2/GlassMC/releases/latest/download/GlassMC.dmg) · 约 10 MB |
 | **Windows** | 10 1809+ / 11，64 位 | [`GlassMC-Setup.exe`](https://github.com/shaun-chen2/GlassMC/releases/latest/download/GlassMC-Setup.exe) · 约 3 MB |
 | **Linux** | 需要 WebKitGTK 4.1 | [`GlassMC.deb`](https://github.com/shaun-chen2/GlassMC/releases/latest/download/GlassMC.deb) · 约 3.4 MB<br>[`GlassMC-linux.tar.gz`](https://github.com/shaun-chen2/GlassMC/releases/latest/download/GlassMC-linux.tar.gz) · 约 4.6 MB（绿色版） |
 
@@ -97,6 +100,52 @@ Release 页面附有每个文件的 SHA-256，下载后可以核对。
 版本、模组、存档、资源包、设置都复制过来，原目录不动。
 HMCL 配置里存着的登录令牌也会顺手带过来。
 
+### 存档与数据
+
+- **世界一览**：列出每个存档的名字、种子、估算游戏时长、最后游玩时间；`level.dat` 损坏也能列出来，不会整页崩。
+- **备份与恢复**：一键把世界复制到独立备份目录，恢复前先把当前世界改名保留；备份带备注与文件数。
+- **截图画廊**：扫描实例与游戏根目录的 `screenshots`，网格预览、点击放大、可直接删除。
+- **单存档数据包**：列出世界 `datapacks`，`.zip` / `.zip.disabled` 一键启停，也能导入本地数据包。
+- **投影文件**：管理 `.litematic` / `.schematic` / `.nbt`，导入到实例 `schematics/`。
+
+### 模组与整合包进阶
+
+- **组合预设**：把当前启用模组存成预设，换整合包或换玩法时一键套用。
+- **冲突检测**：读 jar 元数据，找重复 modid、同一模组多版本、重复文件，给出处理建议。
+- **拖拽导入**：jar 或含 jar 的 zip 直接拖进窗口；同名跳过不覆盖，带 Zip Slip 防护。
+- **批量更新**：从 Modrinth 查每个模组的新版本，勾选后逐个下载、校验、备份旧 jar 再替换。
+- **短分享码 / 增量更新**：整合包压成 `GM1-...` 短码；按文件哈希只下载变更项，删除项先移入备份。
+
+### 联机与服务器
+
+- **服务器列表**：保存常用服务器，置顶、测延迟、看在线人数与 MOTD。
+- **服务器浏览器**：内置一批公共服务器，实时探测后一键加进自己的列表。
+- **FRP 客户端**：填地址 / 端口 / 令牌就能起 frpc，状态灯与日志都在界面里；二进制需要手动点下载。
+
+### 诊断与安全
+
+- **崩溃解释**：读最近日志和 crash-reports，把 OOM、模组库冲突、缺前置、Java 版本不对等翻译成中文建议。
+- **日志导出**：最近 7 天日志 + 崩溃报告打成一个 zip，直接放到下载目录。
+- **冗余清理**：先扫描重复 jar、临时文件、旧日志、空目录，只删你勾选的项。
+- **恶意模组扫描**：启发式检查可疑调用、可执行文件、混淆特征；只提示，不替代杀毒。
+- **MC 新闻**：官方 RSS 聚合，离线时用缓存。
+
+### 快捷、更新与性能
+
+- **固定世界 / 服务器**：首页一步启动；服务器用标准 `--server` / `--port`，不使用 demo / quickPlay。
+- **Discord Rich Presence**：通过本地 IPC 上报当前实例与状态，连不上就静默降级。
+- **静默自动更新**：默认关闭；开启后只把安装包暂存到本地，绝不自动执行。
+- **启动优化**：内存推荐、512MB 低内存模式、智能 GC、压缩指针、启动前脚本、本地扫描基准；清后台需手动勾选。
+- **移动端等价**：触控模式、虚拟按键、外置数据目录迁移（桌面启动器上的等价实现，界面已标注限制）。
+- **辅助包**：离线生成 keepInventory 数据包、矿石高亮资源包、投影 / 血条说明包，只生成不自动安装。
+
+### 分享、社区与硬件
+
+- **分享包**：把实例版本、模组清单和设置打成 zip，附一段可直接复制的介绍。
+- **MCBBS 模板**：用模板生成 BBCode 帖子文本，复制后手动发布（不伪造论坛 API）。
+- **服务器面板 / 便携版**：汇总服务器状态；把数据目录导出成便携版并写清 `GLASSMC_DATA` 用法。
+- **硬件面板**：CPU / 内存 / GPU 信息与占用，每 5 秒刷新。
+
 ### 其它
 
 - **内存**：滑块给，单位 GB。整合包可以给到 8~12 GB。
@@ -107,10 +156,39 @@ HMCL 配置里存着的登录令牌也会顺手带过来。
 - **个性化**：自定义背景图（透明度可调）与启动音效，只读本地文件、不上传。
 - **无障碍**：界面缩放 85%–125%、加强的键盘焦点框、图标按钮读屏标签，
   并跟随系统「减少动态效果」。快捷键见设置页。
-- **实例运维**：复制实例（可选带模组/存档）、分类标签与归档、一键生成桌面快捷方式
+- **实例运维**：复制实例（可选带模组 / 存档）、分类标签与归档、一键生成桌面快捷方式
   （macOS `.app` / Windows `.lnk` / Linux `.desktop`，双击直接进对应实例）。
 - **更新**：启动时静默查一次 GitHub Releases（24 小时缓存），有新版本在设置页提示；
   点一下把对应平台的安装包下到「下载」并打开。也可「忽略此版本」。
+- **MCP 服务端**：`glassmc --mcp` 以 stdio 方式启动，让 Claude 等 MCP 客户端查询实例、
+  模组、存档、崩溃原因、服务器延迟，并在你明确要求时启动游戏或备份存档。
+  清理类工具只扫描不删除。
+
+### 给 AI 客户端用：内置 MCP 服务端
+
+在 MCP 客户端的配置文件（Claude Desktop 的 `claude_desktop_config.json`、CodeBuddy 的
+`mcp.json` 等）里加：
+
+```json
+{
+  "mcpServers": {
+    "glassmc": {
+      "command": "/Applications/GlassMC.app/Contents/MacOS/glassmc",
+      "args": ["--mcp"]
+    }
+  }
+}
+```
+
+Windows 换成 `glassmc.exe` 的实际路径；设置页的「MCP 服务端」卡片会自动生成当前机器的
+可执行文件路径并支持一键复制。协议是标准 MCP 的 stdio 传输（换行分隔 JSON-RPC 2.0），
+支持 `2024-11-05` / `2025-03-26` / `2025-06-18` 协议版本，
+工具包括 `list_versions` / `get_config` / `list_mods` / `list_saves` / `backup_save` /
+`crash_explain` / `cleanup_scan` / `mod_conflicts` / `server_ping` / `frp_status` /
+`auto_update_status` / `launch`。所有操作都在本机完成，不会上传数据。
+
+> Windows 正式版是无控制台的 GUI 程序；若客户端无法通过 stdio 连接，请用 debug 构建
+> （`cargo build`）的 exe，或用控制台包装启动。
 
 ---
 

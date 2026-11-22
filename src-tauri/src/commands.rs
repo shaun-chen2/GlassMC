@@ -185,7 +185,65 @@ pub async fn launch_game(
     let required = launch::required_java(&version_id, &cfg).await;
     let java = java::best_for(required, &cfg.java_path)
         .ok_or_else(|| "没有找到可用的 Java，请先在设置里指定一个".to_string())?;
-    let built = launch::build_command(&version_id, &acc, &java, &cfg).await?;
+    // 启动前脚本（增强模块）：用户显式配置才执行，30 秒超时
+    let tweaks: serde_json::Value = crate::store::load("tweak-prefs");
+    if let Some(script) = tweaks
+        .get("prelaunchScript")
+        .and_then(|v| v.as_str())
+        .filter(|s| !s.trim().is_empty())
+    {
+        #[cfg(windows)]
+        let (shell, flag) = ("cmd", "/C");
+        #[cfg(not(windows))]
+        let (shell, flag) = ("sh", "-c");
+        let run = tokio::time::timeout(
+            std::time::Duration::from_secs(30),
+            tokio::process::Command::new(shell)
+                .arg(flag)
+                .arg(script)
+                .kill_on_drop(true)
+                .output(),
+        )
+        .await;
+        match run {
+            Ok(Ok(out)) if out.status.success() => {}
+            Ok(Ok(out)) => {
+                let err = String::from_utf8_lossy(&out.stderr);
+                return Err(format!(
+                    "启动前脚本失败（{}）：{}",
+                    out.status,
+                    err.trim().chars().take(300).collect::<String>()
+                ));
+            }
+            Ok(Err(e)) => return Err(format!("启动前脚本无法执行：{e}")),
+            Err(_) => return Err("启动前脚本超过 30 秒，已取消启动".into()),
+        }
+    }
+
+    let mut built = launch::build_command(&version_id, &acc, &java, &cfg).await?;
+
+    // 快速游玩：把「固定服务器」转换成标准游戏参数。
+    // 刻意不用 demo / quickPlay —— 那些是版本 JSON 里禁用的特性开关。
+    let pending: serde_json::Value = crate::store::load("quick-pending");
+    if pending
+        .get("versionId")
+        .and_then(|v| v.as_str())
+        .map(|v| v == version_id)
+        .unwrap_or(false)
+    {
+        if let Some(addr) = pending.get("address").and_then(|v| v.as_str()) {
+            if !addr.trim().is_empty() {
+                built.args.push("--server".into());
+                built.args.push(addr.trim().to_string());
+                if let Some(port) = pending.get("port").and_then(|v| v.as_u64()) {
+                    built.args.push("--port".into());
+                    built.args.push(port.to_string());
+                }
+            }
+        }
+        let _ = crate::store::save("quick-pending", &serde_json::json!({}));
+    }
+
     let pid = game::spawn(app.clone(), &built)?;
     // 启动音效 / 外部联动用：失败不影响启动
     let _ = app.emit("game-launch", &version_id);

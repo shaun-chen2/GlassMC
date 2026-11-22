@@ -215,6 +215,9 @@ body {
   display: flex;
   flex-direction: column;
   gap: 2px;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
   padding: 8px 10px 12px;
   background: rgba(var(--sidebar-rgb), calc(var(--sidebar-base) * var(--glass-alpha)));
   border-right: 1px solid var(--card-border);

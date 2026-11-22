@@ -1,12 +1,12 @@
 # GlassMC
 
-> GlassMC 是 Rust + Tauri 2 写的跨平台 Minecraft 启动器：系统级毛玻璃界面，393 个正式版与快照、Fabric / Quilt / Forge / NeoForge、JDK 自动配置、Modrinth 模组、整合包导入导出与陶瓦联机，macOS / Windows / Linux 同一套代码，GPLv3 开源。
+> GlassMC 是 Rust + Tauri 2 写的跨平台 Minecraft 启动器：系统级毛玻璃界面，393 个正式版与快照、Fabric / Quilt / Forge / NeoForge、JDK 自动配置、Modrinth 模组、整合包导入导出、陶瓦联机、存档备份、崩溃诊断与 MCP 服务端，macOS / Windows / Linux 同一套代码，GPLv3 开源。
 
 GlassMC 是一个直接面向最终用户的桌面应用（不是模组加载器、也不是服务端），装好之后选版本、点安装、点启动即可进游戏；启动参数、Java 运行时、依赖库、资源对象、皮肤注入都由启动器处理。界面使用操作系统原生的毛玻璃材质（macOS 的 NSVisualEffectView、Windows 的 Mica / Acrylic、Linux 的 WebKitGTK），不是网页里叠滤镜模拟出来的效果。
 
 ## 核心事实
 
-- 当前版本：1.3.3
+- 当前版本：1.4.0
 - 平台：macOS 15+（Apple Silicon 与 Intel 共用一个 Universal 包）、Windows 10 1809+ / 11（x64，需要 WebView2）、Linux（需要 WebKitGTK 4.1）
 - 技术栈：Rust 后端 + Tauri 2 + 无构建的静态前端（HTML / CSS / 原生 JS）
 - 许可：GPLv3
@@ -47,7 +47,8 @@ GlassMC 是一个直接面向最终用户的桌面应用（不是模组加载器
 - **皮肤站登录了，游戏里还是默认皮肤？** 确认启动的实例用的是那个皮肤站账号。外置登录会在启动时注入 authlib-injector，日志里应该出现 Authentication server: 你的皮肤站地址 和 Httpd is running。
 - **以前 HMCL 的整合包和存档能直接用吗？** 能。左侧「导入」会自动扫描 HMCL、官方启动器、Prism / MultiMC 的目录，选一个点导入，账号、版本、模组、存档都复制过来，原目录不受影响。
 - **Windows / Linux 真的能用吗？** Windows：交叉编译出的是 PE32+ 可执行文件，只依赖系统 DLL 和 WebView2Loader.dll。装进 wine 走完了「静默安装 → 从 Program Files 启动 → 卸载无残留」。真实 Windows 上的窗口长什么样还没看到。
-- **能不安装先看看界面吗？** 可以，glassmc.shuan.uk/web 是同一套前端跑在浏览器里，八个页面都能点，安装、启动、联机走的是示例数据。 它只是让人先看一眼界面：真的下版本、开游戏还是得装桌面版。
+- **能不安装先看看界面吗？** 可以，glassmc.shuan.uk/web 是同一套前端跑在浏览器里，所有页面都能点，安装、启动、联机走的是示例数据。 它只是让人先看一眼界面：真的下版本、开游戏还是得装桌面版。
+- **MCP 服务端怎么接？** 用 glassmc --mcp 启动 stdio 服务端，在 Claude Desktop、CodeBuddy 等客户端里把可执行文件和 --mcp 写进 mcpServers 即可。设置页「MCP 服务端」卡片会生成当前机器的配置示例，可一键复制。
 
 ## 可选
 

@@ -666,7 +666,16 @@ pub async fn build_command(
 
     // 内存取「全局设置」与「实例自带 HMCL 设置」的较大值，大型整合包才不会 OOM
     let setting_mb = (cfg.memory_gb * 1024.0).round() as u32;
-    let max_mb = setting_mb.max(instance_max_memory_mb(version_id).unwrap_or(0));
+    let mut max_mb = setting_mb.max(instance_max_memory_mb(version_id).unwrap_or(0));
+    // 增强模块（512MB 模式）：用户显式打开时才覆盖，默认不改变既有行为。
+    let tweaks: serde_json::Value = crate::store::load("tweak-prefs");
+    let low_memory = tweaks
+        .get("lowMemory")
+        .and_then(|v| v.as_bool())
+        .unwrap_or(false);
+    if low_memory {
+        max_mb = 512;
+    }
 
     let mut args: Vec<String> = jvm_arguments(
         &merged,
@@ -708,6 +717,37 @@ pub async fn build_command(
                 }
             }
         }
+    }
+
+    // 512MB 模式要替换版本 JSON 里可能已有的 -Xmx，而不是再追加一个
+    if low_memory {
+        args.retain(|a| !a.starts_with("-Xmx"));
+        args.insert(0, "-Xmx512M".to_string());
+    }
+
+    // 智能 GC / 内存压缩：只在用户打开开关时追加，且避免重复
+    let mut add_jvm = |flag: &str| {
+        if !args.iter().any(|a| a == flag) {
+            args.push(flag.to_string());
+        }
+    };
+    if tweaks
+        .get("smartGc")
+        .and_then(|v| v.as_bool())
+        .unwrap_or(false)
+    {
+        add_jvm("-XX:+UseG1GC");
+        add_jvm("-XX:MaxGCPauseMillis=50");
+        add_jvm("-XX:+HeapDumpOnOutOfMemoryError");
+    }
+    if tweaks
+        .get("memoryCompression")
+        .and_then(|v| v.as_bool())
+        .unwrap_or(false)
+        && max_mb < 28 * 1024
+    {
+        add_jvm("-XX:+UseCompressedOops");
+        add_jvm("-XX:+UseCompressedClassPointers");
     }
 
     // 自定义 JVM 参数放在主类之前，避免被当成游戏参数

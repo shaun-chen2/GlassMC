@@ -42,19 +42,21 @@ END = "<!-- GEO:END -->"
 
 META_DESC = (
     "GlassMC 是一个跨平台的 Minecraft 启动器：液态玻璃界面，一键装版本、加载器与模组，"
-    "支持离线 / 微软正版 / 皮肤站登录，内置 Modrinth、整合包导入与陶瓦联机。"
+    "支持离线 / 微软正版 / 皮肤站登录，内置 Modrinth、整合包导入、陶瓦联机、"
+    "存档备份、崩溃诊断、服务器延迟与 MCP 服务端。"
     "Rust + Tauri 2 实现，macOS（Apple Silicon / Intel）、Windows、Linux 同一套代码，"
     "并提供浏览器在线体验页。"
 )
 SHORT_DESC = (
     "GlassMC 是 Rust + Tauri 2 写的跨平台 Minecraft 启动器：系统级毛玻璃界面，"
     "393 个正式版与快照、Fabric / Quilt / Forge / NeoForge、JDK 自动配置、"
-    "Modrinth 模组、整合包导入导出与陶瓦联机，macOS / Windows / Linux 同一套代码，GPLv3 开源。"
+    "Modrinth 模组、整合包导入导出、陶瓦联机、存档备份、崩溃诊断与 MCP 服务端，"
+    "macOS / Windows / Linux 同一套代码，GPLv3 开源。"
 )
 OG_TITLE = "GlassMC · 液态玻璃 Minecraft 启动器下载"
 OG_DESC = (
     "跨平台（macOS / Windows / Linux），一键装版本与模组，支持离线 / 微软正版 / 认证服务器登录，"
-    "内置陶瓦联机。不想先安装，可以直接在浏览器里在线体验。"
+    "内置陶瓦联机、存档备份、崩溃诊断与 MCP 服务端。不想先安装，可以直接在浏览器里在线体验。"
 )
 OG_ALT = "GlassMC 界面：液态玻璃质感的启动器窗口浮在深色星云壁纸上"
 

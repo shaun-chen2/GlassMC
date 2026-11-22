@@ -1455,10 +1455,11 @@ dependencies = [
 
 [[package]]
 name = "glassmc"
-version = "1.3.3"
+version = "1.4.0"
 dependencies = [
  "base64 0.22.1",
  "dirs",
+ "flate2",
  "md5",
  "reqwest",
  "serde",

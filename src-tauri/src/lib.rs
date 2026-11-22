@@ -1,10 +1,13 @@
 //! GlassMC — 液态玻璃 Minecraft 启动器（Tauri 2 版，macOS / Windows / Linux）
 
 mod account;
+mod autoupdate;
 mod commands;
 mod commands_ext;
+mod community;
 mod config;
 mod curseforge;
+mod diagnostics;
 mod download;
 mod game;
 mod glass;
@@ -17,13 +20,22 @@ mod javadl;
 mod launch;
 mod loader;
 mod manifest;
+mod mcp;
 mod microsoft;
 mod modpack;
+mod modpacks_advanced;
 mod modrinth;
+mod mods_advanced;
 mod net;
 mod paths;
+mod quick;
+mod saves;
+mod security;
+mod servers;
 mod skins;
+mod store;
 mod terracotta;
+mod tweaks;
 mod update;
 mod yggdrasil;
 
@@ -145,6 +157,11 @@ pub fn cli_test_terracotta() -> Result<String, String> {
     })
 }
 
+/// 命令行入口：`glassmc --mcp`。stdio MCP 服务端，不打开界面。
+pub fn run_mcp() -> Result<(), String> {
+    mcp::serve()
+}
+
 pub fn run() {
     paths::ensure_dirs();
     let initial = config::load();
@@ -166,6 +183,10 @@ pub fn run() {
                     }
                 }
             }
+            // 静默自动更新：命令内部会判断开关，用户未开启时不联网
+            tauri::async_runtime::spawn(async {
+                let _ = crate::autoupdate::auto_check_now().await;
+            });
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
@@ -254,6 +275,105 @@ pub fn run() {
             // ---- 更新 ----
             commands_ext::update_check,
             commands_ext::update_download,
+            // ---- 静默自动更新 ----
+            autoupdate::auto_config_get,
+            autoupdate::auto_config_set,
+            autoupdate::auto_status,
+            autoupdate::auto_check_now,
+            autoupdate::auto_mark_installed,
+            // ---- 安全 ----
+            security::mods_security_scan,
+            security::mc_news,
+            security::mc_news_refresh,
+            // ---- 整合包进阶 ----
+            modpacks_advanced::pack_share_code,
+            modpacks_advanced::pack_preview_code,
+            modpacks_advanced::pack_install_code,
+            modpacks_advanced::pack_diff,
+            modpacks_advanced::pack_apply_diff,
+            // ---- 快捷游玩 / Discord RPC ----
+            quick::pins_list,
+            quick::pin_add,
+            quick::pin_remove,
+            quick::quick_prepare,
+            quick::rpc_config,
+            quick::rpc_status,
+            quick::rpc_send_activity,
+            // ---- 模组进阶 ----
+            mods_advanced::preset_list,
+            mods_advanced::preset_save,
+            mods_advanced::preset_apply,
+            mods_advanced::preset_delete,
+            mods_advanced::mods_conflicts,
+            mods_advanced::mods_drop_import,
+            mods_advanced::mods_update_check,
+            mods_advanced::mods_update_apply,
+            // ---- 存档与数据 ----
+            saves::saves_list,
+            saves::saves_backup,
+            saves::saves_list_backups,
+            saves::saves_restore,
+            saves::saves_delete_backup,
+            saves::screenshots_list,
+            saves::screenshots_delete,
+            saves::saves_datapacks,
+            saves::saves_toggle_datapack,
+            saves::saves_add_datapack,
+            saves::schematic_list,
+            saves::schematic_import,
+            // ---- 联机 / 服务器 / FRP ----
+            servers::servers_list,
+            servers::servers_add,
+            servers::servers_remove,
+            servers::servers_pin,
+            servers::servers_ping,
+            servers::servers_ping_all,
+            servers::servers_join,
+            servers::server_browser_list,
+            servers::server_browser_info,
+            servers::frp_download,
+            servers::frp_config_get,
+            servers::frp_config_save,
+            servers::frp_status,
+            servers::frp_start,
+            servers::frp_stop,
+            servers::frp_log,
+            // ---- 诊断 ----
+            diagnostics::crash_explain,
+            diagnostics::logs_export,
+            diagnostics::logs_reveal,
+            diagnostics::cleanup_scan,
+            diagnostics::cleanup_apply,
+            // ---- 社区 / 硬件 ----
+            community::share_export,
+            community::share_text,
+            community::mcbbs_template_get,
+            community::mcbbs_template_set,
+            community::mcbbs_render,
+            community::server_dashboard,
+            community::portable_export,
+            community::hardware_info,
+            community::hardware_usage,
+            // ---- 移动端等价 / 辅助包 / 启动优化 ----
+            tweaks::tweak_prefs_get,
+            tweaks::tweak_prefs_set,
+            tweaks::low_memory_set,
+            tweaks::low_memory_args,
+            tweaks::memory_recommend,
+            tweaks::data_dir_targets,
+            tweaks::data_dir_move,
+            tweaks::assist_pack_create,
+            tweaks::assist_packs_list,
+            tweaks::assist_pack_open,
+            tweaks::fast_core_bench,
+            tweaks::cleanup_processes_scan,
+            tweaks::cleanup_processes_apply,
+            tweaks::smart_gc_set,
+            tweaks::smart_gc_args,
+            tweaks::prelaunch_script_get,
+            tweaks::prelaunch_script_set,
+            tweaks::prelaunch_script_run,
+            tweaks::memory_compression_args,
             // ---- 实例运维 ----
             commands_ext::copy_instance,
             commands_ext::set_instance_category,
@@ -261,6 +381,8 @@ pub fn run() {
             commands_ext::create_instance_shortcut,
             // ---- 界面资源 ----
             commands_ext::media_data_url,
+            // ---- MCP ----
+            mcp::mcp_status,
         ])
         .build(tauri::generate_context!())
         .expect("构建 GlassMC 失败")
@@ -270,4 +392,33 @@ pub fn run() {
                 terracotta::kill_on_exit();
             }
         });
+}
+
+#[cfg(test)]
+mod smoke_new_features {
+    /// 在空数据/不存在版本上跑一遍新功能读取路径：只允许返回错误，不允许 panic。
+    #[test]
+    fn read_paths_are_panic_free() {
+        let v = "no-such-version".to_string();
+        let _ = crate::saves::saves_list(v.clone());
+        let _ = crate::saves::saves_list_backups(v.clone());
+        let _ = crate::saves::screenshots_list(v.clone());
+        let _ = crate::saves::saves_datapacks(v.clone(), "world".into());
+        let _ = crate::saves::schematic_list(v.clone());
+        let _ = crate::mods_advanced::preset_list();
+        let _ = crate::mods_advanced::mods_conflicts(v.clone());
+        let _ = crate::modpacks_advanced::pack_diff("missing".into());
+        let _ = crate::servers::servers_list();
+        let _ = crate::servers::server_browser_list();
+        let _ = crate::diagnostics::crash_explain(v.clone());
+        let _ = crate::diagnostics::cleanup_scan(v.clone());
+        let _ = crate::security::mods_security_scan(v.clone());
+        let _ = crate::community::server_dashboard();
+        let _ = crate::community::share_text(v.clone());
+        let _ = crate::tweaks::tweak_prefs_get();
+        let _ = crate::tweaks::fast_core_bench();
+        let _ = crate::quick::pins_list();
+        let _ = crate::quick::rpc_status();
+        let _ = crate::autoupdate::auto_status();
+    }
 }

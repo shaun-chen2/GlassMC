@@ -48,6 +48,14 @@ fn main() {
         }
         return;
     }
+    // MCP stdio 服务端：由 MCP 客户端作为子进程拉起，不打开窗口
+    if args.iter().any(|a| a == "--mcp") {
+        if let Err(e) = glassmc_lib::run_mcp() {
+            eprintln!("MCP 服务失败：{e}");
+            std::process::exit(1);
+        }
+        return;
+    }
     if args.iter().any(|a| a == "--test-terracotta") {
         match glassmc_lib::cli_test_terracotta() {
             Ok(text) => println!("{text}"),
