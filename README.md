@@ -16,7 +16,8 @@
 [![介绍页](https://img.shields.io/badge/%E4%BB%8B%E7%BB%8D%E9%A1%B5-glassmc.shuan.uk-111?style=for-the-badge)](https://glassmc.shuan.uk/)
 [![在线体验](https://img.shields.io/badge/%E5%9C%A8%E7%BA%BF%E4%BD%93%E9%AA%8C-%E6%B5%8F%E8%A7%88%E5%99%A8%E9%87%8C%E8%AF%95%E8%AF%95-7fd3a0?style=for-the-badge)](https://glassmc.shuan.uk/web/)
 
-> **1.4.1**：换用新的玻璃方块图标；侧栏按功能分组并支持搜索、折叠；自动更新新增「自动安装并重启」。
+> **1.4.2**：修复 NeoForge 模组把依赖项 `minecraft` 误判成自身 ID 导致的冲突误报。
+> 1.4.1 换用新图标、侧栏支持分组搜索，自动更新可安装并重启。
 > 1.4.0 新增内置 MCP 服务端、存档备份、模组进阶、诊断与安全、服务器列表 / FRP 等 40+ 项功能。
 > 完整变更见 [CHANGELOG](CHANGELOG.md)。
 

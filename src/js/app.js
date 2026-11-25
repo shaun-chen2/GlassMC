@@ -16,7 +16,7 @@
 
   // ---------------------------------------------------------------- mock
   const MOCK_STATE = {
-    version: '1.4.1',
+    version: '1.4.2',
     dataRoot: '/Users/demo/Library/Application Support/GlassMC',
     gameDir: '/Users/demo/Library/Application Support/GlassMC/minecraft',
     os: 'osx',

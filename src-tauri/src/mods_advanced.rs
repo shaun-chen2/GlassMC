@@ -296,9 +296,20 @@ fn parse_json_meta(text: &str, meta: &mut ModMeta) {
 }
 
 fn parse_toml_meta(text: &str, meta: &mut ModMeta) {
+    // NeoForge / Forge 的 mods.toml 里，[[dependencies.xxx]] 也会出现 modId，
+    // 例如每个模组都会声明 modId="minecraft"；这些不是模组自己的 ID。
+    // 只解析 [[mods]] 段，否则会把所有模组误判成同一个 "minecraft"。
+    let mut in_mods = false;
     for line in text.lines() {
         let line = line.trim();
         if line.is_empty() || line.starts_with('#') {
+            continue;
+        }
+        if line.starts_with('[') {
+            in_mods = line.starts_with("[[mods]]");
+            continue;
+        }
+        if !in_mods {
             continue;
         }
         let Some((k, rest)) = line.split_once('=') else {
@@ -966,4 +977,61 @@ pub async fn mods_update_apply(version_id: String, items: Vec<UpdateItem>) -> Up
         out.succeeded.push(name);
     }
     out
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{parse_toml_meta, ModMeta};
+
+    #[test]
+    fn ignores_dependency_modids() {
+        let text = r#"
+modLoader = "javafml"
+loaderVersion = "[4,)"
+license = "MIT"
+
+[[mods]]
+modId = "create"
+version = "1.21.1-6.0.10"
+displayName = "Create"
+
+[[dependencies.create]]
+modId = "minecraft"
+mandatory = true
+versionRange = "[1.21.1,1.22)"
+
+[[dependencies.create]]
+modId = "neoforge"
+mandatory = true
+"#;
+        let mut meta = ModMeta::default();
+        parse_toml_meta(text, &mut meta);
+        assert_eq!(
+            meta.ids,
+            vec!["create"],
+            "依赖里的 minecraft 不应被当成模组 ID"
+        );
+        assert_eq!(meta.name, "Create");
+        assert_eq!(meta.version, "1.21.1-6.0.10");
+    }
+
+    #[test]
+    fn reads_multiple_mods_blocks() {
+        let text = r#"
+[[mods]]
+modId = "first"
+displayName = "First"
+
+[[dependencies.first]]
+modId = "minecraft"
+
+[[mods]]
+modId = "second"
+displayName = "Second"
+"#;
+        let mut meta = ModMeta::default();
+        parse_toml_meta(text, &mut meta);
+        assert_eq!(meta.ids, vec!["first", "second"]);
+        assert_eq!(meta.name, "First");
+    }
 }

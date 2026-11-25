@@ -3,6 +3,14 @@
 格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，
 版本号遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [1.4.2] - 2026-11-25
+
+### 修复
+
+- **模组冲突误报**：解析 `mods.toml` / `neoforge.mods.toml` 时只读取 `[[mods]]` 段，
+  不再把 `[[dependencies.xxx]]` 里的 `modId = "minecraft"` 当成模组自身 ID。
+  此前会把大量 NeoForge 模组误报成「244 个模组声明了同一个 ID minecraft」。
+
 ## [1.4.1] - 2026-11-25
 
 ### 改进

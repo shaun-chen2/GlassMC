@@ -8,7 +8,7 @@
 
 # 一、介绍页正文
 
-macOS · Windows · Linux | v1.4.1 | 约 10 MB
+macOS · Windows · Linux | v1.4.2 | 约 10 MB
 
 # GlassMC
 
@@ -31,7 +31,7 @@ macOS · Windows · Linux | v1.4.1 | 约 10 MB
 
 ## 下载
 
-GlassMC 1.4.1 · macOS 15+ · Windows 10+ · Linux · `GPLv3` 开源
+GlassMC 1.4.2 · macOS 15+ · Windows 10+ · Linux · `GPLv3` 开源
 
 ↓ macOS · dmg 约 10 MB Windows · exe 约 3 MB Linux · deb 约 3.4 MB
 
