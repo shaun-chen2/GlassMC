@@ -16,7 +16,8 @@
 [![介绍页](https://img.shields.io/badge/%E4%BB%8B%E7%BB%8D%E9%A1%B5-glassmc.shuan.uk-111?style=for-the-badge)](https://glassmc.shuan.uk/)
 [![在线体验](https://img.shields.io/badge/%E5%9C%A8%E7%BA%BF%E4%BD%93%E9%AA%8C-%E6%B5%8F%E8%A7%88%E5%99%A8%E9%87%8C%E8%AF%95%E8%AF%95-7fd3a0?style=for-the-badge)](https://glassmc.shuan.uk/web/)
 
-> **1.4.0**：新增内置 MCP 服务端、存档备份、模组进阶、诊断与安全、服务器列表 / FRP 等 40+ 项功能。
+> **1.4.1**：换用新的玻璃方块图标；侧栏按功能分组并支持搜索、折叠；自动更新新增「自动安装并重启」。
+> 1.4.0 新增内置 MCP 服务端、存档备份、模组进阶、诊断与安全、服务器列表 / FRP 等 40+ 项功能。
 > 完整变更见 [CHANGELOG](CHANGELOG.md)。
 
 ![GlassMC 主界面](docs/images/app-window.jpg)
@@ -134,7 +135,8 @@ HMCL 配置里存着的登录令牌也会顺手带过来。
 
 - **固定世界 / 服务器**：首页一步启动；服务器用标准 `--server` / `--port`，不使用 demo / quickPlay。
 - **Discord Rich Presence**：通过本地 IPC 上报当前实例与状态，连不上就静默降级。
-- **静默自动更新**：默认关闭；开启后只把安装包暂存到本地，绝不自动执行。
+- **自动更新**：默认关闭；可只提示、静默下载，或下载后自动安装并重启
+  （macOS 替换 `.app`、Windows 静默跑安装包、Linux 打开安装包）。
 - **启动优化**：内存推荐、512MB 低内存模式、智能 GC、压缩指针、启动前脚本、本地扫描基准；清后台需手动勾选。
 - **移动端等价**：触控模式、虚拟按键、外置数据目录迁移（桌面启动器上的等价实现，界面已标注限制）。
 - **辅助包**：离线生成 keepInventory 数据包、矿石高亮资源包、投影 / 血条说明包，只生成不自动安装。

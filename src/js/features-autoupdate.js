@@ -1,11 +1,12 @@
 /* =====================================================================
- * features-autoupdate.js —— 静默自动更新（设置页卡片）
+ * features-autoupdate.js —— 自动更新（设置页卡片）
  *
  * 只往 #settings 幂等注入一张卡片，不新增 nav、不改 app.js：
  * - 开关 / 模式走 auto_config_set；
  * - 状态走 auto_status（纯本地读取，离线也能秒回）；
  * - 立即检查走 auto_check_now（失败返回 ok:false，不会把界面挂住）；
- * - 手动安装按钮调已有的 open_path，只打开、不自动执行升级流程。
+ * - 「安装并重启」走 auto_install_staged：macOS 替换 .app，Windows 静默跑安装包，
+ *   Linux 打开安装包；也保留「打开安装包」给不想自动安装的用户。
  * ===================================================================== */
 (function () {
   'use strict';
@@ -20,15 +21,14 @@
 
   let lastStatus = null;
   let refreshToken = 0;
-  let bound = false;
 
   // ---------------------------------------------------------------- 卡片
 
   function cardHtml() {
     return (
       '<div class="card" id="auto-card" data-auto-card="1">' +
-        '<div class="card-title" data-i18n="auto.title">静默自动更新</div>' +
-        '<div class="desc" data-i18n="auto.desc">后台检查新版本；开启「静默下载」后会把安装包暂存到本地，由你决定何时安装。</div>' +
+        '<div class="card-title" data-i18n="auto.title">自动更新</div>' +
+        '<div class="desc" data-i18n="auto.desc">后台检查新版本；可以只提示、静默下载，或下载后自动安装并重启。</div>' +
         '<div class="field">' +
           '<label class="hstack" style="gap:8px">' +
             '<input type="checkbox" id="auto-enabled" data-i18n-aria-label="auto.enable">' +
@@ -41,8 +41,9 @@
           '<select id="auto-mode">' +
             '<option value="notify" data-i18n="auto.mode.notify">只提示我</option>' +
             '<option value="silent-download" data-i18n="auto.mode.download">静默下载安装包</option>' +
+            '<option value="auto-install" data-i18n="auto.mode.install">自动安装并重启</option>' +
           '</select>' +
-          '<div class="desc" data-i18n="auto.modeDesc">静默下载只会把安装包存到 更新/updates 目录，绝不会自动安装或替换当前版本。</div>' +
+          '<div class="desc" data-i18n="auto.modeDesc">自动安装会替换当前程序并重启；macOS 需要当前 .app 可写，Windows 可能弹管理员确认，Linux 会打开安装包。</div>' +
         '</div>' +
         '<div class="field">' +
           '<div class="lbl" data-i18n="auto.status">状态</div>' +
@@ -51,7 +52,8 @@
         '</div>' +
         '<div class="hstack" style="gap:8px;flex-wrap:wrap">' +
           '<button class="btn primary" id="auto-check" data-i18n="auto.checkNow">立即检查</button>' +
-          '<button class="btn" id="auto-install" style="display:none" data-i18n="auto.install">手动安装</button>' +
+          '<button class="btn" id="auto-install" style="display:none" data-i18n="auto.install">安装并重启</button>' +
+          '<button class="btn" id="auto-open" style="display:none" data-i18n="auto.open">打开安装包</button>' +
         '</div>' +
       '</div>'
     );
@@ -67,9 +69,9 @@
       card = document.getElementById('auto-card');
     }
     // data-i18n 节点由 i18n.apply(document) 统一刷新；这里只绑定一次事件。
-    if (card && !bound) {
+    if (card && !card.dataset.bound) {
+      card.dataset.bound = '1';
       bind(card);
-      bound = true;
     }
   }
 
@@ -81,7 +83,9 @@
     const check = card.querySelector('#auto-check');
     if (check) check.addEventListener('click', () => checkNow(check));
     const install = card.querySelector('#auto-install');
-    if (install) install.addEventListener('click', openStaged);
+    if (install) install.addEventListener('click', installNow);
+    const open = card.querySelector('#auto-open');
+    if (open) open.addEventListener('click', openStaged);
   }
 
   // ---------------------------------------------------------------- 渲染
@@ -131,6 +135,7 @@
 
     const staged = document.getElementById('auto-staged');
     const install = document.getElementById('auto-install');
+    const open = document.getElementById('auto-open');
     if (staged) {
       if (status && status.stagedExists) {
         staged.innerHTML =
@@ -138,9 +143,11 @@
           '<span class="mono-dim" title="' + esc(status.stagedPath || '') + '">' +
           esc(status.stagedName || '') + ' · ' + esc(formatSize(status.stagedSize)) + '</span>';
         if (install) install.style.display = '';
+        if (open) open.style.display = '';
       } else {
         staged.textContent = t('staged.none');
         if (install) install.style.display = 'none';
+        if (open) open.style.display = 'none';
       }
     }
   }
@@ -196,6 +203,28 @@
       await refresh();
     } catch (e) {
       toast(t('toast.offline', { err: firstLine(e) }), 'err');
+    } finally {
+      GM.busy(false);
+      btn.disabled = false;
+    }
+  }
+
+  async function installNow(btn) {
+    if (!btn || btn.disabled) return;
+    const path = lastStatus && lastStatus.stagedPath;
+    if (!path) {
+      toast(t('toast.noStaged'), 'err');
+      return;
+    }
+    if (!window.confirm(t('installConfirm'))) return;
+    btn.disabled = true;
+    GM.busy(true, t('installing'));
+    try {
+      const msg = await invoke('auto_install_staged');
+      toast(msg || t('toast.installing'), 'ok');
+      await refresh();
+    } catch (e) {
+      toast(t('toast.installFail', { err: firstLine(e) }), 'err');
     } finally {
       GM.busy(false);
       btn.disabled = false;

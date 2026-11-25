@@ -16,7 +16,7 @@
 
   // ---------------------------------------------------------------- mock
   const MOCK_STATE = {
-    version: '1.4.0',
+    version: '1.4.1',
     dataRoot: '/Users/demo/Library/Application Support/GlassMC',
     gameDir: '/Users/demo/Library/Application Support/GlassMC/minecraft',
     os: 'osx',
@@ -134,6 +134,24 @@
           { touchMode: false, virtualKeys: false, lowMemory: false, smartGc: false, prelaunchScript: '' },
           args.patch || {}
         );
+      case 'auto_status':
+        return {
+          config: { enabled: false, mode: 'notify', lastCheck: 0, lastVersion: '', stagedPath: '', failures: 0 },
+          currentVersion: MOCK_STATE.version,
+          stagedExists: false, stagedName: '', stagedSize: 0
+        };
+      case 'auto_config_set':
+        return {
+          enabled: !!args.enabled, mode: args.mode || 'notify',
+          lastCheck: 0, lastVersion: '', stagedPath: '', failures: 0
+        };
+      case 'auto_check_now':
+        return {
+          ok: true, message: t('auto.toast.latest'), latest: MOCK_STATE.version,
+          hasUpdate: false, downloaded: false, skipped: false, stagedPath: '', stagedSize: 0
+        };
+      case 'auto_install_staged':
+        throw new Error('预览模式不支持安装更新');
       case 'mcp_status':
         return {
           executable: '/Applications/GlassMC.app/Contents/MacOS/glassmc',

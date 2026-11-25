@@ -10,8 +10,9 @@
   const t = (key, vars) => (typeof GM.t === 'function' ? GM.t('mcp.' + key, vars) : key);
   const esc = (s) => (typeof GM.esc === 'function' ? GM.esc(s) : String(s == null ? '' : s));
 
-  let bound = false;
   let status = null;
+  let loading = false;
+  let loadRetry = 0;
 
   function cardHtml() {
     return (
@@ -41,6 +42,14 @@
   }
 
   async function load() {
+    // 首帧 ready 钩子可能早于 app.js 暴露 __GM，等它就绪再取状态
+    if (!window.__GM || typeof window.__GM.invoke !== 'function') {
+      if (loadRetry++ < 10) setTimeout(load, 150);
+      return;
+    }
+    if (loading) return;
+    loading = true;
+    loadRetry = 0;
     try {
       status = await GM.invoke('mcp_status');
       if (!status) throw new Error('empty mcp_status');
@@ -57,6 +66,8 @@
       if (win) win.style.display = isWin ? '' : 'none';
     } catch (e) {
       GM.toast(t('status.fail', { err: String((e && e.message) || e) }), 'err');
+    } finally {
+      loading = false;
     }
   }
 
@@ -95,17 +106,25 @@
       grid.insertAdjacentHTML('beforeend', cardHtml());
       card = document.getElementById('mcp-card');
     }
-    if (card && !bound) {
+    if (card && !card.dataset.bound) {
+      card.dataset.bound = '1';
       card.querySelector('#mcp-copy').onclick = copyConfig;
       card.querySelector('#mcp-refresh').onclick = load;
-      bound = true;
       load();
-    } else if (card && bound && status) {
+    } else if (card && status) {
       // 切换语言后动态拼出来的工具数标签不会被 i18n.apply 自动刷新
       const label = card.querySelector('#mcp-tools');
       if (label) label.textContent = t('tools') + ': ' + (status.toolCount || 0);
     }
   }
 
-  GM.register({ ready: inject, render: inject });
+  GM.register({
+    ready: inject,
+    render: inject,
+    nav: (page) => {
+      if (page !== 'settings') return;
+      inject();
+      if (!status) load();
+    },
+  });
 })();

@@ -13,6 +13,7 @@
 
 use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
+use std::sync::atomic::{AtomicBool, Ordering};
 use tokio::io::AsyncWriteExt;
 
 use crate::net;
@@ -26,6 +27,8 @@ const KEY: &str = "auto-update";
 const CHECK_TTL: i64 = 24 * 3600;
 /// 暂存目录：data_root/updates（不是下载目录，避免和用户文件混在一起）。
 const UPDATES_DIR: &str = "updates";
+/// 防止启动检查与设置页按钮同时触发两次安装。
+static INSTALLING: AtomicBool = AtomicBool::new(false);
 
 // ---------------------------------------------------------------- 配置
 
@@ -152,11 +155,11 @@ pub fn auto_config_get() -> AutoConfig {
 pub fn auto_config_set(enabled: bool, mode: String) -> Result<AutoConfig, String> {
     let mut c = load_config();
     c.enabled = enabled;
-    // 不认识的值一律退回「只提示」，避免前端传错导致静默下载被意外打开。
-    c.mode = if mode.trim() == "silent-download" {
-        "silent-download".to_string()
-    } else {
-        "notify".to_string()
+    // 不认识的值一律退回「只提示」，避免前端传错导致自动安装被意外打开。
+    c.mode = match mode.trim() {
+        "silent-download" => "silent-download".to_string(),
+        "auto-install" => "auto-install".to_string(),
+        _ => "notify".to_string(),
     };
     save_config(&c)?;
     Ok(c)
@@ -197,7 +200,7 @@ pub fn auto_mark_installed(version: String) -> Result<AutoConfig, String> {
 /// 3. 同一版本、之前暂存过但文件已被移走、且还在 24 小时内 -> 跳过并清掉失效引用；
 /// 4. 否则尝试下载。
 #[tauri::command]
-pub async fn auto_check_now() -> Result<CheckNowResult, String> {
+pub async fn auto_check_now(app: tauri::AppHandle) -> Result<CheckNowResult, String> {
     let prev = load_config();
 
     if !prev.enabled {
@@ -244,6 +247,10 @@ pub async fn auto_check_now() -> Result<CheckNowResult, String> {
         c.last_check = now;
         c.last_version = info.latest.clone();
         c.failures = 0;
+        // 已经是这台机器上的版本：之前暂存的安装包不再有意义，清掉引用（文件保留）
+        if c.staged_path.trim() != "" {
+            c.staged_path.clear();
+        }
         let _ = save_config(&c);
         return Ok(result(
             true,
@@ -280,12 +287,47 @@ pub async fn auto_check_now() -> Result<CheckNowResult, String> {
     let same_version = prev.last_version == info.latest;
     let (staged_exists, _, staged_size) = staged_info(&prev.staged_path);
 
-    // 1. 已为这个版本暂存过：不再重复下载。
+    // 1. 已为这个版本暂存过：不再重复下载；自动安装模式下直接进入安装。
     if same_version && staged_exists {
         let mut c = prev.clone();
         c.last_check = now;
         c.failures = 0;
         let _ = save_config(&c);
+        if c.mode == "auto-install" {
+            return Ok(match begin_install(&app, &prev.staged_path) {
+                Ok(outcome) => {
+                    if outcome.quit {
+                        schedule_exit(&app);
+                    }
+                    result(
+                        true,
+                        outcome.message,
+                        info.latest,
+                        true,
+                        false,
+                        true,
+                        prev.staged_path,
+                        staged_size,
+                    )
+                }
+                Err(e) => {
+                    let mut c = prev.clone();
+                    c.last_check = now;
+                    c.failures = c.failures.saturating_add(1);
+                    let _ = save_config(&c);
+                    result(
+                        false,
+                        format!("自动安装失败：{e}"),
+                        info.latest,
+                        true,
+                        false,
+                        true,
+                        prev.staged_path,
+                        staged_size,
+                    )
+                }
+            });
+        }
         return Ok(result(
             true,
             format!("{} 的安装包已暂存，请手动安装", info.latest),
@@ -351,6 +393,42 @@ pub async fn auto_check_now() -> Result<CheckNowResult, String> {
             c.failures = 0;
             c.staged_path = path.clone();
             let _ = save_config(&c);
+            if c.mode == "auto-install" {
+                return Ok(match begin_install(&app, &path) {
+                    Ok(outcome) => {
+                        if outcome.quit {
+                            schedule_exit(&app);
+                        }
+                        result(
+                            true,
+                            outcome.message,
+                            info.latest,
+                            true,
+                            true,
+                            false,
+                            path,
+                            size,
+                        )
+                    }
+                    Err(e) => {
+                        let mut c = prev.clone();
+                        c.last_check = now;
+                        c.last_version = info.latest.clone();
+                        c.failures = c.failures.saturating_add(1);
+                        let _ = save_config(&c);
+                        result(
+                            false,
+                            format!("已下载，但自动安装失败：{e}"),
+                            info.latest,
+                            true,
+                            true,
+                            false,
+                            path,
+                            size,
+                        )
+                    }
+                });
+            }
             Ok(result(
                 true,
                 format!("已暂存 {}，请手动安装", info.latest),
@@ -465,6 +543,224 @@ fn ext_of(name: &str) -> String {
     ".bin".to_string()
 }
 
+// ---------------------------------------------------------------- 安装暂存包
+
+/// 自动安装的返回：是否需要退出当前进程交给安装脚本。
+struct InstallOutcome {
+    message: String,
+    quit: bool,
+}
+
+fn schedule_exit(app: &tauri::AppHandle) {
+    let handle = app.clone();
+    std::thread::spawn(move || {
+        std::thread::sleep(std::time::Duration::from_millis(600));
+        handle.exit(0);
+    });
+}
+
+fn begin_install(app: &tauri::AppHandle, path: &str) -> Result<InstallOutcome, String> {
+    let _ = app;
+    let p = Path::new(path);
+    if path.trim().is_empty() || !p.is_file() {
+        return Err("安装包不存在，请重新检查更新".into());
+    }
+    if INSTALLING.swap(true, Ordering::SeqCst) {
+        return Err("正在安装更新，请稍候".into());
+    }
+    match install_staged(p) {
+        Ok(outcome) => {
+            if !outcome.quit {
+                INSTALLING.store(false, Ordering::SeqCst);
+            }
+            Ok(outcome)
+        }
+        Err(e) => {
+            INSTALLING.store(false, Ordering::SeqCst);
+            Err(e)
+        }
+    }
+}
+
+/// 用户手动点「安装并重启」，或自动模式下启动检查完成后调用。
+#[tauri::command]
+pub fn auto_install_staged(app: tauri::AppHandle) -> Result<String, String> {
+    let c = load_config();
+    if c.staged_path.trim().is_empty() {
+        return Err("没有已暂存的安装包".into());
+    }
+    let outcome = begin_install(&app, &c.staged_path)?;
+    if outcome.quit {
+        schedule_exit(&app);
+    }
+    Ok(outcome.message)
+}
+
+fn install_staged(path: &Path) -> Result<InstallOutcome, String> {
+    #[cfg(target_os = "macos")]
+    {
+        return install_macos(path);
+    }
+    #[cfg(target_os = "windows")]
+    {
+        return install_windows(path);
+    }
+    #[cfg(all(unix, not(target_os = "macos")))]
+    {
+        return install_linux(path);
+    }
+    #[allow(unreachable_code)]
+    Err("当前平台不支持自动安装，请手动运行安装包".into())
+}
+
+#[cfg(target_os = "macos")]
+fn install_macos(path: &Path) -> Result<InstallOutcome, String> {
+    if path.extension().and_then(|e| e.to_str()) != Some("dmg") {
+        return Err("当前平台只支持 dmg 安装包".into());
+    }
+    let exe = std::env::current_exe().map_err(|e| format!("找不到当前程序：{e}"))?;
+    let app_bundle = exe
+        .ancestors()
+        .find(|p| p.extension().and_then(|e| e.to_str()) == Some("app"))
+        .ok_or_else(|| "找不到当前 .app 路径，请手动安装".to_string())?;
+    let parent = app_bundle
+        .parent()
+        .ok_or_else(|| "找不到 .app 所在目录".to_string())?;
+
+    // 先探测写权限：没有权限就直接报错，不能让启动器先退出、再安装失败。
+    let probe = parent.join(".glassmc-update-probe");
+    std::fs::write(&probe, b"probe")
+        .map_err(|e| format!("没有权限写入 {}（{e}），请手动安装", parent.display()))?;
+    let _ = std::fs::remove_file(&probe);
+
+    let dir = paths::paths().data_root.join(UPDATES_DIR);
+    std::fs::create_dir_all(&dir).map_err(|e| format!("创建更新目录失败：{e}"))?;
+    let script = dir.join("install-macos.sh");
+    let log = dir.join("install-macos.log");
+    let body = r#"#!/bin/sh
+set -u
+PID="$1"; DMG="$2"; TARGET="$3"; LOG="$4"
+exec >>"$LOG" 2>&1
+echo "[glassmc] waiting for pid $PID"
+while kill -0 "$PID" 2>/dev/null; do sleep 0.3; done
+MNT="$(mktemp -d /tmp/glassmc-dmg.XXXXXX)" || exit 1
+if ! hdiutil attach "$DMG" -nobrowse -quiet -mountpoint "$MNT"; then exit 1; fi
+APP="$(find "$MNT" -maxdepth 2 -name '*.app' -print -quit)"
+if [ -z "$APP" ]; then hdiutil detach "$MNT" -quiet; exit 1; fi
+rm -rf "$TARGET.old"
+if mv "$TARGET" "$TARGET.old" && ditto "$APP" "$TARGET"; then
+  xattr -dr com.apple.quarantine "$TARGET" 2>/dev/null || true
+  rm -rf "$TARGET.old"
+  open "$TARGET"
+else
+  rm -rf "$TARGET"
+  [ -d "$TARGET.old" ] && mv "$TARGET.old" "$TARGET"
+  open "$DMG"
+fi
+hdiutil detach "$MNT" -quiet
+"#;
+    std::fs::write(&script, body).map_err(|e| format!("写入安装脚本失败：{e}"))?;
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        std::fs::set_permissions(&script, std::fs::Permissions::from_mode(0o700))
+            .map_err(|e| format!("设置安装脚本权限失败：{e}"))?;
+    }
+
+    std::process::Command::new("/bin/sh")
+        .arg(&script)
+        .arg(std::process::id().to_string())
+        .arg(path)
+        .arg(app_bundle)
+        .arg(&log)
+        .stdin(std::process::Stdio::null())
+        .stdout(std::process::Stdio::null())
+        .stderr(std::process::Stdio::null())
+        .spawn()
+        .map_err(|e| format!("启动安装脚本失败：{e}"))?;
+
+    Ok(InstallOutcome {
+        message: "正在安装更新，启动器将自动重启".into(),
+        quit: true,
+    })
+}
+
+#[cfg(target_os = "windows")]
+fn install_windows(path: &Path) -> Result<InstallOutcome, String> {
+    if path.extension().and_then(|e| e.to_str()) != Some("exe") {
+        return Err("当前平台只支持 exe 安装包".into());
+    }
+    let target = std::env::current_exe().map_err(|e| format!("找不到当前程序：{e}"))?;
+    let dir = paths::paths().data_root.join(UPDATES_DIR);
+    std::fs::create_dir_all(&dir).map_err(|e| format!("创建更新目录失败：{e}"))?;
+    let script = dir.join("install-windows.bat");
+    let log = dir.join("install-windows.log");
+    let body = r#"@echo off
+setlocal
+set PID=%1
+set INSTALLER=%~2
+set TARGET=%~3
+set LOG=%~4
+:wait
+tasklist /FI "PID eq %PID%" 2>nul | find "%PID%" >nul
+if not errorlevel 1 (
+  timeout /t 1 /nobreak >nul
+  goto wait
+)
+start "" /wait "%INSTALLER%" /S >>"%LOG%" 2>&1
+if exist "%TARGET%" start "" "%TARGET%"
+"#;
+    std::fs::write(&script, body).map_err(|e| format!("写入安装脚本失败：{e}"))?;
+
+    use std::os::windows::process::CommandExt;
+    const CREATE_NO_WINDOW: u32 = 0x0800_0000;
+    let script_s = script.to_string_lossy().to_string();
+    let pid_s = std::process::id().to_string();
+    let installer_s = path.to_string_lossy().to_string();
+    let target_s = target.to_string_lossy().to_string();
+    let log_s = log.to_string_lossy().to_string();
+    std::process::Command::new("cmd")
+        .args([
+            "/C",
+            "start",
+            "",
+            "/min",
+            script_s.as_str(),
+            pid_s.as_str(),
+            installer_s.as_str(),
+            target_s.as_str(),
+            log_s.as_str(),
+        ])
+        .creation_flags(CREATE_NO_WINDOW)
+        .spawn()
+        .map_err(|e| format!("启动安装脚本失败：{e}"))?;
+
+    Ok(InstallOutcome {
+        message: "正在安装更新，启动器将自动重启（如弹出管理员确认请允许）".into(),
+        quit: true,
+    })
+}
+
+#[cfg(all(unix, not(target_os = "macos")))]
+fn install_linux(path: &Path) -> Result<InstallOutcome, String> {
+    let opener = if cfg!(target_os = "linux") {
+        "xdg-open"
+    } else {
+        "open"
+    };
+    std::process::Command::new(opener)
+        .arg(path)
+        .stdin(std::process::Stdio::null())
+        .stdout(std::process::Stdio::null())
+        .stderr(std::process::Stdio::null())
+        .spawn()
+        .map_err(|e| format!("无法打开安装包：{e}"))?;
+    Ok(InstallOutcome {
+        message: "已打开安装包，请按系统提示完成安装（Linux 需要包管理器权限）".into(),
+        quit: false,
+    })
+}
+
 // ---------------------------------------------------------------- 测试
 
 #[cfg(test)]
@@ -478,6 +774,18 @@ mod tests {
         assert_eq!(c.mode, "notify");
         assert!(c.staged_path.is_empty());
         assert_eq!(c.failures, 0);
+    }
+
+    #[test]
+    #[cfg(target_os = "macos")]
+    fn mac_refuses_non_dmg() {
+        let p = std::env::temp_dir().join("glassmc-test-update.zip");
+        std::fs::write(&p, b"x").unwrap();
+        match super::install_staged(&p) {
+            Ok(_) => panic!("非 dmg 安装包不应被自动安装"),
+            Err(e) => assert!(e.contains("dmg"), "错误信息应说明只支持 dmg：{e}"),
+        }
+        let _ = std::fs::remove_file(&p);
     }
 
     #[test]

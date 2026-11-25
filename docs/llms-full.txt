@@ -1,14 +1,14 @@
 # GlassMC 全文语料
 
 > 站点：https://glassmc.shuan.uk/
-> 内容更新时间：2026-11-22（由 Scripts/gen-geo.py 自动生成）
+> 内容更新时间：2026-11-25（由 Scripts/gen-geo.py 自动生成）
 > 内容：介绍页正文 + 仓库内技术文档。许可 GPLv3。
 
 ---
 
 # 一、介绍页正文
 
-macOS · Windows · Linux | v1.4.0 | 约 10 MB
+macOS · Windows · Linux | v1.4.1 | 约 10 MB
 
 # GlassMC
 
@@ -31,7 +31,7 @@ macOS · Windows · Linux | v1.4.0 | 约 10 MB
 
 ## 下载
 
-GlassMC 1.4.0 · macOS 15+ · Windows 10+ · Linux · `GPLv3` 开源
+GlassMC 1.4.1 · macOS 15+ · Windows 10+ · Linux · `GPLv3` 开源
 
 ↓ macOS · dmg 约 10 MB Windows · exe 约 3 MB Linux · deb 约 3.4 MB
 
@@ -109,7 +109,7 @@ Fabric、Quilt、Forge、NeoForge 一键装；JDK 8 / 11 / 17 / 21 按版本自�
 
 ### 快捷、性能与更新
 
-固定世界 / 服务器一步启动、Discord 状态、512MB 模式、智能 GC、启动前脚本；静默更新只暂存安装包。
+固定世界 / 服务器一步启动、Discord 状态、512MB 模式、智能 GC、启动前脚本；自动更新可只提示、暂存或安装并重启。
 
 12
 

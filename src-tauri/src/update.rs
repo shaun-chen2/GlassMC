@@ -1,8 +1,8 @@
 //! 更新检查：查 GitHub Releases 的最新 tag，按平台挑安装包，下载到「下载」目录。
 //!
-//! 不做静默自更新 —— 当前 macOS 产物是 ad-hoc 签名（没有 Developer ID、没有公证），
-//! 自己替换 .app 之后 Gatekeeper 照样会拦，不如老实把安装包交到用户手里。
-//! 但至少把「有没有新版本、新版本改了什么、装哪个文件」这三件事在应用内解决掉。
+//! 只负责「查版本 / 挑安装包 / 下载」；自动安装与替换流程在 `autoupdate.rs`。
+//! macOS 产物是 ad-hoc 签名（没有 Developer ID、没有公证），自动安装只能尽力而为：
+//! 替换后去掉 quarantine 并重新打开，仍可能被 Gatekeeper 拦一次。
 
 use serde::Serialize;
 use std::path::{Path, PathBuf};

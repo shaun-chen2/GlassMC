@@ -183,9 +183,11 @@ pub fn run() {
                     }
                 }
             }
-            // 静默自动更新：命令内部会判断开关，用户未开启时不联网
-            tauri::async_runtime::spawn(async {
-                let _ = crate::autoupdate::auto_check_now().await;
+            // 自动更新：命令内部会判断开关，用户未开启时不联网；
+            // 选中「自动安装」时，下载完成后会交给安装脚本并退出当前进程。
+            let update_handle = app.handle().clone();
+            tauri::async_runtime::spawn(async move {
+                let _ = crate::autoupdate::auto_check_now(update_handle).await;
             });
             Ok(())
         })
@@ -280,6 +282,7 @@ pub fn run() {
             autoupdate::auto_config_set,
             autoupdate::auto_status,
             autoupdate::auto_check_now,
+            autoupdate::auto_install_staged,
             autoupdate::auto_mark_installed,
             // ---- 安全 ----
             security::mods_security_scan,
