@@ -124,6 +124,16 @@
         return null;
       case 'game_running':
         return MOCK_STATE.running;
+      case 'tweak_prefs_get':
+        return {
+          touchMode: false, virtualKeys: false, lowMemory: false,
+          smartGc: false, prelaunchScript: ''
+        };
+      case 'tweak_prefs_set':
+        return Object.assign(
+          { touchMode: false, virtualKeys: false, lowMemory: false, smartGc: false, prelaunchScript: '' },
+          args.patch || {}
+        );
       case 'mcp_status':
         return {
           executable: '/Applications/GlassMC.app/Contents/MacOS/glassmc',

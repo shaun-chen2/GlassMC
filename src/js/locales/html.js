@@ -19,6 +19,15 @@ window.GM.i18n.add('zh-CN', {
   'html.nav.settings': '设置',
   'html.nav.new': '新',
   'html.nav.switchAccount': '切换账号',
+  'html.nav.search': '搜索功能',
+  'html.nav.noMatch': '没有匹配的功能',
+  'html.nav.group.play': '游戏',
+  'html.nav.group.content': '内容',
+  'html.nav.group.online': '联机',
+  'html.nav.group.tools': '工具',
+  'html.nav.group.community': '社区',
+  'html.nav.group.system': '系统',
+  'html.nav.group.more': '更多',
 
   // ---------------------------------------------------------------- 首页
   'html.home.play': '启动游戏',
@@ -211,6 +220,15 @@ window.GM.i18n.add('en-US', {
   'html.nav.settings': 'Settings',
   'html.nav.new': 'New',
   'html.nav.switchAccount': 'Switch account',
+  'html.nav.search': 'Search features',
+  'html.nav.noMatch': 'No matching features',
+  'html.nav.group.play': 'Play',
+  'html.nav.group.content': 'Content',
+  'html.nav.group.online': 'Online',
+  'html.nav.group.tools': 'Tools',
+  'html.nav.group.community': 'Community',
+  'html.nav.group.system': 'System',
+  'html.nav.group.more': 'More',
 
   // ---------------------------------------------------------------- Home
   'html.home.play': 'Launch Game',

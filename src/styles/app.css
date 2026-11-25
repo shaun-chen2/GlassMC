@@ -214,14 +214,119 @@ body {
   flex: none;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 8px;
   min-height: 0;
-  overflow-y: auto;
-  scrollbar-width: thin;
-  padding: 8px 10px 12px;
+  overflow: hidden;
+  padding: 8px 8px 10px;
   background: rgba(var(--sidebar-rgb), calc(var(--sidebar-base) * var(--glass-alpha)));
   border-right: 1px solid var(--card-border);
 }
+
+/* 导航区独立滚动，账号卡固定在底部，不再跟着一长串入口一起滚走 */
+.nav-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-right: 2px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--card-border) transparent;
+}
+.nav-scroll::-webkit-scrollbar { width: 5px; }
+.nav-scroll::-webkit-scrollbar-thumb { background: var(--card-border); border-radius: 3px; }
+.nav-scroll::-webkit-scrollbar-track { background: transparent; }
+
+/* 功能分组：17 个入口按「游戏 / 内容 / 联机 / 工具 / 社区 / 系统」折叠 */
+.nav-group {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.nav-group + .nav-group { margin-top: 4px; }
+.nav-group-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 22px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-dimmer);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  cursor: default;
+  transition: color .16s ease, background-color .16s ease;
+}
+.nav-group-head:hover { color: var(--text-dim); background: var(--hover); }
+.nav-group-head .g-count {
+  margin-left: auto;
+  font-size: 9.5px;
+  opacity: .7;
+}
+.nav-group-head .g-chev {
+  width: 11px;
+  height: 11px;
+  flex: none;
+  opacity: .6;
+  transition: transform .18s ease;
+}
+.nav-group.collapsed .g-chev { transform: rotate(-90deg); }
+.nav-group.collapsed .nav-item { display: none; }
+.nav-group.has-active > .nav-group-head { color: var(--text-dim); }
+.nav-group.has-active > .nav-group-head .g-label { color: var(--accent-hi); }
+
+/* 搜索：入口多起来后，比记住分组更快 */
+.nav-search {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex: none;
+  height: 30px;
+  padding: 0 8px;
+  margin: 0 0 3px;
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  background: var(--card-bg);
+  transition: border-color .16s ease;
+}
+.nav-search:focus-within { border-color: var(--accent); }
+.nav-search svg { width: 13px; height: 13px; flex: none; opacity: .55; }
+.nav-search input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--text);
+  font-size: 12px;
+}
+.nav-search input::placeholder { color: var(--text-dimmer); }
+.nav-search kbd {
+  flex: none;
+  padding: 1px 3px;
+  border: 1px solid var(--card-border);
+  border-radius: 4px;
+  color: var(--text-dimmer);
+  font-family: var(--font-mono);
+  font-size: 9px;
+}
+.nav-hide { display: none !important; }
+.nav-empty {
+  padding: 12px 8px;
+  color: var(--text-dimmer);
+  font-size: 11.5px;
+  text-align: center;
+}
+/* 搜索时强制展开，折叠状态不被破坏 */
+.nav-filtering .nav-group.collapsed .nav-item { display: flex; }
+.nav-filtering .nav-group.collapsed .g-chev { transform: none; }
 
 .nav-item {
   display: flex;
@@ -684,7 +789,11 @@ input[type="range"]:active::-webkit-slider-thumb { transform: scale(1.14); }
 /* ---------------------------------- 窄窗口 */
 @media (max-width: 900px) {
   :root { --sidebar-w: 64px; }
-  .nav-item { justify-content: center; padding: 0; }
+  .nav-search, .nav-group-head { display: none; }
+  .nav-scroll { align-items: center; }
+  .nav-group, .nav-group + .nav-group { width: 100%; margin-top: 0; align-items: center; }
+  .nav-group.collapsed .nav-item { display: flex; }
+  .nav-item { justify-content: center; padding: 0; width: 100%; }
   .nav-item span.tx, .nav-item .badge { display: none; }
   .account-chip .who { display: none; }
   .stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
