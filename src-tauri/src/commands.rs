@@ -30,6 +30,9 @@ pub struct Bootstrap {
     pub installed: Vec<InstalledVersion>,
     pub java: Vec<JavaInstall>,
     pub running: bool,
+    /// macOS 从 DMG / 下载目录直接打开时，系统会把 app 放到随机只读路径（App Translocation）。
+    /// 这种状态下启动更慢，自动更新也无法替换，需要提示用户拖进「应用程序」。
+    pub translocated: bool,
 }
 
 fn platform_label() -> String {
@@ -87,8 +90,13 @@ pub fn bootstrap(state: State<'_, ConfigState>, tier: State<'_, glass::TierState
         glass_hint: tier_now,
         dwm_round: glass::dwm_rounded(),
         installed: manifest::scan_installed(),
-        java: java::installed(&cfg.java_path),
+        // Java 检测要启动多个 JVM 读版本，冷启动可能几百毫秒到数秒。
+        // 首屏先返回空列表，前端渲染完再异步调 list_java 补上。
+        java: Vec::new(),
         running: game::is_running(),
+        translocated: std::env::current_exe()
+            .map(|p| p.to_string_lossy().contains("AppTranslocation"))
+            .unwrap_or(false),
         active_account: active,
         accounts,
         config: cfg,
@@ -146,9 +154,12 @@ pub async fn list_remote(
 }
 
 #[tauri::command]
-pub fn list_java(state: State<'_, ConfigState>) -> Vec<JavaInstall> {
+pub async fn list_java(state: State<'_, ConfigState>) -> Result<Vec<JavaInstall>, String> {
     let cfg = state.0.lock().unwrap().clone();
-    java::installed(&cfg.java_path)
+    // 放到阻塞线程池，别占用处理 UI 请求的线程
+    tauri::async_runtime::spawn_blocking(move || java::installed(&cfg.java_path))
+        .await
+        .map_err(|e| format!("Java 检测失败：{e}"))
 }
 
 /// 只构建命令不启动，用于界面展示「这一版会怎么启动」。

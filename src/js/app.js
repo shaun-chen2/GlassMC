@@ -16,7 +16,7 @@
 
   // ---------------------------------------------------------------- mock
   const MOCK_STATE = {
-    version: '1.4.2',
+    version: '1.4.3',
     dataRoot: '/Users/demo/Library/Application Support/GlassMC',
     gameDir: '/Users/demo/Library/Application Support/GlassMC/minecraft',
     os: 'osx',
@@ -272,7 +272,8 @@
     remoteLoading: false,
     remoteShown: 200,
     update: null,
-    logOpen: false
+    logOpen: false,
+    javaLoading: false
   };
 
   // ---------------------------------------------------------------- 工具
@@ -355,10 +356,12 @@
     $('#env-source').title = S.config.downloadBase;
     $('#env-glass').textContent = b.glassHint === 'liquid' ? t('app.chrome.glass_liquid') : t('app.chrome.glass_frosted');
     const j = b.java && b.java[0];
-    $('#env-java').textContent = j ? 'Java ' + j.version + ' · ' + j.vendor : t('app.chrome.java_none');
+    $('#env-java').textContent = S.javaLoading
+      ? t('app.chrome.detecting')
+      : j ? 'Java ' + j.version + ' · ' + j.vendor : t('app.chrome.java_none');
     $('#nav-badge-versions').textContent = String(b.installed.length);
     $('#stat-versions').textContent = String(b.installed.length);
-    $('#stat-java').textContent = String((b.java || []).length);
+    $('#stat-java').textContent = S.javaLoading ? '—' : String((b.java || []).length);
     $('#stat-mem').textContent = (S.config.memoryGb || 0).toFixed(0) + 'G';
     renderAccountChip();
   }
@@ -633,8 +636,12 @@
     if (quit) quit.checked = !!c.quitOnClose;
 
     const list = S.boot.java || [];
-    $('#java-count').textContent = t('app.settings.java_count', { n: list.length });
-    $('#java-list').innerHTML = list.length
+    $('#java-count').textContent = S.javaLoading
+      ? t('app.chrome.detecting')
+      : t('app.settings.java_count', { n: list.length });
+    $('#java-list').innerHTML = S.javaLoading
+      ? '<div class="empty"><span class="big-ico">◌</span><span>' + t('app.chrome.detecting') + '</span></div>'
+      : list.length
       ? list
           .map(
             (j, i) => `
@@ -655,15 +662,24 @@
   }
 
   // ---------------------------------------------------------------- 渲染：全部
-  function renderAll() {
+  function renderAll(deferFeatures = false) {
     renderChrome();
     renderHome();
     renderVersions();
     renderRemote();
     renderSettings();
     syncToggleScheme();
-    // 账号页与模组页由 features.js 接管（带皮肤头像、Modrinth 等）
-    if (window.__GM_ON_RENDER) window.__GM_ON_RENDER();
+    // 账号页与模组页由 features.js 接管（带皮肤头像、Modrinth 等）。
+    // 首屏先让这几块基础内容上屏，功能页延后一帧，避免几十个卡片抢首帧。
+    if (window.__GM_ON_RENDER) {
+      if (deferFeatures) {
+        const run = () => window.__GM_ON_RENDER();
+        if (window.requestAnimationFrame) requestAnimationFrame(() => setTimeout(run, 0));
+        else setTimeout(run, 30);
+      } else {
+        window.__GM_ON_RENDER();
+      }
+    }
   }
 
   // ---------------------------------------------------------------- 页面切换
@@ -1069,15 +1085,52 @@
   }
 
   // ---------------------------------------------------------------- 启动
+
+  let javaLoadToken = 0;
+
+  /** 首屏之后再扫描 Java，避免几个 JVM 的冷启动拖慢窗口出现。 */
+  async function loadJava() {
+    if (!IS_TAURI) {
+      S.javaLoading = false;
+      return;
+    }
+    const token = ++javaLoadToken;
+    S.javaLoading = true;
+    try {
+      const list = await invoke('list_java');
+      if (token !== javaLoadToken) return;
+      S.boot.java = list || [];
+    } catch (e) {
+      console.warn('[GlassMC] Java 检测失败', e);
+    } finally {
+      if (token === javaLoadToken) {
+        S.javaLoading = false;
+        renderAll();
+      }
+    }
+  }
+
+  function hideSplash() {
+    const el = document.getElementById('boot-splash');
+    if (!el || el.dataset.done) return;
+    el.dataset.done = '1';
+    requestAnimationFrame(() => {
+      el.classList.add('done');
+      setTimeout(() => el.remove(), 420);
+    });
+  }
+
   async function boot() {
     try {
       S.boot = await invoke('bootstrap');
     } catch (e) {
+      hideSplash();
       toast(t('app.toast.boot_failed', { msg: e }), 'err');
       console.error(e);
       return;
     }
     S.config = S.boot.config;
+    S.javaLoading = IS_TAURI;
     S.installed = S.boot.installed || [];
     S.running = !!S.boot.running;
 
@@ -1094,8 +1147,11 @@
 
     applyTheme();
     applyAlpha();
-    renderAll();
+    renderAll(true);
     bind();
+    hideSplash();
+    // Java 检测放在首帧之后，不阻塞窗口与首页内容
+    setTimeout(loadJava, 30);
 
     if (S.running) {
       setRunning(true, t('app.log.running'));
@@ -1103,6 +1159,10 @@
     }
 
     if (!S.running) setRunning(false);
+
+    if (S.boot.translocated) {
+      toast(t('app.boot.translocated'), 'err');
+    }
 
     await listen('game-log', (ev) => appendLog(ev.payload.stream, ev.payload.line));
     await listen('game-exit', (ev) => {

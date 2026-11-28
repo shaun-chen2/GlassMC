@@ -3,6 +3,8 @@
 window.GM.i18n.add('zh-CN', {
   // ---- 顶栏 / 环境信息
   'app.chrome.detecting': '检测中…',
+  'app.boot.starting': '正在启动 GlassMC…',
+  'app.boot.translocated': '正在从下载目录运行，首次启动会更慢，自动更新也无法替换。请把 GlassMC 拖进「应用程序」后再打开。',
   'app.chrome.glass_liquid': '液态玻璃',
   'app.chrome.glass_frosted': '磨砂',
   'app.chrome.java_none': '未检测到',
@@ -118,6 +120,8 @@ window.GM.i18n.add('zh-CN', {
 window.GM.i18n.add('en-US', {
   // ---- 顶栏 / 环境信息
   'app.chrome.detecting': 'Detecting…',
+  'app.boot.starting': 'Starting GlassMC…',
+  'app.boot.translocated': 'Running from the Downloads folder. First launch is slower and auto-update cannot replace the app. Please drag GlassMC into Applications and open it there.',
   'app.chrome.glass_liquid': 'Liquid glass',
   'app.chrome.glass_frosted': 'Frosted',
   'app.chrome.java_none': 'Not detected',

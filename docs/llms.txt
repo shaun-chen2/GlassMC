@@ -6,7 +6,7 @@ GlassMC 是一个直接面向最终用户的桌面应用（不是模组加载器
 
 ## 核心事实
 
-- 当前版本：1.4.2
+- 当前版本：1.4.3
 - 平台：macOS 15+（Apple Silicon 与 Intel 共用一个 Universal 包）、Windows 10 1809+ / 11（x64，需要 WebView2）、Linux（需要 WebKitGTK 4.1）
 - 技术栈：Rust 后端 + Tauri 2 + 无构建的静态前端（HTML / CSS / 原生 JS）
 - 许可：GPLv3

@@ -14,6 +14,14 @@ if (/Windows/i.test(navigator.userAgent)) document.documentElement.dataset.os = 
 </head>
 <body>
 
+<!-- 首帧占位：窗口一出现就有反馈，避免冷启动时先看到一块空玻璃 -->
+<div class="boot-splash" id="boot-splash" aria-hidden="true">
+  <div class="boot-inner">
+    <span class="boot-spinner"></span>
+    <span class="boot-text" data-i18n="app.boot.starting">正在启动 GlassMC…</span>
+  </div>
+</div>
+
 <!-- 自定义背景图：压在玻璃窗口下面，pointer-events 关掉，不挡任何点击 -->
 <div class="bg-layer" id="bg-layer" aria-hidden="true"></div>
 

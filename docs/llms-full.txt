@@ -1,14 +1,14 @@
 # GlassMC 全文语料
 
 > 站点：https://glassmc.shuan.uk/
-> 内容更新时间：2026-11-25（由 Scripts/gen-geo.py 自动生成）
+> 内容更新时间：2026-11-28（由 Scripts/gen-geo.py 自动生成）
 > 内容：介绍页正文 + 仓库内技术文档。许可 GPLv3。
 
 ---
 
 # 一、介绍页正文
 
-macOS · Windows · Linux | v1.4.2 | 约 10 MB
+macOS · Windows · Linux | v1.4.3 | 约 10 MB
 
 # GlassMC
 
@@ -31,7 +31,7 @@ macOS · Windows · Linux | v1.4.2 | 约 10 MB
 
 ## 下载
 
-GlassMC 1.4.2 · macOS 15+ · Windows 10+ · Linux · `GPLv3` 开源
+GlassMC 1.4.3 · macOS 15+ · Windows 10+ · Linux · `GPLv3` 开源
 
 ↓ macOS · dmg 约 10 MB Windows · exe 约 3 MB Linux · deb 约 3.4 MB
 

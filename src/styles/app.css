@@ -208,6 +208,42 @@ body {
   min-height: 0;
 }
 
+
+/* ---------------------------------- 首帧占位 */
+.boot-splash {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: grid;
+  place-items: center;
+  background: rgba(6, 11, 20, .94);
+  color: #dbe7f6;
+  transition: opacity .34s ease, visibility .34s ease;
+}
+html[data-theme="light"] .boot-splash { background: rgba(244, 248, 253, .94); color: #1a2636; }
+.boot-splash.done { opacity: 0; visibility: hidden; pointer-events: none; }
+.boot-inner {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 13px 18px;
+  border: 1px solid rgba(255, 255, 255, .12);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, .05);
+}
+html[data-theme="light"] .boot-inner { border-color: rgba(20, 35, 55, .12); background: rgba(255, 255, 255, .6); }
+.boot-spinner {
+  width: 15px;
+  height: 15px;
+  flex: none;
+  border: 2px solid rgba(127, 211, 160, .25);
+  border-top-color: #7fd3a0;
+  border-radius: 50%;
+  animation: bootSpin .8s linear infinite;
+}
+.boot-text { font-size: 12.5px; letter-spacing: .02em; }
+@keyframes bootSpin { to { transform: rotate(360deg); } }
+
 /* ---------------------------------- 侧边栏 */
 .sidebar {
   width: var(--sidebar-w);
